@@ -603,13 +603,9 @@ export default function App() {
 
         <footer className="mt-auto border-t bg-background/80">
           <div
-            className={`${containerClass} flex flex-col gap-2 py-4 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between`}
+            className={`${containerClass} flex items-center justify-center py-4 text-xs text-muted-foreground`}
           >
-            <span>May the dice be with you.</span>
-            <span>
-              {state.players.length}{" "}
-              {state.players.length === 1 ? "player" : "players"}
-            </span>
+            <span className="text-center">May the dice be with you.</span>
           </div>
         </footer>
       </div>
