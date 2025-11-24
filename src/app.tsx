@@ -299,4 +299,355 @@ export default function App() {
           >
             <DialogTrigger asChild>
               <Button
-{
+                variant="outline"
+                size="icon"
+                aria-label="Open leaderboard"
+              >
+                <Trophy className="h-4 w-4" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Leaderboard</DialogTitle>
+                <DialogDescription>
+                  Highlights from the current session
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  {topThree.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      No players yet. Add someone to get started.
+                    </p>
+                  ) : (
+                    topThree.map((player, index) => (
+                      <div
+                        key={player.id}
+                        className="flex items-center justify-between rounded-md bg-card/80 px-3 py-2 shadow-sm"
+                      >
+                        <span className="flex items-center gap-2 text-sm font-medium">
+                          {["🥇", "🥈", "🥉"][index]} {player.name}
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                          {player.score} pts
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
+                {remainingLeaderboard.length > 0 && (
+                  <div className="space-y-1">
+                    {remainingLeaderboard.map((player, index) => (
+                      <div
+                        key={player.id}
+                        className="flex items-center justify-between rounded-md bg-muted/40 px-3 py-1.5 text-xs shadow-sm"
+                      >
+                        <span className="flex items-center gap-2">
+                          🎲 {index + 4} — {player.name}
+                        </span>
+                        <span className="text-muted-foreground">
+                          {player.score}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-between">
+                <Button
+                  onClick={() => {
+                    void handleShare();
+                  }}
+                  variant="secondary"
+                  className="w-full sm:w-auto"
+                >
+                  <Share2 className="mr-2 h-4 w-4" /> Share
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  onClick={() => setIsResetDialogOpen(true)}
+                >
+                  <RefreshCw className="mr-2 h-4 w-4" /> Reset scores
+                </Button>
+                <DialogClose asChild>
+                  <Button className="w-full sm:w-auto">OK</Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleQuickAdd}
+            aria-label="Add player"
+            className="shrink-0"
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => {
+              void handleShare();
+            }}
+            aria-label="Share session"
+            className="shrink-0"
+          >
+            <Share2 className="h-4 w-4" />
+          </Button>
+
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setIsClearDialogOpen(true)}
+            aria-label="Clear session"
+            className="shrink-0"
+          >
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+
+          <ThemeToggle />
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-dvh bg-background text-foreground">
+      <div className="safe-area flex w-full min-h-dvh flex-col">
+        <header className="sticky top-0 z-20 bg-background/80 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/70">
+          <div className={containerClass}>{renderHeaderContent()}</div>
+        </header>
+
+        {(!isOnline || showInstallBanner) && (
+          <div className={`${containerClass} mt-3`}>
+            <div className="rounded-lg bg-card p-4 text-card-foreground shadow-md">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="space-y-2 text-sm">
+                  {!isOnline && (
+                    <p className="font-medium text-destructive">
+                      You are offline. Changes are saved locally and will sync
+                      when you reconnect.
+                    </p>
+                  )}
+                  {showInstallBanner && (
+                    <p className="font-medium">
+                      Install GG Counter for quicker access and offline support.
+                    </p>
+                  )}
+                </div>
+                <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:flex-nowrap">
+                  {showInstallBanner && (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={handleInstallRequest}
+                      className="w-full sm:w-auto"
+                    >
+                      <Download className="mr-2 h-4 w-4" /> Install app
+                    </Button>
+                  )}
+                  {showInstallBanner && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setInstallDismissed(true)}
+                      className="w-full sm:w-auto"
+                    >
+                      Dismiss
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <main className="flex-1">
+          <div className={`${containerClass} flex flex-col gap-6 py-6`}>
+            {!hasPlayers && addPlayerCard}
+
+            {hasPlayers && (
+              <>
+                <section className="grid grid-cols-1 justify-items-center gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                  {state.players.map((player) => (
+                    <PlayerCard
+                      key={player.id}
+                      player={player}
+                      isLeader={leaderId === player.id}
+                      onRename={renamePlayer}
+                      onRemove={removePlayer}
+                      onAdjust={adjustScore}
+                      className="max-w-xs sm:max-w-sm"
+                    />
+                  ))}
+                </section>
+                <div className="mt-2 w-full">{addPlayerCard}</div>
+              </>
+            )}
+
+            <div ref={leaderboardCardRef} className={sharedCardWidth}>
+              <Card className="border-0 shadow-lg">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                    <Trophy className="h-4 w-4" /> Leaderboard
+                  </CardTitle>
+                  {summary.leader ? (
+                    <span className="text-sm font-medium text-primary">
+                      {summary.leader.name}
+                    </span>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">
+                      No players yet
+                    </span>
+                  )}
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="space-y-2">
+                    {topThree.length === 0 ? (
+                      <CardDescription>
+                        Add players to populate the leaderboard.
+                      </CardDescription>
+                    ) : (
+                      topThree.map((player, index) => (
+                        <div
+                          key={player.id}
+                          className="flex items-center justify-between rounded-md bg-card/80 px-3 py-2 shadow-sm"
+                        >
+                          <span className="flex items-center gap-2 text-sm font-medium">
+                            {["🥇", "🥈", "🥉"][index]} {player.name}
+                          </span>
+                          <span className="text-sm text-muted-foreground">
+                            {player.score} pts
+                          </span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  {remainingLeaderboard.length > 0 && (
+                    <div className="grid gap-1 text-xs text-muted-foreground">
+                      {remainingLeaderboard.map((player, index) => (
+                        <div
+                          key={player.id}
+                          className="flex items-center justify-between rounded-md bg-muted/40 px-3 py-1 shadow-sm"
+                        >
+                          <span>
+                            {index + 4}. {player.name}
+                          </span>
+                          <span>{player.score}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+                <CardFooter className="flex flex-wrap items-center gap-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => {
+                      void handleShare();
+                    }}
+                    disabled={sortedPlayers.length === 0}
+                    className="w-full sm:w-auto"
+                  >
+                    <Share2 className="mr-2 h-4 w-4" /> Share
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsResetDialogOpen(true)}
+                    disabled={sortedPlayers.length === 0}
+                    className="w-full sm:w-auto"
+                  >
+                    <RefreshCw className="mr-2 h-4 w-4" /> Reset scores
+                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="w-full sm:w-auto"
+                      >
+                        Clear session
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Clear session?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This deletes all players and scores. You cannot undo
+                          this action.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          onClick={resetGame}
+                        >
+                          Clear
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </CardFooter>
+              </Card>
+            </div>
+          </div>
+        </main>
+
+        <footer className="mt-auto border-t bg-background/80">
+          <div
+            className={`${containerClass} flex flex-col gap-2 py-4 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between`}
+          >
+            <span>May the dice be with you.</span>
+            <span>
+              {state.players.length}{" "}
+              {state.players.length === 1 ? "player" : "players"}
+            </span>
+          </div>
+        </footer>
+      </div>
+
+      <AlertDialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reset all scores?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will set every player's score to zero without removing
+              players.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleResetConfirm}>
+              Reset
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <AlertDialog open={isClearDialogOpen} onOpenChange={setIsClearDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Clear session?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This removes all players and scores. You cannot undo this action.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={handleClearConfirm}
+            >
+              Clear
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}
