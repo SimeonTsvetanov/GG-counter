@@ -45,7 +45,7 @@ import {
 } from "lucide-react";
 import meepleIconUrl from "../meeple-plus.svg?url";
 
-const maxPlayers = 16;
+// no hard limit on players
 
 export default function App() {
   const {
@@ -68,7 +68,7 @@ export default function App() {
   const [isLeaderboardInView, setIsLeaderboardInView] = useState(true);
 
   const leaderId = summary.leader?.id ?? null;
-  const remainingSlots = maxPlayers - state.players.length;
+  const playerCount = state.players.length;
   const showInstallBanner = canInstall && !isInstalled && !installDismissed;
   const containerClass = "mx-auto w-full max-w-5xl px-0 sm:px-4 lg:px-8";
   const sortedPlayers = useMemo(
@@ -103,10 +103,6 @@ export default function App() {
   }, [isInstalled]);
 
   const handleAddPlayer = () => {
-    if (remainingSlots <= 0) {
-      return;
-    }
-
     const trimmed = newPlayerName.trim();
     if (trimmed.length === 0) {
       return;
@@ -225,7 +221,7 @@ export default function App() {
             Add Player
           </CardTitle>
           <span className="text-xs text-muted-foreground">
-            {state.players.length}/{maxPlayers}
+            {state.players.length} players
           </span>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -235,34 +231,22 @@ export default function App() {
               value={newPlayerName}
               onChange={(event) => setNewPlayerName(event.target.value)}
               onKeyDown={(event) => {
-                if (event.key === "Enter" && remainingSlots > 0) {
+                if (event.key === "Enter") {
                   handleAddPlayer();
                 }
               }}
               placeholder="Player Name"
               aria-label="Player name"
-              disabled={remainingSlots <= 0}
               className="flex-1 min-w-0"
             />
-            <Button
-              onClick={handleAddPlayer}
-              disabled={remainingSlots <= 0}
-              className="w-full sm:w-auto"
-            >
+            <Button onClick={handleAddPlayer} className="w-full sm:w-auto">
               Add
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">Player name</p>
-          {remainingSlots <= 0 ? (
-            <p className="text-xs text-muted-foreground">
-              You have reached the maximum number of players.
-            </p>
-          ) : (
-            <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-              {remainingSlots} open {remainingSlots === 1 ? "slot" : "slots"}{" "}
-              remaining
-            </p>
-          )}
+          <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+            {playerCount} players
+          </p>
         </CardContent>
       </Card>
     </div>

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useReducer } from "react";
 import { clearState, loadState, saveState } from "../lib/storage";
 import type { GameState, Player } from "../types";
 
-const MAX_PLAYERS = 16;
+// no hard maximum for players
 
 type GameAction =
   | { type: "add-player"; name: string }
@@ -33,9 +33,6 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       return action.state;
     }
     case "add-player": {
-      if (state.players.length >= MAX_PLAYERS) {
-        return state;
-      }
       const nextIndex = state.players.length + 1;
       const player = createPlayer(ensurePlayerName(action.name, nextIndex));
       return {
