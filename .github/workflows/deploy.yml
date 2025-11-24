@@ -35,6 +35,21 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Validate repository index.html
+        run: |
+          echo "Checking index.html for accidental built assets or placeholders..."
+          if grep -q '/GG-counter/assets/' index.html 2>/dev/null || grep -q '%BASE_URL%' index.html 2>/dev/null; then
+            echo "ERROR: index.html contains built asset paths or %BASE_URL% placeholders.\nPlease keep the dev Vite template in the repo (script -> /src/main.tsx) and avoid committing built files. Revert index.html and push again." >&2
+            echo "--- index.html snippet ---"
+            sed -n '1,120p' index.html || true
+            exit 1
+          fi
+          if ! grep -q '/src/main.tsx' index.html 2>/dev/null; then
+            echo "ERROR: index.html does not reference /src/main.tsx. Restore the Vite template index.html before building." >&2
+            sed -n '1,120p' index.html || true
+            exit 1
+          fi
+
       - name: Build project
         run: npm run build
 
