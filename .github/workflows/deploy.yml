@@ -37,9 +37,10 @@ jobs:
 
       - name: Validate repository index.html
         run: |
-          echo "Checking index.html for accidental built assets or placeholders..."
-          if grep -q '/GG-counter/assets/' index.html 2>/dev/null || grep -q '%BASE_URL%' index.html 2>/dev/null; then
-            echo "ERROR: index.html contains built asset paths or %BASE_URL% placeholders.\nPlease keep the dev Vite template in the repo (script -> /src/main.tsx) and avoid committing built files. Revert index.html and push again." >&2
+          echo "Checking index.html for accidental built assets..."
+          # Fail only if repo contains concrete built asset paths (from previous dist) that would break the build.
+          if grep -q '/GG-counter/assets/' index.html 2>/dev/null || grep -q '/GG-counter/registerSW.js' index.html 2>/dev/null; then
+            echo "ERROR: index.html contains built asset paths (e.g. /GG-counter/assets/) which should not be committed.\nPlease keep the dev Vite template in the repo (script -> /src/main.tsx) and avoid committing built files. Revert index.html and push again." >&2
             echo "--- index.html snippet ---"
             sed -n '1,120p' index.html || true
             exit 1
