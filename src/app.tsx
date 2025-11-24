@@ -259,8 +259,8 @@ export default function App() {
   const renderHeaderContent = () => {
     if (isLeaderboardInView) {
       return (
-        <div className="flex flex-col gap-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:py-4">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between gap-3 py-3">
+          <div className="flex items-center gap-3 min-w-0">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
               <LayoutList className="h-5 w-5" aria-hidden />
             </div>
@@ -273,7 +273,7 @@ export default function App() {
               </p>
             </div>
           </div>
-          <div className="flex w-full justify-end sm:w-auto">
+          <div className="flex-shrink-0">
             <ThemeToggle />
           </div>
         </div>
@@ -472,19 +472,21 @@ export default function App() {
 
             {hasPlayers && (
               <>
-                <section className="grid grid-cols-1 justify-items-center gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-                  {state.players.map((player) => (
-                    <PlayerCard
-                      key={player.id}
-                      player={player}
-                      isLeader={leaderId === player.id}
-                      onRename={renamePlayer}
-                      onRemove={removePlayer}
-                      onAdjust={adjustScore}
-                      className="max-w-xs sm:max-w-sm"
-                    />
-                  ))}
-                </section>
+                <div className="mx-auto w-full max-w-lg sm:max-w-none">
+                  <section className="grid grid-cols-2 justify-items-center gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                    {state.players.map((player) => (
+                      <PlayerCard
+                        key={player.id}
+                        player={player}
+                        isLeader={leaderId === player.id}
+                        onRename={renamePlayer}
+                        onRemove={removePlayer}
+                        onAdjust={adjustScore}
+                        className="w-full"
+                      />
+                    ))}
+                  </section>
+                </div>
                 <div className="mt-2 w-full">{addPlayerCard}</div>
               </>
             )}
