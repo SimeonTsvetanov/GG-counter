@@ -371,7 +371,9 @@ export default function App() {
               </div>
               <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-between">
                 <Button
-                  onClick={handleShare}
+                  onClick={() => {
+                    void handleShare();
+                  }}
                   variant="secondary"
                   className="w-full sm:w-auto"
                 >
@@ -404,7 +406,9 @@ export default function App() {
           <Button
             variant="outline"
             size="icon"
-            onClick={handleShare}
+            onClick={() => {
+              void handleShare();
+            }}
             aria-label="Share session"
             className="shrink-0"
           >
@@ -559,7 +563,9 @@ export default function App() {
                   <Button
                     variant="secondary"
                     size="sm"
-                    onClick={handleShare}
+                    onClick={() => {
+                      void handleShare();
+                    }}
                     disabled={sortedPlayers.length === 0}
                     className="w-full sm:w-auto"
                   >
