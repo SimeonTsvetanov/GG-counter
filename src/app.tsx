@@ -605,7 +605,14 @@ export default function App() {
           <div
             className={`${containerClass} flex items-center justify-center py-4 text-xs text-muted-foreground`}
           >
-            <span className="text-center">May the dice be with you.</span>
+            <a
+              href="https://buymeacoffee.com/simeontsvetanov"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-center hover:text-foreground transition-colors"
+            >
+              If you support me &quot;May the dice be with you&quot;
+            </a>
           </div>
         </footer>
       </div>
