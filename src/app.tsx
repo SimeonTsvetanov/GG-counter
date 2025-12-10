@@ -273,7 +273,120 @@ export default function App() {
               </p>
             </div>
           </div>
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 flex items-center gap-2">
+            <Dialog
+              open={isLeaderboardDialogOpen}
+              onOpenChange={setIsLeaderboardDialogOpen}
+            >
+              <DialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Open leaderboard"
+                >
+                  <Trophy className="h-4 w-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Leaderboard</DialogTitle>
+                  <DialogDescription>
+                    Highlights from the current session
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    {topThree.length === 0 ? (
+                      <p className="text-sm text-muted-foreground">
+                        No players yet. Add someone to get started.
+                      </p>
+                    ) : (
+                      topThree.map((player, index) => (
+                        <div
+                          key={player.id}
+                          className="flex items-center justify-between rounded-md bg-card/80 px-3 py-2 shadow-sm"
+                        >
+                          <span className="flex items-center gap-2 text-sm font-medium">
+                            {["🥇", "🥈", "🥉"][index]} {player.name}
+                          </span>
+                          <span className="text-sm text-muted-foreground">
+                            {player.score} pts
+                          </span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  {remainingLeaderboard.length > 0 && (
+                    <div className="space-y-1">
+                      {remainingLeaderboard.map((player, index) => (
+                        <div
+                          key={player.id}
+                          className="flex items-center justify-between rounded-md bg-muted/40 px-3 py-1.5 text-xs shadow-sm"
+                        >
+                          <span className="flex items-center gap-2">
+                            🎲 {index + 4} — {player.name}
+                          </span>
+                          <span className="text-muted-foreground">
+                            {player.score}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-between">
+                  <Button
+                    onClick={() => {
+                      void handleShare();
+                    }}
+                    variant="secondary"
+                    className="w-full sm:w-auto"
+                  >
+                    <Share2 className="mr-2 h-4 w-4" /> Share
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full sm:w-auto"
+                    onClick={() => setIsResetDialogOpen(true)}
+                  >
+                    <RefreshCw className="mr-2 h-4 w-4" /> Reset scores
+                  </Button>
+                  <DialogClose asChild>
+                    <Button className="w-full sm:w-auto">OK</Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleQuickAdd}
+              aria-label="Add player"
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                void handleShare();
+              }}
+              aria-label="Share session"
+            >
+              <Share2 className="h-4 w-4" />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsClearDialogOpen(true)}
+              aria-label="Clear session"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+
             <ThemeToggle />
           </div>
         </div>
