@@ -15,8 +15,7 @@ Offline score tracker for board-game nights — a free micro-app by Simeon "Moni
   the area, then only the chapters it points to; agents are in `plugins/*/agents/*.md`.
 - React stays (DECISIONS 2026-11-19): `engineering` → react, only the parts this app needs.
 - Run `pnpm verify` before saying "done"; keep working while it fails. Never weaken a lint rule or
-  a test to get green; the only lint exception is the dated size-rule block in `eslint.config.js`
-  (removed in PLAN T-05).
+  a test to get green (the temporary size-rule block was removed in PLAN T-05).
 - The e2e tests in `tests/e2e/` are characterization tests of the pre-forge behaviour — a change
   that breaks one is a behaviour change and needs a SPEC/DECISIONS entry first.
 - Saved data: `localStorage` keys `gg-counter/state` and `gg-counter-theme` are read by installed
@@ -24,14 +23,17 @@ Offline score tracker for board-game nights — a free micro-app by Simeon "Moni
 - Moni corrects/dislikes something → apply it and add an entry to `LEARNINGS.md`.
 - Decisions → `docs/DECISIONS.md` (date · decision · reason) the same day. Update `STATUS.md` (≤ 30 lines).
 
-## Where things are (workspace since PLAN T-04)
+## Where things are (workspace since PLAN T-04, features since T-05)
 ```
-packages/core   gg-counter-core (private) — pure score logic + Vitest/fast-check tests; no DOM/storage/network
-app/            gg-counter-app — the React PWA (Vite): src/app.tsx (main screen), src/components/,
-                src/hooks/ (use-game-state wraps core), src/lib/storage.ts (I/O only), src/providers/;
-                src/components/ui/ = vendored shadcn/Radix. Imports core by name (`gg-counter-core`).
+packages/core   gg-counter-core (private) — pure score logic + Vitest/fast-check tests; no DOM/storage/network;
+                test/fixtures/ = saved-state fixtures (also imported by tests/e2e)
+app/            gg-counter-app — the React PWA (Vite): src/app.tsx (composition root), feature folders
+                src/players/, src/leaderboard/, src/session/ (header, action bar, confirmations), src/share/;
+                src/components/ (theme toggle, status banner), src/hooks/ (use-game-state wraps core),
+                src/lib/ (storage I/O, layout classes), src/providers/; src/components/ui/ = vendored shadcn/Radix.
+                Imports core by name (`gg-counter-core`).
 app/public/     icons, favicon             tests/e2e     Playwright (desktop + phone, Chromium)
-tests/fixtures  saved-state fixtures       docs/         SPEC, PLAN, DECISIONS, migration baseline
+docs/           SPEC, PLAN, DECISIONS, migration baseline
 app/vite.config.ts  base `/GG-counter/` in production, PWA manifest (id `gg-counter-pwa-v1`)
 ```
 

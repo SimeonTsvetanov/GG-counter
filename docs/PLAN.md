@@ -61,7 +61,7 @@
 - Reading list: engineering → react §2, structure §4–5.
 - Acceptance: `structure-check` and lint green; T-01 tests green; screenshots before/after identical; the temporary size-rule block in `eslint.config.js` (added in T-03 for `app.tsx` and `player-card.tsx`; paths updated by T-04) is deleted.
 - Depends on: T-04
-- [ ] done
+- [x] done — `app.tsx` (747 lines) → 117-line composition root + `players/`, `leaderboard/`, `session/`, `share/` (score dialog lives in `players/`; no `scores/` folder needed); one action bar, one leaderboard dialog and one clear-session dialog instead of copies; size-rule block deleted; saved-state fixtures moved to `packages/core/test/fixtures/` (shared with e2e); 44 before/after screenshots (390×844 + 1280×800, light + dark) byte-identical; 16 e2e green (2026-11-19).
 
 ### T-06 · `app.config.ts` + generator (single source of truth)
 - Goal: head/meta/OG, canonical, JSON-LD, manifest, sitemap, llms.txt, 404 from one config; **static HTML carries the h1, the answer sentence, steps and FAQ** (crawlers see text without JavaScript); base path `/GG-counter/` set explicitly.

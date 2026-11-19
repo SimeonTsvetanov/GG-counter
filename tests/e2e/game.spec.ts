@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { DIRTY_STATE, NULL_ENTRY_STATE, STATE_KEY, THEME_KEY, V0_STATE, V1_STATE } from "../fixtures/saved-state";
+import { DIRTY_STATE, NULL_ENTRY_STATE, STATE_KEY, THEME_KEY, V0_STATE, V1_STATE } from "../../packages/core/test/fixtures/saved-state";
 
 // Characterization tests: they describe what GG Counter did before the forge migration
 // (docs/SPEC.md AC1–AC8) and must stay green through every migration step.

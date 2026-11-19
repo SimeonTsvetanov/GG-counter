@@ -1,8 +1,8 @@
 // Reading the saved game exactly as the pre-forge app did (SPEC F7, AC7): example tests with the real
-// shapes from tests/fixtures plus fast-check properties (never throws, output valid, idempotent).
+// shapes from ./fixtures (shared with tests/e2e) plus fast-check properties (never throws, output valid, idempotent).
 import { describe, expect, it } from "vitest";
 import fc from "fast-check";
-import { DIRTY_STATE, NULL_ENTRY_STATE, V0_STATE, V1_STATE } from "../../../tests/fixtures/saved-state.ts";
+import { DIRTY_STATE, NULL_ENTRY_STATE, V0_STATE, V1_STATE } from "./fixtures/saved-state.ts";
 import { GAME_VERSION, parseSavedState, type GameState } from "../src/index.ts";
 
 const NOW = "2026-11-19T10:00:00.000Z";
