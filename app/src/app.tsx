@@ -15,7 +15,8 @@ import { ClearSessionDialog } from "./session/clear-session-dialog";
 import { ResetScoresDialog } from "./session/reset-scores-dialog";
 import { shareLeaderboard } from "./share/share-leaderboard";
 import { useTheme } from "./providers/theme-provider";
-import { t } from "./i18n";
+import { applyLanguage, t } from "./i18n";
+import { useLanguage } from "./i18n/use-language";
 import { AppFooter } from "./ui/app-footer";
 import { CrashTestHook } from "./ui/error-boundary";
 import { ShellDialogs } from "./ui/shell-dialogs";
@@ -26,6 +27,8 @@ const LEADERBOARD_IN_VIEW_THRESHOLD = 0.15;
 
 /** The whole GG Counter screen: players, scores, leaderboard, share, install banner, how it works and FAQ. */
 export function App(): React.JSX.Element {
+  // Re-renders the whole screen (every t() call below) when the language changes in Settings.
+  const lang = useLanguage();
   const game = useGameState();
   const shell = useAppShell();
   const { setTheme } = useTheme();
@@ -38,7 +41,7 @@ export function App(): React.JSX.Element {
   const leaderboardCardRef = useRef<HTMLDivElement>(null);
   const isLeaderboardInView = useInView(leaderboardCardRef, LEADERBOARD_IN_VIEW_THRESHOLD);
   const pageInfoSlotRef = useRef<HTMLDivElement>(null);
-  usePageInfo(pageInfoSlotRef);
+  usePageInfo(pageInfoSlotRef, lang);
 
   const handleShare = () => {
     void shareLeaderboard(game.state.players, () => { setIsLeaderboardDialogOpen(false); });
@@ -121,10 +124,12 @@ export function App(): React.JSX.Element {
         onImported={(data) => {
           game.reloadFromStorage();
           setTheme(data.theme);
+          void applyLanguage(data.lang);
         }}
         onCleared={() => {
           game.reloadFromStorage();
           setTheme("system");
+          void applyLanguage(null);
         }}
       />
       <CrashTestHook />

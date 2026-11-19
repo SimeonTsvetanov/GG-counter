@@ -9,7 +9,7 @@ import { Input } from "../components/ui/input";
 import type { GameStateApi } from "../hooks/use-game-state";
 import { t } from "../i18n";
 import { cn } from "../lib/utils";
-import { limitMessage } from "./limit-message";
+import { limitCode, limitMessage, type LimitCode } from "./limit-message";
 import { RemovePlayerButton } from "./remove-player-button";
 import { ScoreDialog } from "./score-dialog";
 
@@ -34,8 +34,8 @@ export function PlayerCard({
   className,
 }: PlayerCardProps): React.JSX.Element {
   const [name, setName] = useState(player.name);
-  const [nameError, setNameError] = useState<string | null>(null);
-  const [scoreError, setScoreError] = useState<string | null>(null);
+  const [nameError, setNameError] = useState<LimitCode | null>(null);
+  const [scoreError, setScoreError] = useState<LimitCode | null>(null);
   const ids = { name: useId(), score: useId() };
 
   useEffect(() => {
@@ -53,15 +53,15 @@ export function PlayerCard({
     if (trimmed !== player.name) {
       // Like the Add field: a refused name stays in the field with the reason under it.
       const renamed = onRename(player.id, trimmed);
-      setNameError(renamed.ok ? null : limitMessage(renamed.error.code));
+      setNameError(renamed.ok ? null : limitCode(renamed.error.code));
     }
   };
 
-  /** Changes the score by `delta`; returns why core refused it, or null when applied. */
-  const adjust = (delta: number): string | null => {
+  /** Changes the score by `delta`; returns the limit core refused it for, or null when applied (or silently refused). */
+  const adjust = (delta: number): LimitCode | null => {
     const adjusted = onAdjust(player.id, delta);
     if (adjusted.ok) setScoreError(null);
-    return adjusted.ok ? null : limitMessage(adjusted.error.code);
+    return adjusted.ok ? null : limitCode(adjusted.error.code);
   };
 
   return (
@@ -97,7 +97,7 @@ export function PlayerCard({
               onConfirm={() => { onRemove(player.id); }}
             />
           </div>
-          <p id={ids.name} role="alert" className="text-sm font-medium text-destructive">{nameError}</p>
+          <p id={ids.name} role="alert" className="text-sm font-medium text-destructive">{nameError && limitMessage(nameError)}</p>
         </div>
 
         <div>
@@ -123,7 +123,7 @@ export function PlayerCard({
               <Plus className="h-6 w-6" />
             </Button>
           </div>
-          <p id={ids.score} role="alert" className="text-center text-sm font-medium text-destructive">{scoreError}</p>
+          <p id={ids.score} role="alert" className="text-center text-sm font-medium text-destructive">{scoreError && limitMessage(scoreError)}</p>
         </div>
       </CardContent>
     </Card>

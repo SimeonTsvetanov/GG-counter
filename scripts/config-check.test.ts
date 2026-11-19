@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { app as config, type AppConfig } from "../app.config.ts";
+import { app as config, l10n, type AppConfig, type AppText } from "../app.config.ts";
 import { MAX_DESCRIPTION_LENGTH, MAX_TITLE_LENGTH, configProblems } from "./config-check.ts";
 import { pageTitle } from "./seo.ts";
 
@@ -9,7 +9,7 @@ const packageVersion = (JSON.parse(readFileSync(new URL("../package.json", impor
 
 describe("app.config.ts", () => {
   it("meets every rule (title ≤ 60, description ≤ 155, 3–5 steps, 5–7 FAQ, version = package.json)", () => {
-    expect(configProblems(app, { packageVersion })).toEqual([]);
+    expect(configProblems(app, { packageVersion, l10n })).toEqual([]);
     expect(pageTitle(app).length).toBeLessThanOrEqual(MAX_TITLE_LENGTH);
     expect(app.description.length).toBeLessThanOrEqual(MAX_DESCRIPTION_LENGTH);
   });
@@ -40,9 +40,23 @@ describe("configProblems", () => {
       accent: "blue",
       seo: { ...app.seo, contentUpdated: "19.11.2026" },
     };
-    const problems = configProblems(broken, { packageVersion: "9.9.9" });
+    const problems = configProblems(broken, { packageVersion: "9.9.9", l10n });
     for (const fragment of ["kebab-case", "basePath", "package.json", "title has", "description has", "answer does not name", "steps: 1", "faq: 0", "colour \"blue\"", "contentUpdated"]) {
       expect(problems.some((p) => p.includes(fragment)), fragment).toBe(true);
     }
+  });
+
+  it("checks the UI languages: English first, and each other language has all its texts", () => {
+    const bg: AppText = l10n.bg;
+    const reordered: AppConfig = { ...app, languages: ["bg", "en", "bg"] };
+    expect(configProblems(reordered, { packageVersion, l10n })).toEqual(expect.arrayContaining([expect.stringContaining('start with "en"'), "languages has duplicates"]));
+    expect(configProblems(app, { packageVersion, l10n: {} })).toEqual(["l10n.bg is missing"]);
+    const short: AppText = { ...bg, steps: bg.steps.slice(1), faq: [], answer: "Брояч на точки." };
+    expect(configProblems(app, { packageVersion, l10n: { bg: short } })).toEqual([
+      "l10n.bg.steps: 4 items, English has 5",
+      "l10n.bg.faq: 0 items, English has 7",
+      "l10n.bg.answer does not name the app",
+    ]);
+    expect(configProblems({ ...app, languages: ["en"] }, { packageVersion, l10n })).toEqual(["l10n.bg is not in languages"]);
   });
 });

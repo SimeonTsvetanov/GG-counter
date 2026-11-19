@@ -26,8 +26,8 @@ export function PodiumList({ players, empty }: PodiumListProps): React.JSX.Eleme
               <span className="flex items-center gap-2 text-sm font-medium">
                 {MEDALS[index]} {player.name}
               </span>
-              <span className="text-sm text-muted-foreground">
-                {t("app.leaderboard.points", { score: player.score })}
+              <span className="whitespace-nowrap text-sm text-muted-foreground">
+                {t("app.leaderboard.points", { count: player.score })}
               </span>
             </div>
           ))}

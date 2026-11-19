@@ -8,11 +8,12 @@ export const APP_ID: string = __APP_ID__;
 /** The start of every key this app writes. */
 export const KEY_PREFIX = `${APP_ID}:v1:`;
 
-/** The keys written since PLAN T-07: the game, the theme and the one-time migration marker. */
+/** The keys written since PLAN T-07 (game, theme, one-time migration marker) and T-09 (UI language). */
 export const STORAGE_KEYS = {
   state: `${KEY_PREFIX}state`,
   theme: `${KEY_PREFIX}theme`,
   migrated: `${KEY_PREFIX}migrated`,
+  lang: `${KEY_PREFIX}lang`,
 } as const;
 
 /**

@@ -8,7 +8,9 @@ export default defineConfig({
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? "github" : "list",
-  use: { baseURL: LIVE ?? "http://localhost:4173/GG-counter/", trace: "retain-on-failure" },
+  // locale: a fixed browser language, so runs do not depend on the machine; the app starts in English
+  // whatever it is (PLAN T-09, no browser detection — tests/e2e/i18n.spec.ts checks it with bg-BG).
+  use: { baseURL: LIVE ?? "http://localhost:4173/GG-counter/", trace: "retain-on-failure", locale: "en-US" },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"] } },
     { name: "phone", use: { ...devices["Pixel 7"] } },

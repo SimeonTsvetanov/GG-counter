@@ -4,11 +4,17 @@
  * Used by app/vite.config.ts (index.html) and scripts/generate.ts (404.html).
  *
  * The block's Tailwind classes are written out here in full because app/tailwind.config.ts scans
- * this file. The app's `usePageInfo` hook moves the `<section>` below the leaderboard on mount and
- * drops `[data-static-only]` (the h1: the React header has its own) — keep the markers in sync.
+ * this file. The app's `usePageInfo` hook moves the `<section>` below the leaderboard on mount, drops
+ * `[data-static-only]` (the h1: the React header has its own) and translates the parts marked
+ * `data-i18n` (en.ts keys) and `data-text` (app.config texts) — keep the markers in sync. The static
+ * HTML is English only: one English URL for crawlers (seo-geo §2, PLAN T-09).
  */
 import type { AppConfig } from "../app.config.ts";
+import { en } from "../app/src/i18n/en.ts";
 import { escapeHtml } from "./seo.ts";
+
+/** The English texts of the block's headings and label, from the app's dictionary (one source). */
+const PAGE = en.app.page;
 
 /** Returns the steps as `<li>` items. */
 function stepItems(app: AppConfig): string {
@@ -33,15 +39,15 @@ function faqItems(app: AppConfig): string {
  */
 export function pageInfoHtml(app: AppConfig): string {
   return `<div data-page-info class="safe-area">
-      <section aria-label="About ${escapeHtml(app.name)}" class="mx-auto w-full max-w-lg space-y-4 rounded-lg bg-card p-6 text-sm text-card-foreground shadow-md">
+      <section aria-label="${escapeHtml(PAGE.label.replace("{{name}}", app.name))}" data-i18n-aria-label="app.page.label" class="mx-auto w-full max-w-lg space-y-4 rounded-lg bg-card p-6 text-sm text-card-foreground shadow-md">
         <h1 data-static-only class="text-base font-semibold">${escapeHtml(app.name)}</h1>
-        <p class="text-muted-foreground">${escapeHtml(app.answer)}</p>
-        <h2 class="text-base font-semibold">How it works</h2>
-        <ol class="list-decimal space-y-1 pl-5 text-muted-foreground">
+        <p data-text="answer" class="text-muted-foreground">${escapeHtml(app.answer)}</p>
+        <h2 data-i18n="app.page.howItWorks" class="text-base font-semibold">${escapeHtml(PAGE.howItWorks)}</h2>
+        <ol data-text="steps" class="list-decimal space-y-1 pl-5 text-muted-foreground">
           ${stepItems(app)}
         </ol>
-        <h2 class="text-base font-semibold">Frequently asked questions</h2>
-        <div class="space-y-2">
+        <h2 data-i18n="app.page.faq" class="text-base font-semibold">${escapeHtml(PAGE.faq)}</h2>
+        <div data-text="faq" class="space-y-2">
           ${faqItems(app)}
         </div>
       </section>

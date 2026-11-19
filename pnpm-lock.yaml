@@ -226,6 +226,9 @@ importers:
       gg-counter-core:
         specifier: workspace:*
         version: link:../packages/core
+      i18next:
+        specifier: 26.7.2
+        version: 26.7.2(typescript@5.9.2)
       lucide-react:
         specifier: 0.554.0
         version: 0.554.0(react@19.2.0)
@@ -2431,6 +2434,14 @@ packages:
 
   hookified@2.2.0:
     resolution: {integrity: sha512-p/LgFzRN5FeoD3DLS6bkUapeye6E4SI6yJs6KetENd18S+FBthqYq2amJUWpt5z0EQwwHemidjY5OqJGEKm5uA==}
+
+  i18next@26.7.2:
+    resolution: {integrity: sha512-RsOY3BeaCDdkk52NeJSFAXELQ2rQXBO/tOub6L8ue2ICPfR/FRDWDOfEDg4xMPd1SqO5goVYQ6i72qWEUB/PPw==}
+    peerDependencies:
+      typescript: ^5 || ^6 || ^7
+    peerDependenciesMeta:
+      typescript:
+        optional: true
 
   idb@7.1.1:
     resolution: {integrity: sha512-gchesWBzyvGHRO9W8tzUWFDycow5gwjvFKfyV9FF32Y7F50yZMp7mP+T2mJIWFx49zicqyC4uefHM17o6xKIVQ==}
@@ -5902,6 +5913,10 @@ snapshots:
   hookified@1.15.1: {}
 
   hookified@2.2.0: {}
+
+  i18next@26.7.2(typescript@5.9.2):
+    optionalDependencies:
+      typescript: 5.9.2
 
   idb@7.1.1: {}
 

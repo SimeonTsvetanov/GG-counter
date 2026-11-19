@@ -19,7 +19,7 @@ Offline score tracker for board-game nights — a free micro-app by Simeon "Moni
   a test to get green (the temporary size-rule block was removed in PLAN T-05).
 - The e2e tests in `tests/e2e/` are characterization tests of the pre-forge behaviour — a change
   that breaks one is a behaviour change and needs a SPEC/DECISIONS entry first.
-- Saved data: only `app/src/storage/` touches browser storage (ESLint rule). Keys `gg-counter:v1:state|theme|migrated`;
+- Saved data: only `app/src/storage/` touches browser storage (ESLint rule). Keys `gg-counter:v1:state|theme|migrated|last-seen-version|lang`;
   the pre-forge `gg-counter/state` and `gg-counter-theme` are copied once and never written — removal per PLAN T-14.
 - Moni corrects/dislikes something → apply it and add an entry to `LEARNINGS.md`.
 - Decisions → `docs/DECISIONS.md` (date · decision · reason) the same day. Update `STATUS.md` (≤ 30 lines).
@@ -35,14 +35,17 @@ packages/core   gg-counter-core (private) — pure score logic + Vitest/fast-che
 app/            gg-counter-app — the React PWA (Vite): src/app.tsx (composition root), feature folders
                 src/players/, src/leaderboard/, src/session/ (header, action bar, confirmations), src/share/;
                 src/ui/ = app shell (PLAN T-08): menu, shell dialogs (lazy), Settings data panel, footer, toasts,
-                pwa.ts (service worker + update toast), error boundary/screen; src/i18n/en.ts = every UI text + t();
+                pwa.ts (service worker + update toast), error boundary/screen; src/i18n/ (PLAN T-09) = i18next:
+                en.ts (every UI text, the source), bg.ts (lazy chunk, typed against en.ts), index.ts (t, setLanguage),
+                detect.ts (start language), use-language.ts (re-render hook); no JSX string literals (ESLint rule,
+                scripts/ui-text-rule.ts); Bulgarian app.config texts = `l10n.bg` in app.config.ts;
                 src/config.ts = the one import of app.config.ts;
                 src/components/ (theme toggle, status banner), src/hooks/ (use-game-state wraps core),
                 src/storage/ (localStorage: game, theme, prefs, migration, export/import/clear; sessionStorage guard;
                 tests in app/test/storage/, UI logic tests in app/test/ui/),
                 src/lib/ (layout classes), src/providers/; src/components/ui/ = vendored shadcn/Radix.
                 Imports core by name (`gg-counter-core`; fixtures for tests: `gg-counter-core/test-fixtures`).
-app/public/     icons, favicon, og-image   tests/e2e     Playwright (desktop + phone, Chromium)
+app/public/     icons, favicon, og-image   tests/e2e     Playwright (desktop + phone, Chromium; locale en-US, i18n.spec bg-BG)
 docs/           SPEC, PLAN, DECISIONS, migration baseline
 app.config.ts   single source (PLAN T-06; `shell` = menu/footer, T-08)  scripts/  generate.ts, seo.ts, static-page.ts,
                 config-check.ts, changelog.ts (What's new), credits.ts (About), sw-handover.ts (+ tests), og-image.ts

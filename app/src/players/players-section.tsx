@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { Player } from "gg-counter-core";
 import type { GameStateApi } from "../hooks/use-game-state";
 import { AddPlayerCard } from "./add-player-card";
-import { limitMessage } from "./limit-message";
+import { limitCode, limitMessage, type LimitCode } from "./limit-message";
 import { PlayerCard } from "./player-card";
 
 /** Props of {@link PlayersSection}. */
@@ -35,7 +35,7 @@ export function PlayersSection({
   addInputRef,
 }: PlayersSectionProps): React.JSX.Element {
   const [newPlayerName, setNewPlayerName] = useState("");
-  const [addError, setAddError] = useState<string | null>(null);
+  const [addError, setAddError] = useState<LimitCode | null>(null);
 
   const handleAddPlayer = () => {
     // Core trims the name and rejects a blank or over-limit one; rejected text stays in the field.
@@ -45,7 +45,7 @@ export function PlayersSection({
       setAddError(null);
       return;
     }
-    setAddError(limitMessage(added.error.code));
+    setAddError(limitCode(added.error.code));
   };
 
   const addPlayerCard = (
@@ -59,7 +59,7 @@ export function PlayersSection({
       }}
       onAdd={handleAddPlayer}
       playerCount={players.length}
-      error={addError}
+      error={addError && limitMessage(addError)}
     />
   );
 

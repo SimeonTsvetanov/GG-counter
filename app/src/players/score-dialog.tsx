@@ -15,19 +15,20 @@ import {
 } from "../components/ui/dialog";
 import { Input } from "../components/ui/input";
 import { t } from "../i18n";
+import { limitMessage, type LimitCode } from "./limit-message";
 
 /** Props of {@link ScoreDialog}. */
 interface ScoreDialogProps {
   player: Player;
-  /** Adds `delta` (non-zero, may be negative); returns why it was refused, or null when applied. */
-  onApply: (delta: number) => string | null;
+  /** Adds `delta` (non-zero, may be negative); returns the limit it was refused for, or null when applied. */
+  onApply: (delta: number) => LimitCode | null;
 }
 
 /** Shows the score; tapping it asks for an amount to add or subtract. */
 export function ScoreDialog({ player, onApply }: ScoreDialogProps): React.JSX.Element {
   const [customAmount, setCustomAmount] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<LimitCode | null>(null);
   const errorId = useId();
 
   const handleApplyCustom = () => {
@@ -92,7 +93,7 @@ export function ScoreDialog({ player, onApply }: ScoreDialogProps): React.JSX.El
             aria-invalid={error !== null}
             aria-describedby={errorId}
           />
-          <p id={errorId} role="alert" className="mt-2 text-sm font-medium text-destructive empty:mt-0">{error}</p>
+          <p id={errorId} role="alert" className="mt-2 text-sm font-medium text-destructive empty:mt-0">{error && limitMessage(error)}</p>
         </div>
         <DialogFooter>
           <DialogClose asChild>

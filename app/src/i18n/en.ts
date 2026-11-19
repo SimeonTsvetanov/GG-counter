@@ -1,6 +1,7 @@
-// Every user-visible text of GG Counter in English — the one place PLAN T-09 translates (bg.ts) and
-// wires to i18next. Keys follow the forge template: `shell.*` for the app frame, `app.*` for the
-// score keeper. `{{name}}` marks a value filled in by t() (app/src/i18n/index.ts).
+// Every user-visible text of GG Counter in English — the source of truth that bg.ts translates key
+// for key (PLAN T-09). Keys follow the forge template: `shell.*` for the app frame, `app.*` for the
+// score keeper. `{{name}}` marks a value filled in by t() (app/src/i18n/index.ts); `key_one` /
+// `key_other` are the plural forms i18next picks with `count` (English and Bulgarian have two).
 
 /** The English dictionary: the source of truth for every UI language. */
 export const en = {
@@ -36,6 +37,9 @@ export const en = {
       },
       installed: "Installed ✓",
     },
+    language: {
+      label: "Language",
+    },
     theme: {
       label: "Theme",
       toggle: "Toggle theme",
@@ -57,9 +61,11 @@ export const en = {
       exported: "Saved {{file}} ✓",
       import: "Import data",
       importTitle: "Replace the current game?",
-      importMessage: "The game in “{{file}}” ({{count}} players) replaces the players, scores and theme saved on this device. You cannot undo this.",
+      importMessage_one: "The game in “{{file}}” ({{count}} player) replaces the players, scores and settings saved on this device. You cannot undo this.",
+      importMessage_other: "The game in “{{file}}” ({{count}} players) replaces the players, scores and settings saved on this device. You cannot undo this.",
       importConfirm: "Replace",
-      imported: "Game imported ✓ {{count}} players",
+      imported_one: "Game imported ✓ {{count}} player",
+      imported_other: "Game imported ✓ {{count}} players",
       importErrors: {
         IMPORT_TOO_BIG: "That file is too big to be a {{name}} export. Choose the file you exported from Settings.",
         IMPORT_NOT_JSON: "That file is not a {{name}} export. Choose the .json file you exported from Settings.",
@@ -73,7 +79,7 @@ export const en = {
       danger: "Delete",
       clear: "Clear my data",
       clearTitle: "Delete all your data?",
-      clearMessage: "This deletes everything {{name}} saved on this device: all players, their scores and your theme choice. Other apps are not affected. You cannot undo this.",
+      clearMessage: "This deletes everything {{name}} saved on this device: all players, their scores and your theme choice, plus the language you picked. Other apps are not affected. You cannot undo this.",
       clearConfirm: "Delete",
       cleared: "Your data was deleted ✓",
       clearFailed: "Some data could not be deleted. Close other tabs of {{name}} and try again.",
@@ -88,7 +94,7 @@ export const en = {
       installIOS: "iPhone or iPad (Safari): tap Share, then Add to Home Screen, keep Open as Web App on, tap Add.",
       installDesktop: "Computer (Chrome, Edge): use the install icon in the address bar or Menu → Install app.",
       privacy: "Privacy & your data",
-      privacyText: "{{name}} saves players, scores and your theme only in this browser on this device. Nothing is sent anywhere: no account, no cookies, no analytics.",
+      privacyText: "{{name}} saves players, scores and your settings only in this browser on this device. Nothing is sent anywhere: no account, no cookies, no analytics.",
       privacyData: "Settings → Your data exports the game to a file, imports it again on any device, or deletes everything.",
       limits: "Limits & troubleshooting",
       limitPlayers: "Up to {{max}} players per game.",
@@ -152,7 +158,8 @@ export const en = {
     },
     players: {
       addTitle: "Add Player",
-      count: "{{count}} players",
+      count_one: "{{count}} player",
+      count_other: "{{count}} players",
       namePlaceholder: "Player Name",
       nameLabel: "Player name",
       add: "Add",
@@ -177,7 +184,8 @@ export const en = {
       noPlayers: "No players yet",
       emptyCard: "Add players to populate the leaderboard.",
       emptyDialog: "No players yet. Add someone to get started.",
-      points: "{{score}} pts",
+      points_one: "{{count}} pts",
+      points_other: "{{count}} pts",
       rankRow: "{{rank}}. {{name}}",
       rankRowDialog: "🎲 {{rank}} — {{name}}",
       share: "Share",
@@ -200,6 +208,24 @@ export const en = {
     },
     footer: {
       support: "If you support me \"May the dice be with you\"",
+    },
+    // The share text (SPEC §4): the English words must give core's ENGLISH_LEADERBOARD_LABELS exactly
+    // (unit test in app/test/ui/share-text.test.ts); numbers stay plain digits like before.
+    share: {
+      title: "{{name}} Leaderboard",
+      line: "{{place}} — {{name}} ({{points}})",
+      points_one: "{{count}} pts",
+      points_other: "{{count}} pts",
+      total: "Total score: {{total}}",
+      players: "Players: {{players}}",
+      snapshot: "Snapshot: {{time}}",
+    },
+    // The "about, how it works, FAQ" block of index.html (scripts/static-page.ts writes these English
+    // texts into the static HTML; app/src/hooks/use-page-info.ts translates the block in the app).
+    page: {
+      label: "About {{name}}",
+      howItWorks: "How it works",
+      faq: "Frequently asked questions",
     },
   },
 } as const;

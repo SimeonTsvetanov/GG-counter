@@ -1,6 +1,7 @@
 // "Share app" (app-shell §8): the device's share sheet with the app's name, tagline and address;
 // where there is none (most desktops) the address is copied. Cancelling the sheet is not an error.
 import { app } from "../config";
+import { appText } from "../i18n";
 
 /** How sharing ended. */
 export type ShareAppOutcome = "shared" | "copied" | "cancelled" | "failed";
@@ -16,7 +17,7 @@ export async function shareApp(): Promise<ShareAppOutcome> {
   const nav: Partial<Navigator> = navigator;
   if (nav.share) {
     try {
-      await nav.share({ title: app.name, text: app.tagline, url: app.url });
+      await nav.share({ title: app.name, text: appText().tagline, url: app.url });
       return "shared";
     } catch (error: unknown) {
       if (isCancel(error)) return "cancelled";

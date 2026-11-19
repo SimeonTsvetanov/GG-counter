@@ -1,8 +1,10 @@
 // What's new (app-shell §5): the last versions of CHANGELOG.md with their user-facing lines, read at
-// build time (scripts/changelog.ts → __CHANGELOG__). Opening it marks this version as seen.
+// build time (scripts/changelog.ts → __CHANGELOG__). Opening it marks this version as seen. The
+// changelog is written in English only (DECISIONS 2026-11-19), so its lines carry lang="en" in another
+// UI language (accessibility: language of parts); the dialog's own labels are translated.
 import { useEffect } from "react";
 import { app } from "../config";
-import { t } from "../i18n";
+import { getLanguage, t } from "../i18n";
 import { writeLastSeenVersion } from "../storage/prefs";
 import { ShellDialog } from "./shell-dialog";
 
@@ -24,6 +26,8 @@ export function WhatsNewDialog({ onClose, opener }: WhatsNewDialogProps): React.
     writeLastSeenVersion(app.version);
   }, []);
 
+  // undefined = no attribute: the lines are in the page's language already.
+  const changelogLang = getLanguage() === "en" ? undefined : "en";
   return (
     <ShellDialog title={t("shell.whatsNew.title")} onClose={onClose} opener={opener}>
       <div className="space-y-4 text-sm">
@@ -31,7 +35,7 @@ export function WhatsNewDialog({ onClose, opener }: WhatsNewDialogProps): React.
         {__CHANGELOG__.map((entry) => (
           <section key={entry.version} className="space-y-2">
             <h3 className="font-semibold">{versionHeading(entry.version, entry.date)}</h3>
-            <ul className="list-disc space-y-1 pl-5 text-muted-foreground">
+            <ul lang={changelogLang} className="list-disc space-y-1 pl-5 text-muted-foreground">
               {entry.items.map((item) => <li key={item}>{item}</li>)}
             </ul>
           </section>

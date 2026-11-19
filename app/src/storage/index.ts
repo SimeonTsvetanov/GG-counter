@@ -1,11 +1,13 @@
 // The storage module's "my data" functions (engineering → browser-storage §3, §8): export, import and
-// clear this app's data. Called by Settings and the error screen (PLAN T-08). The game, theme and migration have their own
-// files next to this one; nothing outside app/src/storage touches localStorage (ESLint rule).
+// clear this app's data. Called by Settings and the error screen (PLAN T-08). The game, theme, language and migration
+// have their own files next to this one; nothing outside app/src/storage touches localStorage (ESLint rule).
 import { parseSavedState, type GameState, type Result } from "gg-counter-core";
 import { APP_ID, STORAGE_KEYS, isOwnKey } from "./keys";
 import { listKeys, readRaw, removeRaw, writeRaw, type StorageErrorCode, type StorageResult } from "./local-store";
 import { encodeGame, readGame } from "./game";
 import { isTheme, readTheme, writeTheme, type Theme } from "./theme";
+import { isLanguage, readLanguage, writeLanguage } from "./lang";
+import type { LanguageCode } from "../config";
 
 /** The export format version; bumped (with an import migration) when `data` changes shape. */
 export const EXPORT_SCHEMA_VERSION = 1;
@@ -17,6 +19,11 @@ export const MAX_IMPORT_CHARS = 1_000_000;
 export interface AppData {
   readonly state: GameState;
   readonly theme: Theme;
+  /**
+   * The UI language chosen in Settings (PLAN T-09); null = no choice saved. Files exported before
+   * T-09 have no `lang` and import as null, which keeps the device's current choice.
+   */
+  readonly lang: LanguageCode | null;
 }
 
 /** An export file: `{ app, schemaVersion, exportedAt, data }`. */
@@ -59,7 +66,7 @@ export function exportData(now: string = new Date().toISOString()): DataExport {
     app: APP_ID,
     schemaVersion: EXPORT_SCHEMA_VERSION,
     exportedAt: now,
-    data: { state: readGame(now), theme: readTheme() ?? "system" },
+    data: { state: readGame(now), theme: readTheme() ?? "system", lang: readLanguage() },
   };
 }
 
@@ -84,13 +91,15 @@ export function checkImport(text: string, now: string = new Date().toISOString()
   if (typeof raw.exportedAt !== "string" || !isRecord(data) || !isTheme(data.theme) || !isRecord(data.state)) {
     return rejected("IMPORT_INVALID", "The file is damaged: some of its data is missing.");
   }
+  const lang = data.lang ?? null;
+  if (lang !== null && !isLanguage(lang)) return rejected("IMPORT_INVALID", "The file is damaged: its language is unknown.");
   const players = data.state.players;
   const game = parseSavedState(data.state, now);
   // because parseSavedState drops invalid players, and an import must never apply part of a game
   if (!Array.isArray(players) || !game.ok || game.value.players.length !== players.length) {
     return rejected("IMPORT_INVALID", "The file is damaged: some players cannot be read.");
   }
-  return { ok: true, value: { state: game.value, theme: data.theme } };
+  return { ok: true, value: { state: game.value, theme: data.theme, lang } };
 }
 
 /** Puts `previous` back under `key` (null = no value). */
@@ -109,13 +118,14 @@ function restore(key: string, previous: string | null): void {
 export function importData(text: string, now: string = new Date().toISOString()): ImportResult {
   const parsed = checkImport(text, now);
   if (!parsed.ok) return parsed;
-  const previous = { state: readRaw(STORAGE_KEYS.state), theme: readRaw(STORAGE_KEYS.theme) };
+  const { state, theme, lang } = parsed.value;
+  const previous = { state: readRaw(STORAGE_KEYS.state), theme: readRaw(STORAGE_KEYS.theme), lang: readRaw(STORAGE_KEYS.lang) };
   // The game goes first: it is the big value, so a full storage fails before anything changed.
-  const savedGame = writeRaw(STORAGE_KEYS.state, encodeGame(parsed.value.state));
-  const saved = savedGame.ok ? writeTheme(parsed.value.theme) : savedGame;
+  const savedGame = writeRaw(STORAGE_KEYS.state, encodeGame(state));
+  const savedTheme = savedGame.ok ? writeTheme(theme) : savedGame;
+  const saved = savedTheme.ok && lang !== null ? writeLanguage(lang) : savedTheme;
   if (saved.ok) return parsed;
-  restore(STORAGE_KEYS.state, previous.state);
-  restore(STORAGE_KEYS.theme, previous.theme);
+  for (const key of ["state", "theme", "lang"] as const) restore(STORAGE_KEYS[key], previous[key]);
   return rejected(saved.error.code, saved.error.message);
 }
 

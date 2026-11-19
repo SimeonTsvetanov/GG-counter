@@ -7,6 +7,9 @@ The app is being migrated into the forge (`docs/PLAN.md`): the URL, saved games 
 copies keep working.
 
 ### Added
+- Bulgarian: the whole app in Bulgarian (Settings → Language: English or Български). English stays
+  the default; your choice is remembered on this device. The shared leaderboard
+  text follows the language (the English text is unchanged).
 - A menu in the header: Help, Settings, What's new, Share app, Install app, Report a problem, About
   and Support. It works with the keyboard too.
 - Settings: choose the theme (System, Light, Dark), export your game to a file, import it again

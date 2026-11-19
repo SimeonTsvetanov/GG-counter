@@ -6,6 +6,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { createPortal } from "react-dom";
 import { Button } from "../components/ui/button";
 import { t } from "../i18n";
+import { useLanguage } from "../i18n/use-language";
 import { cn } from "../lib/utils";
 
 /** How long an info toast stays (ui-patterns §6: 4–6 s). */
@@ -87,6 +88,8 @@ function ToastView({ toast, inDialog, onDismiss, onHold }: { toast: Toast; inDia
 
 /** Provides {@link useToast} and renders the live region. */
 export function ToastProvider({ children }: { children: ReactNode }): React.JSX.Element {
+  // A toast's own text is the language it was shown in; its Dismiss button follows a switch.
+  useLanguage();
   const [info, setInfo] = useState<Toast | null>(null);
   const [pinned, setPinned] = useState<Toast | null>(null);
   const [isHeld, setIsHeld] = useState(false);

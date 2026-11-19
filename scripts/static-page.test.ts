@@ -23,6 +23,11 @@ describe("pageInfoHtml", () => {
   it("carries the markers the app's usePageInfo hook relies on", () => {
     expect(html).toMatch(/^<div data-page-info /);
     expect(html.match(/<section\b/g)).toHaveLength(1);
+    // PLAN T-09: the hook translates these parts; the static text itself stays English.
+    expect(html).toContain('<section aria-label="About GG Counter" data-i18n-aria-label="app.page.label"');
+    for (const marker of ['data-text="answer"', 'data-text="steps"', 'data-text="faq"', 'data-i18n="app.page.howItWorks" class="text-base font-semibold">How it works<', 'data-i18n="app.page.faq" class="text-base font-semibold">Frequently asked questions<']) {
+      expect(html).toContain(marker);
+    }
   });
 
   it("escapes config text", () => {

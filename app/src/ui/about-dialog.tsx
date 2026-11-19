@@ -1,7 +1,7 @@
 // About (app-shell §9): what the app does, who made it, version and licence, source and changelog
 // links, and the open-source packages it ships (scripts/credits.ts → __CREDITS__, build time).
 import { app } from "../config";
-import { t } from "../i18n";
+import { appText, t } from "../i18n";
 import { ShellDialog } from "./shell-dialog";
 import type { ShellDialogId } from "./use-shell-dialog";
 
@@ -21,7 +21,7 @@ export function AboutDialog({ onClose, opener, openDialog }: AboutDialogProps): 
   return (
     <ShellDialog title={t("shell.about.title", { name: app.name })} onClose={onClose} opener={opener}>
       <div className="space-y-3 text-sm">
-        <p>{app.description}</p>
+        <p>{appText().description}</p>
         <p>
           {t("shell.about.builtBy", { author: app.author.name })}{" "}
           <a className={LINK_CLASS} href={app.author.github} target="_blank" rel="noopener noreferrer">{t("shell.about.github")}</a>

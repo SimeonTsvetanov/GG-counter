@@ -1,6 +1,6 @@
 // The share text must keep the pre-forge format exactly (SPEC §4, e2e AC5).
 import { describe, expect, it } from "vitest";
-import { formatLeaderboard, type Player } from "../src/index.ts";
+import { ENGLISH_LEADERBOARD_LABELS, bulgarianOrdinal, formatLeaderboard, type LeaderboardTextLabels, type Player } from "../src/index.ts";
 
 /** A player with `name` (also used as id) and `score`. */
 function player(name: string, score: number): Player {
@@ -28,5 +28,20 @@ describe("formatLeaderboard", () => {
   });
   it("no players → header and totals only", () => {
     expect(formatLeaderboard({ players: [], snapshot: "now" })).toBe("🏆 GG Counter Leaderboard\n\n\n🎯 Total score: 0\n👥 Players: 0\n🕒 Snapshot: now");
+  });
+  it("uses the labels of another language and keeps the emoji and the line order", () => {
+    const labels: LeaderboardTextLabels = {
+      title: "Класиране",
+      line: (place, name, score) => `${bulgarianOrdinal(place)} — ${name} (${String(score)} т.)`,
+      total: (total) => `Общо: ${String(total)}`,
+      players: (count) => `Играчи: ${String(count)}`,
+      snapshot: (time) => `Към ${time}`,
+    };
+    const text = formatLeaderboard({ players: [player("Ана", 3), player("Боби", 5)], snapshot: "19.11.2026 г.", labels });
+    expect(text).toBe(["🏆 Класиране", "", "🥇 1-во — Боби (5 т.)", "🥈 2-ро — Ана (3 т.)", "", "🎯 Общо: 8", "👥 Играчи: 2", "🕒 Към 19.11.2026 г."].join("\n"));
+  });
+  it("the English labels are the default", () => {
+    const players = [player("Ana", 34), player("Boris", 27)];
+    expect(formatLeaderboard({ players, snapshot: "now", labels: ENGLISH_LEADERBOARD_LABELS })).toBe(formatLeaderboard({ players, snapshot: "now" }));
   });
 });

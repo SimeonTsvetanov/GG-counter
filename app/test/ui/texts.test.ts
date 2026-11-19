@@ -2,7 +2,7 @@
 import { describe, expect, it } from "vitest";
 import { en } from "../../src/i18n/en.ts";
 import { formatNumber, t, type MessageKey } from "../../src/i18n/index.ts";
-import { limitMessage } from "../../src/players/limit-message.ts";
+import { limitCode, limitMessage } from "../../src/players/limit-message.ts";
 import { SHELL_DIALOGS, dialogFromHash } from "../../src/ui/use-shell-dialog.ts";
 import { app } from "../../src/config.ts";
 
@@ -30,10 +30,19 @@ describe("t()", () => {
     }
   });
 
-  it("throws for a path that does not end at a text (a bug, never user input)", () => {
-    // because the type forbids it; the runtime check guards a wrong cast
-    expect(() => t("shell.menu" as MessageKey)).toThrow(/Missing UI text/);
-    expect(() => t("shell.nope.deeper" as MessageKey)).toThrow(/Missing UI text/);
+  it("a path that does not end at a text gives no dictionary text (a bug the type forbids)", () => {
+    // because MessageKey forbids it; since PLAN T-09 i18next answers with the key instead of throwing
+    const texts = new Set(entries(en).map(([, text]) => text));
+    for (const key of ["shell.menu", "shell.nope.deeper"]) {
+      const text = t(key as MessageKey);
+      expect(texts.has(text), key).toBe(false);
+      expect(text).toContain(key);
+    }
+  });
+
+  it("picks the plural form with count", () => {
+    expect([t("app.players.count", { count: 1 }), t("app.players.count", { count: 3 })]).toEqual(["1 player", "3 players"]);
+    expect(t("app.leaderboard.points", { count: 1 })).toBe("1 pts");
   });
 
   it("every menu group and entry of app.config.ts has a label", () => {
@@ -49,6 +58,10 @@ describe("t()", () => {
 });
 
 describe("limitMessage", () => {
+  it("keeps only the codes that have a message", () => {
+    expect(["PLAYERS_TOO_MANY", "NAME_TOO_LONG", "SCORE_OUT_OF_RANGE", "NAME_EMPTY", "x"].map(limitCode)).toEqual(["PLAYERS_TOO_MANY", "NAME_TOO_LONG", "SCORE_OUT_OF_RANGE", null, null]);
+  });
+
   it("explains the three limits with their numbers", () => {
     expect(limitMessage("PLAYERS_TOO_MANY")).toBe("A game can have up to 50 players. Remove a player to add another.");
     expect(limitMessage("NAME_TOO_LONG")).toMatch(/up to 40 characters/);

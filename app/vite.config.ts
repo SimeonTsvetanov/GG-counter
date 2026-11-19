@@ -6,7 +6,7 @@ import { join, resolve } from "node:path";
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA, type ManifestOptions } from "vite-plugin-pwa";
-import { app as config, type AppConfig } from "../app.config.ts";
+import { app as config, l10n, type AppConfig } from "../app.config.ts";
 import { OG_IMAGE, headTags } from "../scripts/seo.ts";
 import { noscriptHtml, pageInfoHtml } from "../scripts/static-page.ts";
 import { whatsNew } from "../scripts/changelog.ts";
@@ -119,9 +119,11 @@ export default defineConfig(({ mode }) => {
 
   return {
     base,
-    // The storage namespace (app/src/storage/keys.ts) comes from app.config.ts, like everything else.
+    // The storage namespace (app/src/storage/keys.ts) comes from app.config.ts, like everything else;
+    // the Bulgarian config texts are used in app/src/i18n/bg.ts only, so they ship in its lazy chunk.
     define: {
       __APP_ID__: JSON.stringify(app.id),
+      __APP_TEXT_BG__: JSON.stringify(l10n.bg),
       __CHANGELOG__: JSON.stringify(whatsNew(readFileSync(new URL("../CHANGELOG.md", import.meta.url), "utf8"))),
       __CREDITS__: JSON.stringify(appCredits(new URL("./", import.meta.url))),
     },

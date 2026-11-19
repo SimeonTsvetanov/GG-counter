@@ -2,13 +2,27 @@
  * app.config.ts — the single source of truth for GG Counter (APP-STANDARD §0, app-shell §1).
  * The static head and page text of app/index.html, the PWA manifest, sitemap.xml, llms.txt,
  * robots.txt and 404.html are generated from this object (scripts/generate.ts, app/vite.config.ts).
- * Only the sections this app uses: no URL parameters, embed, API, MCP or n8n (DECISIONS 2026-11-19).
+ * Only the sections this app uses: no embed, API, MCP or n8n (DECISIONS 2026-11-19); the one URL
+ * parameter is `?lang=` (PLAN T-09, app-shell → i18n), never in the sitemap or canonical.
  */
 
 /** One question of the FAQ: shown in `<details>`, in the FAQPage JSON-LD and in llms.txt. */
 export interface FaqItem {
   readonly q: string;
   readonly a: string;
+}
+
+/** A UI language: English is the default and the fallback (app-shell → i18n). */
+export type LanguageCode = "en" | "bg";
+
+/** The page and Help texts of `app` in another UI language: same number of steps, features and FAQ items. */
+export interface AppText {
+  readonly tagline: string;
+  readonly description: string;
+  readonly answer: string;
+  readonly steps: readonly string[];
+  readonly features: readonly string[];
+  readonly faq: readonly FaqItem[];
 }
 
 /** The fields of the PWA manifest that installed copies depend on (SPEC §4 — never change `id`). */
@@ -65,7 +79,8 @@ export interface AppConfig {
   readonly repo: string;
   /** = root package.json "version" (generate.ts fails on a mismatch). */
   readonly version: string;
-  readonly languages: readonly "en"[];
+  /** UI languages, English first; the static page, head, sitemap and llms.txt are English only (seo-geo §2). */
+  readonly languages: readonly LanguageCode[];
   /** Accent / theme colour (hex). */
   readonly accent: string;
   readonly author: { readonly name: string; readonly github: string };
@@ -102,7 +117,7 @@ export const app = {
   url: "https://simeontsvetanov.github.io/GG-counter/",
   repo: "https://github.com/SimeonTsvetanov/GG-counter",
   version: "0.1.0",
-  languages: ["en"],
+  languages: ["en", "bg"],
   accent: "#1F4ED8",
   author: { name: "Simeon Tsvetanov", github: "https://github.com/SimeonTsvetanov" },
   contact: { email: "tsvetanov.simeon@gmail.com" },
@@ -172,3 +187,64 @@ export const app = {
   },
   seo: { googleVerification: null, contentUpdated: "2026-11-19" },
 } as const satisfies AppConfig;
+
+/**
+ * The texts of `app` in the other UI languages (app-shell → i18n §3); Bulgarian sentences in the
+ * polite plural (i18n §5, forge DECISIONS 2026-11-06). A separate export, so the build ships them in the Bulgarian chunk
+ * only (app/vite.config.ts `__APP_TEXT_BG__`); generate.ts checks the counts against English.
+ * Steps name the exact Bulgarian UI labels of app/src/i18n/bg.ts.
+ */
+export const l10n = {
+  bg: {
+    tagline: "Безплатен брояч на точки за настолни игри, работи без интернет",
+    description:
+      "GG Counter брои точките на вечерите с настолни игри: до 50 играчи, +1/−1 или произволна стойност, класиране, което споделяте като текст. Безплатно, без акаунт, работи без интернет.",
+    answer:
+      "GG Counter е безплатен брояч на точки за вечери с настолни игри: добавяте до 50 играчи, променяте точките с +1, −1 или произволна стойност и споделяте класирането като текст. GG Counter не иска акаунт, работи без интернет след първото отваряне и пази играта само на Вашето устройство.",
+    steps: [
+      "Напишете името на играч и натиснете „Добави“. Повторете за всички на масата — до 50 играчи.",
+      "Натиснете + или − на картата на играча, за да промените точките му с една.",
+      "Натиснете самия резултат, за да добавите или извадите произволна стойност, например 12 или −12, после натиснете „Приложи“.",
+      "Вижте картата „Класиране“: играчите са подредени по точки, с 🥇 🥈 🥉 за първите трима.",
+      "Натиснете „Сподели“, за да изпратите класирането като текст, или „Нулирай точките“, за да играете отново със същите играчи.",
+    ],
+    features: [
+      "До 50 играчи в една игра",
+      "Бутони +1 / −1 и произволна промяна на точките",
+      "Класиране по точки",
+      "Споделяне на класирането като текст",
+      "Работи без интернет след първото отваряне",
+      "Играта се пази само на устройството",
+    ],
+    faq: [
+      {
+        q: "Безплатен ли е GG Counter?",
+        a: "Да. GG Counter е безплатен — без акаунт, без регистрация и без реклами. Изходният код е отворен под лиценза MIT.",
+      },
+      {
+        q: "Работи ли GG Counter без интернет?",
+        a: "Да, след първото отваряне. Браузърът пази копие на GG Counter, така че той се отваря и брои точки и без интернет. Под заглавната лента се показва известие, когато сте без интернет.",
+      },
+      {
+        q: "Къде се пазят точките и изпращат ли се някъде?",
+        a: "GG Counter пази играчите и точките в хранилището на браузъра, само на това устройство. Нищо не се изпраща към сървър: няма акаунти, бисквитки или статистики. Ако изтриете данните на браузъра за сайта, запазената игра се изтрива.",
+      },
+      {
+        q: "Колко играчи мога да добавя?",
+        a: "GG Counter приема до 50 играчи в една игра. Всеки резултат може да е от −999 999 до 999 999.",
+      },
+      {
+        q: "Как да споделя резултата?",
+        a: "Натиснете „Сподели“ в картата „Класиране“. GG Counter отваря менюто за споделяне на устройството с класирането като текст; където няма такова меню, GG Counter копира текста, за да го поставите във всеки чат.",
+      },
+      {
+        q: "Как да инсталирам GG Counter на телефона си?",
+        a: "На Android отворете GG Counter в Chrome и натиснете „Инсталирай приложението“, когато банерът го предложи, или изберете Add to Home screen в менюто на браузъра. На iPhone или iPad отворете GG Counter в Safari, натиснете Share, после Add to Home Screen.",
+      },
+      {
+        q: "Става ли GG Counter за всяка игра?",
+        a: "Да, за всяка игра с точки — Carcassonne, Star Realms, игри с карти или куиз вечер. GG Counter събира и изважда точките, които въвеждате; не знае правилата на никоя игра.",
+      },
+    ],
+  },
+} as const satisfies Readonly<Record<Exclude<LanguageCode, "en">, AppText>>;

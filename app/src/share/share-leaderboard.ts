@@ -1,8 +1,10 @@
-// Shares the session leaderboard as text (core `formatLeaderboard`): Web Share first, else the
-// clipboard. Used by the header Share button, the leaderboard dialog and the leaderboard card.
+// Shares the session leaderboard as text (core `formatLeaderboard`, words from share-text.ts in the UI
+// language): Web Share first, else the clipboard. Used by the header Share button, the leaderboard
+// dialog and the leaderboard card.
 import { formatLeaderboard, type Player } from "gg-counter-core";
 import { app } from "../config";
 import { t } from "../i18n";
+import { leaderboardLabels, snapshotTime } from "./share-text";
 
 /**
  * lib.dom types `navigator.share` and `navigator.clipboard` as always present, but browsers omit
@@ -41,7 +43,7 @@ export async function shareLeaderboard(players: readonly Player[], onShared: () 
     return;
   }
 
-  const text = formatLeaderboard({ players, snapshot: new Date().toLocaleString() });
+  const text = formatLeaderboard({ players, snapshot: snapshotTime(new Date()), labels: leaderboardLabels() });
   const nav = optionalNavigator();
   try {
     if (nav?.share) {

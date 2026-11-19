@@ -8,7 +8,7 @@
 import { copyFileSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { app, type AppConfig } from "../app.config.ts";
+import { app, l10n, type AppConfig } from "../app.config.ts";
 import { llmsTxt, pageLastmod, robotsTxt, sitemapXml } from "./seo.ts";
 import { notFoundHtml } from "./static-page.ts";
 import { configProblems } from "./config-check.ts";
@@ -30,7 +30,7 @@ function writePublic(file: string, text: string): void {
 }
 
 const packageVersion = (JSON.parse(readText("package.json")) as { version?: unknown }).version;
-const problems = configProblems(config, { packageVersion });
+const problems = configProblems(config, { packageVersion, l10n });
 if (problems.length > 0) {
   throw new Error(`app.config.ts is not valid:\n- ${problems.join("\n- ")}`);
 }

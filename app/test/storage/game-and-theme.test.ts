@@ -20,7 +20,7 @@ describe("keys", () => {
   it("are namespaced `gg-counter:v1:` (app.id — checked against app.config.ts in scripts/theme-init.test.ts) and match the e2e fixtures", async () => {
     const { STORAGE_KEYS, LEGACY_KEYS, KEY_PREFIX } = await loadModules();
     expect(KEY_PREFIX).toBe("gg-counter:v1:");
-    expect(STORAGE_KEYS).toEqual({ state: NEW_STATE_KEY, theme: NEW_THEME_KEY, migrated: MIGRATED_KEY });
+    expect(STORAGE_KEYS).toEqual({ state: NEW_STATE_KEY, theme: NEW_THEME_KEY, migrated: MIGRATED_KEY, lang: "gg-counter:v1:lang" });
     expect(LEGACY_KEYS).toEqual({ state: STATE_KEY, theme: THEME_KEY });
   });
 

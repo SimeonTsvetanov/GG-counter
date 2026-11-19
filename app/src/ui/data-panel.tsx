@@ -21,8 +21,11 @@ export interface DataPanelProps {
 /** UTF-8 uses at most 4 bytes per character: a bigger file cannot be within the import limit. */
 const MAX_IMPORT_BYTES = MAX_IMPORT_CHARS * 4;
 
-/** Why an import was refused, in words; READ_FAILED = the browser could not read the file. */
-function importErrorText(code: ImportErrorCode | "READ_FAILED"): string {
+/** Why an import was refused; READ_FAILED = the browser could not read the file. */
+type ImportProblem = ImportErrorCode | "READ_FAILED";
+
+/** Why an import was refused, in words in the active language. */
+function importErrorText(code: ImportProblem): string {
   return t(`shell.settings.importErrors.${code}`, { name: app.name });
 }
 
@@ -41,19 +44,20 @@ async function readImportFile(file: File): Promise<{ ok: true; text: string } | 
 export function DataPanel({ onImported, onCleared }: DataPanelProps): React.JSX.Element {
   const showToast = useToast();
   const fileInput = useRef<HTMLInputElement>(null);
-  const [error, setError] = useState<string | null>(null);
+  // The code, not the text: the message follows a language switch made in the same Settings dialog.
+  const [error, setError] = useState<ImportProblem | null>(null);
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
 
   const askToImport = async (file: File): Promise<void> => {
     setError(null);
     const read = await readImportFile(file);
     if (!read.ok) {
-      setError(importErrorText(read.code));
+      setError(read.code);
       return;
     }
     const checked = checkImport(read.text);
     if (!checked.ok) {
-      setError(importErrorText(checked.error.code));
+      setError(checked.error.code);
       return;
     }
     const count = checked.value.state.players.length;
@@ -64,7 +68,7 @@ export function DataPanel({ onImported, onCleared }: DataPanelProps): React.JSX.
       onConfirm: () => {
         const imported = importData(read.text);
         if (!imported.ok) {
-          setError(importErrorText(imported.error.code));
+          setError(imported.error.code);
           return;
         }
         onImported(imported.value);
@@ -110,7 +114,7 @@ export function DataPanel({ onImported, onCleared }: DataPanelProps): React.JSX.
             }}
           />
         </div>
-        <p role="alert" className="text-sm text-destructive">{error}</p>
+        <p role="alert" className="text-sm text-destructive">{error && importErrorText(error)}</p>
         <p className="text-xs text-muted-foreground">{t("shell.settings.dataNote")}</p>
       </section>
       <section aria-labelledby="settings-danger" className="space-y-2">

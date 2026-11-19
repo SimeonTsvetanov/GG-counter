@@ -28,19 +28,26 @@
 
 ## 4. Usage modes and public interfaces (must not change — migrate §1)
 - Hosting: standard (GitHub Pages). **URL stays `https://simeontsvetanov.github.io/GG-counter/`** (Moni 2026-11-19).
-- Modes after migration: browser only. No URL parameters, no embed, no API, no MCP (DECISIONS 2026-11-19).
+- Modes after migration: browser only. No embed, no API, no MCP (DECISIONS 2026-11-19). One URL parameter since T-09:
+  `?lang=en|bg` shows that UI language for this visit (not saved; never in the sitemap or canonical).
+- Languages (T-09): English (default, fallback) and Bulgarian. Start: `?lang=` → choice saved in Settings → English (no
+  browser auto-detect, forge DECISIONS 2026-11-06). Raw HTML, head, JSON-LD, sitemap, llms.txt and the 404 page are English only.
 - Storage keys (localStorage, shared origin): `gg-counter/state` =
   `{ players: [{ id, name, score, createdAt }], lastUpdated, version: 1 }` · `gg-counter-theme` = `light|dark` (key removed for "system").
   Both keys are app-prefixed but not in the forge `id:v1:` format; they are migrated to it with the old values kept until verified.
 - PWA: manifest `id: "gg-counter-pwa-v1"`, `start_url` and `scope` `/GG-counter/`, service worker `sw.js`, cache id `gg-counter`.
 - Share text: `🏆 GG Counter Leaderboard` / one line per player `🥇 1st — Ana (34 pts)` / `🎯 Total score` / `👥 Players` / `🕒 Snapshot`.
+  In Bulgarian (T-09) the same emoji and lines with Bulgarian words: `🏆 Класиране в GG Counter` / `🥇 1-во — Ана (34 точки)` /
+  `🎯 Общо точки: 58` / `👥 Играчи: 3` / `🕒 Към <local time>`; the English text stays byte for byte as above.
 
 ## 5. Data and storage
-- Stored: players and scores, theme, the last version whose What's new was seen (`gg-counter:v1:last-seen-version`, T-08) → tier: prefs (localStorage) · export/import/clear: Settings → Your data (T-08), file `gg-counter-data-YYYY-MM-DD.json`; an import is checked through core and confirmed before it replaces the game.
+- Stored: players and scores, theme, the last version whose What's new was seen (`gg-counter:v1:last-seen-version`, T-08), the UI
+  language chosen in Settings (`gg-counter:v1:lang` = `"en"|"bg"`, T-09; absent = English) → tier: prefs (localStorage) · export/import/clear: Settings → Your data (T-08), file `gg-counter-data-YYYY-MM-DD.json`; an import is checked through core and confirmed before it replaces the game. The export's `data.lang` (T-09, `null` = no
+  choice) is written on import when present; files from before T-09 keep the device's choice.
 - Nothing leaves the device; no analytics, no network calls except loading the app.
 
 ## 6. UI
-- **Level 2 — React stays** (Moni 2026-11-19; existing app, see DECISIONS). Languages: English + Bulgarian (new).
+- **Level 2 — React stays** (Moni 2026-11-19; existing app, see DECISIONS). Languages: English + Bulgarian (T-09; app/src/i18n).
 - Accent today `#1F4ED8`; logo `public/favicon.svg` (meeple). Screens: one main screen, dialogs.
 
 ## 7. Limits and performance

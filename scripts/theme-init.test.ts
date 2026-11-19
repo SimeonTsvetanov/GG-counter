@@ -25,7 +25,7 @@ function run(stored: Record<string, string> | null, { systemDark = false } = {})
 
 describe("themeInitScript", () => {
   it("uses the storage module's keys (app.id namespace, pre-forge fallback)", () => {
-    expect(STORAGE_KEYS).toEqual({ state: `${app.id}:v1:state`, theme: `${app.id}:v1:theme`, migrated: `${app.id}:v1:migrated` });
+    expect(STORAGE_KEYS).toEqual({ state: `${app.id}:v1:state`, theme: `${app.id}:v1:theme`, migrated: `${app.id}:v1:migrated`, lang: `${app.id}:v1:lang` });
     expect(LEGACY_THEME_KEY).toBe(LEGACY_KEYS.theme);
     expect(script).toContain(JSON.stringify(STORAGE_KEYS.theme));
     expect(script).toContain(JSON.stringify(STORAGE_KEYS.migrated));

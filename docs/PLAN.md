@@ -93,7 +93,12 @@
 - Reading list: app-shell → i18n; growth → seo-geo §2.
 - Acceptance: no hard-coded UI string (lint rule); both languages pass T-01 flows; share text localized, English format unchanged.
 - Depends on: T-08
-- [ ] done
+- [x] done — i18next 26.7.2 (no react-i18next: a `useSyncExternalStore` hook in the composition roots); `bg.ts` + `l10n.bg`
+  of app.config.ts in a lazy chunk (5.1 KB gzip), loaded before the first render only for Bulgarian; Settings → Language,
+  start = `?lang=` → saved `gg-counter:v1:lang` → English (no auto-detect); export/import/clear carry the choice;
+  share text in Bulgarian, English byte for byte (property test); in-app page block translated, raw HTML English only;
+  JSX UI-text lint rule (scripts/ui-text-rule.ts); 18 Bulgarian e2e (desktop + phone); first-load JS 136.2 KB gzip
+  (perf-check WARN over 130: i18next ≈ 16 KB) (2026-11-19).
 
 ### T-10 · Legal pages
 - Goal: Terms, Privacy, AI notice, Legal notice, Support as dialogs and standalone pages, matched to what the code does.

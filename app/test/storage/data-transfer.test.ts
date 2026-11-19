@@ -4,6 +4,8 @@ import { MIGRATED_KEY, NEW_STATE_KEY, NEW_THEME_KEY, NULL_ENTRY_STATE, STATE_KEY
 import { FakeStorage, OTHER_APPS, blockStorage, unblockStorage, useStorage } from "./fake-storage.ts";
 
 const NOW = "2026-11-19T12:00:00.000Z";
+/** The UI language key (PLAN T-09). */
+const LANG_KEY = "gg-counter:v1:lang";
 
 /** Loads fresh copies of the storage modules. */
 async function start() {
@@ -20,27 +22,27 @@ function exportText(changes: Record<string, unknown> = {}, data: Record<string, 
 afterEach(unblockStorage);
 
 describe("exportData", () => {
-  it("returns { app, schemaVersion, exportedAt, data: { state, theme } }", async () => {
-    useStorage(new FakeStorage({ [NEW_STATE_KEY]: JSON.stringify(V1_STATE), [NEW_THEME_KEY]: "\"dark\"" }));
+  it("returns { app, schemaVersion, exportedAt, data: { state, theme, lang } }", async () => {
+    useStorage(new FakeStorage({ [NEW_STATE_KEY]: JSON.stringify(V1_STATE), [NEW_THEME_KEY]: "\"dark\"", [LANG_KEY]: "\"bg\"" }));
     const { exportData } = await start();
-    expect(exportData(NOW)).toEqual({ app: "gg-counter", schemaVersion: 1, exportedAt: NOW, data: { state: V1_STATE, theme: "dark" } });
+    expect(exportData(NOW)).toEqual({ app: "gg-counter", schemaVersion: 1, exportedAt: NOW, data: { state: V1_STATE, theme: "dark", lang: "bg" } });
   });
 
-  it("nothing saved → an empty game and the system theme", async () => {
-    useStorage(new FakeStorage({ [STATE_KEY]: JSON.stringify(V1_STATE) }));
+  it("nothing saved → an empty game, the system theme and no language choice", async () => {
+    useStorage(new FakeStorage({ [STATE_KEY]: JSON.stringify(V1_STATE), [LANG_KEY]: "\"de\"" }));
     const { exportData } = await start();
-    expect(exportData(NOW).data).toEqual({ state: { players: [], lastUpdated: NOW, version: 1 }, theme: "system" });
+    expect(exportData(NOW).data).toEqual({ state: { players: [], lastUpdated: NOW, version: 1 }, theme: "system", lang: null });
   });
 });
 
 describe("importData", () => {
   it("round trip: export → clear → import restores the same data", async () => {
-    const storage = useStorage(new FakeStorage({ [NEW_STATE_KEY]: JSON.stringify(V1_STATE), [NEW_THEME_KEY]: "\"light\"" }));
+    const storage = useStorage(new FakeStorage({ [NEW_STATE_KEY]: JSON.stringify(V1_STATE), [NEW_THEME_KEY]: "\"light\"", [LANG_KEY]: "\"en\"" }));
     const { exportData, clearData, importData } = await start();
     const file = JSON.stringify(exportData(NOW));
     clearData();
     expect(storage.snapshot()).toEqual({});
-    expect(importData(file, NOW)).toEqual({ ok: true, value: { state: V1_STATE, theme: "light" } });
+    expect(importData(file, NOW)).toEqual({ ok: true, value: { state: V1_STATE, theme: "light", lang: "en" } });
     expect(exportData(NOW)).toEqual(JSON.parse(file));
   });
 
@@ -50,6 +52,17 @@ describe("importData", () => {
     expect(importData(exportText({}, { theme: "system" }), NOW).ok).toBe(true);
     expect(readGame(NOW)).toEqual(V1_STATE);
     expect(storage.getItem(NEW_THEME_KEY)).toBeNull();
+  });
+
+  it("writes the file's language; a file from before T-09 (no lang) keeps the current choice", async () => {
+    const storage = useStorage(new FakeStorage({ [LANG_KEY]: "\"bg\"" }));
+    const { importData } = await start();
+    expect(importData(exportText(), NOW)).toMatchObject({ ok: true, value: { lang: null } });
+    expect(storage.getItem(LANG_KEY)).toBe("\"bg\"");
+    expect(importData(exportText({}, { lang: "en" }), NOW)).toMatchObject({ ok: true, value: { lang: "en" } });
+    expect(storage.getItem(LANG_KEY)).toBe("\"en\"");
+    expect(importData(exportText({}, { lang: null }), NOW).ok).toBe(true);
+    expect(storage.getItem(LANG_KEY)).toBe("\"en\"");
   });
 
   const rejected: readonly (readonly [string, string, string])[] = [
@@ -62,6 +75,7 @@ describe("importData", () => {
     ["no exportedAt", exportText({ exportedAt: 5 }), "IMPORT_INVALID"],
     ["no data", exportText({ data: null }), "IMPORT_INVALID"],
     ["bad theme", exportText({}, { theme: "blue" }), "IMPORT_INVALID"],
+    ["unknown language", exportText({}, { lang: "de" }), "IMPORT_INVALID"],
     ["state not an object", exportText({}, { state: [] }), "IMPORT_INVALID"],
     ["players missing", exportText({}, { state: { lastUpdated: NOW } }), "IMPORT_INVALID"],
     ["one player invalid (never imports part of a game)", exportText({}, { state: NULL_ENTRY_STATE }), "IMPORT_INVALID"],
@@ -85,6 +99,15 @@ describe("importData", () => {
     expect(importData(exportText(), NOW)).toMatchObject({ ok: false, error: { code: "STORAGE_FULL" } });
     expect(storage.snapshot()).toEqual({ [NEW_STATE_KEY]: JSON.stringify(V0_STATE) });
     expect(readGame(NOW).players.map((p) => p.name)).toEqual(["Ana", "Boris"]);
+  });
+
+  it("a failure on the language write rolls the game and the theme back", async () => {
+    const before = { [NEW_STATE_KEY]: JSON.stringify(V0_STATE), [NEW_THEME_KEY]: "\"light\"", [LANG_KEY]: "\"bg\"" };
+    const storage = useStorage(new FakeStorage(before));
+    storage.writeBehaviour = (key) => (key === LANG_KEY ? "full" : "ok");
+    const { importData } = await start();
+    expect(importData(exportText({}, { lang: "en" }), NOW)).toMatchObject({ ok: false, error: { code: "STORAGE_FULL" } });
+    expect(storage.snapshot()).toEqual(before);
   });
 
   it("a failure on the first write leaves an empty storage empty", async () => {
@@ -128,7 +151,7 @@ describe("checkImport (Settings checks a file before asking to replace the game)
     const storage = useStorage(new FakeStorage({ [NEW_STATE_KEY]: JSON.stringify(V0_STATE), ...OTHER_APPS }));
     const before = storage.snapshot();
     const { checkImport } = await start();
-    expect(checkImport(exportText(), NOW)).toEqual({ ok: true, value: { state: V1_STATE, theme: "dark" } });
+    expect(checkImport(exportText(), NOW)).toEqual({ ok: true, value: { state: V1_STATE, theme: "dark", lang: null } });
     expect(storage.snapshot()).toEqual(before);
   });
 
@@ -163,6 +186,7 @@ describe("clearData", () => {
       [NEW_STATE_KEY]: JSON.stringify(V1_STATE),
       [NEW_THEME_KEY]: "\"dark\"",
       [MIGRATED_KEY]: "{}",
+      [LANG_KEY]: "\"bg\"",
       "gg-counter:v1:later": "1",
     }));
     const { clearData } = await start();

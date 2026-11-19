@@ -5,6 +5,7 @@ import js from "@eslint/js";
 import tseslint from "typescript-eslint";
 import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
+import { UI_TEXT_SELECTORS } from "./scripts/ui-text-rule.ts";
 
 /** Files whose tool requires `export default` (code-quality §2). */
 const TOOL_CONFIG_FILES = ["**/*.config.{js,ts,mjs,mts}", "**/pw.*.config.ts"];
@@ -16,6 +17,8 @@ const HTML_SINKS = [
 /** Browser storage is touched only by app/src/storage (browser-storage §3): namespacing, migration, failures. */
 const STORAGE_APIS = ["localStorage", "sessionStorage", "indexedDB"];
 const STORAGE_MESSAGE = "Use the storage module in app/src/storage (engineering → browser-storage §3).";
+/** Modules: named exports only (code-quality §2); tool configs are exempt below. */
+const NO_DEFAULT_EXPORT = { selector: "ExportDefaultDeclaration", message: "Use a named export (code-quality §2)." };
 /** Tests read best as long `describe` blocks; size limits apply to source only. */
 const TEST_FILES = ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "tests/**"];
 
@@ -37,7 +40,7 @@ export default tseslint.config(
       "@typescript-eslint/consistent-type-assertions": ["error", { assertionStyle: "as", objectLiteralTypeAssertions: "never" }],
       "@typescript-eslint/explicit-module-boundary-types": "error",
       // Modules: named exports only (tool configs are exempt below)
-      "no-restricted-syntax": ["error", { selector: "ExportDefaultDeclaration", message: "Use a named export (code-quality §2)." }],
+      "no-restricted-syntax": ["error", NO_DEFAULT_EXPORT],
       // Clarity
       eqeqeq: ["error", "always", { null: "ignore" }],
       curly: ["error", "multi-line"],
@@ -67,6 +70,8 @@ export default tseslint.config(
   },
   // React: hooks rules; components are PascalCase functions and may be longer than plain functions.
   { files: ["**/*.tsx"], plugins: { "react-hooks": reactHooks }, rules: { "react-hooks/rules-of-hooks": "error", "react-hooks/exhaustive-deps": "error", "max-lines-per-function": ["error", { max: 150, skipBlankLines: true, skipComments: true }] } },
+  // PLAN T-09: no hard-coded UI text in the app's JSX — every string goes through t() (scripts/ui-text-rule.ts).
+  { files: ["app/src/**/*.tsx"], rules: { "no-restricted-syntax": ["error", NO_DEFAULT_EXPORT, ...UI_TEXT_SELECTORS] } },
   { files: TOOL_CONFIG_FILES, rules: { "no-restricted-syntax": "off" } },
   { files: TEST_FILES, rules: { "max-lines-per-function": "off", "max-lines": "off" } },
   // Layers (engineering → structure §1–2): dependencies point one way, other packages by name only.
