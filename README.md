@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="public/favicon.svg" alt="GG Counter Logo" width="120" height="120" />
+  <img src="app/public/favicon.svg" alt="GG Counter Logo" width="120" height="120" />
   <h1>GG Counter</h1>
   <p>
     <strong>The ultimate offline-first companion for your board game nights.</strong>

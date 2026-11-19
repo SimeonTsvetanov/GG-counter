@@ -1,6 +1,8 @@
 # pnpm-workspace.yaml — forge supply-chain policy (engineering → security §5).
-# The workspace packages (packages/*, app) are added in PLAN T-04; until then the app is the root package.
-packages: []
+# Workspace (PLAN T-04): packages/core = gg-counter-core (private), app = gg-counter-app (the PWA).
+packages:
+  - packages/*
+  - app
 
 minimumReleaseAge: 1440        # don't install versions younger than 1 day
 minimumReleaseAgeExclude: []   # urgent fixes only, each with a DECISIONS line: - pkg@1.2.3

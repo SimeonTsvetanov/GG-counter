@@ -9,44 +9,23 @@
   },
   "license": "MIT",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "preview": "vite preview",
+    "dev": "pnpm -F gg-counter-app dev",
+    "build": "tsc -b && pnpm -r build",
+    "preview": "pnpm -F gg-counter-app preview",
     "lint": "eslint . --max-warnings=0",
-    "typecheck": "tsc -p tsconfig.eslint.json",
+    "typecheck": "tsc -b",
     "test": "playwright test",
     "e2e": "playwright test",
     "verify": "pnpm lint && pnpm typecheck && pnpm build && pnpm e2e"
-  },
-  "dependencies": {
-    "@radix-ui/react-alert-dialog": "1.1.15",
-    "@radix-ui/react-dialog": "1.1.5",
-    "@radix-ui/react-dropdown-menu": "2.1.16",
-    "@radix-ui/react-slot": "1.1.1",
-    "class-variance-authority": "0.7.0",
-    "clsx": "2.1.0",
-    "lucide-react": "0.554.0",
-    "react": "19.2.0",
-    "react-dom": "19.2.0",
-    "tailwind-merge": "2.3.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@playwright/test": "1.63.0",
     "@types/node": "^24.10.1",
-    "@types/react": "19.0.8",
-    "@types/react-dom": "19.0.3",
-    "@vite-pwa/assets-generator": "^0.2.6",
-    "@vitejs/plugin-react": "4.3.3",
-    "autoprefixer": "10.4.20",
     "eslint": "^10.15.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.14.0",
-    "postcss": "8.4.47",
-    "tailwindcss": "3.4.17",
     "typescript": "5.9.2",
-    "typescript-eslint": "^8.73.0",
-    "vite": "5.4.8",
-    "vite-plugin-pwa": "0.20.5"
+    "typescript-eslint": "^8.73.0"
   }
 }

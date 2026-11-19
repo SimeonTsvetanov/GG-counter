@@ -13,5 +13,5 @@ export default defineConfig({
     { name: "desktop", use: { ...devices["Desktop Chrome"] } },
     { name: "phone", use: { ...devices["Pixel 7"] } },
   ],
-  webServer: LIVE ? undefined : { command: "pnpm preview --port 4173 --strictPort", url: "http://localhost:4173/GG-counter/", reuseExistingServer: !process.env.CI },
+  webServer: LIVE ? undefined : { command: "pnpm -F gg-counter-app preview --port 4173 --strictPort", url: "http://localhost:4173/GG-counter/", reuseExistingServer: !process.env.CI },
 });

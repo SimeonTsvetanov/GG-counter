@@ -1,6 +1,6 @@
 {
-  "extends": "./tsconfig.json",
-  "compilerOptions": { "noEmit": true, "types": ["node", "vite/client", "vite-plugin-pwa/client"] },
-  "include": ["src", "tests", "*.ts", "*.config.*"],
-  "exclude": ["node_modules", "dist"]
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": { "noEmit": true, "types": ["node"] },
+  "include": ["app/src", "app/*.ts", "tests", "*.ts"],
+  "exclude": ["**/node_modules", "**/dist", ".tsbuild"]
 }

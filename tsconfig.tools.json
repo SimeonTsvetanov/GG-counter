@@ -3,10 +3,10 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "composite": true,
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
     "noEmit": false,
+    "emitDeclarationOnly": true,
+    "outDir": ".tsbuild/tools",
     "types": ["node"]
   },
-  "include": ["vite.config.ts"]
+  "include": ["playwright.config.ts", "tests/**/*.ts"]
 }

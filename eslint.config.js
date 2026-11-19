@@ -12,7 +12,7 @@ const TOOL_CONFIG_FILES = ["**/*.config.{js,ts,mjs,mts}", "**/pw.*.config.ts"];
 const TEST_FILES = ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "tests/**"];
 
 export default tseslint.config(
-  { ignores: ["**/*.d.ts", "**/dist/**", "postcss.config.cjs", "**/.tsbuild/**", "app/public/**", "coverage/**", "playwright-report/**", "test-results/**"] },
+  { ignores: ["**/*.d.ts", "**/dist/**", "app/postcss.config.cjs", "**/.tsbuild/**", "app/public/**", "coverage/**", "playwright-report/**", "test-results/**"] },
   js.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
@@ -64,8 +64,8 @@ export default tseslint.config(
   // React: hooks rules; components are PascalCase functions and may be longer than plain functions.
   { files: ["**/*.tsx"], plugins: { "react-hooks": reactHooks }, rules: { "react-hooks/rules-of-hooks": "error", "react-hooks/exhaustive-deps": "error", "max-lines-per-function": ["error", { max: 150, skipBlankLines: true, skipComments: true }] } },
   // TEMPORARY (2026-11-19, PLAN T-03): size rules only, for the two oversized pre-forge components.
-  // PLAN T-04 moves them (update these paths), PLAN T-05 splits them by feature and deletes this block.
-  { files: ["src/app.tsx", "src/components/player-card.tsx"], rules: { "max-lines": "off", "max-lines-per-function": "off" } },
+  // Paths updated by PLAN T-04 (app moved to app/); PLAN T-05 splits them by feature and deletes this block.
+  { files: ["app/src/app.tsx", "app/src/components/player-card.tsx"], rules: { "max-lines": "off", "max-lines-per-function": "off" } },
   { files: TOOL_CONFIG_FILES, rules: { "no-restricted-syntax": "off" } },
   { files: TEST_FILES, rules: { "max-lines-per-function": "off", "max-lines": "off" } },
   // Layers (engineering → structure §1–2): dependencies point one way, other packages by name only.

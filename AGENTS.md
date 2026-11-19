@@ -24,16 +24,16 @@ Offline score tracker for board-game nights — a free micro-app by Simeon "Moni
 - Moni corrects/dislikes something → apply it and add an entry to `LEARNINGS.md`.
 - Decisions → `docs/DECISIONS.md` (date · decision · reason) the same day. Update `STATUS.md` (≤ 30 lines).
 
-## Where things are (until PLAN T-04 moves the app to `app/` and logic to `packages/core`)
+## Where things are (workspace since PLAN T-04)
 ```
-src/            React app: app.tsx (main screen), components/, hooks/, lib/storage.ts, providers/
-src/components/ui/  vendored shadcn/Radix primitives
-public/         icons, favicon             tests/e2e     Playwright (desktop + phone, Chromium)
+app/            gg-counter-app — the React PWA (Vite): src/app.tsx (main screen), src/components/,
+                src/hooks/, src/lib/storage.ts, src/providers/; src/components/ui/ = vendored shadcn/Radix
+app/public/     icons, favicon             tests/e2e     Playwright (desktop + phone, Chromium)
 tests/fixtures  saved-state fixtures       docs/         SPEC, PLAN, DECISIONS, migration baseline
-vite.config.ts  base `/GG-counter/` in production, PWA manifest (id `gg-counter-pwa-v1`)
+app/vite.config.ts  base `/GG-counter/` in production, PWA manifest (id `gg-counter-pwa-v1`)
 ```
 
 ## Commands
 `pnpm i` · `pnpm dev` · `pnpm verify` (lint + typecheck + build + e2e) · `pnpm lint` ·
-`pnpm typecheck` (src, tests and config files via `tsconfig.eslint.json`) · `pnpm build` ·
-`pnpm e2e` (needs `pnpm build`; serves `dist/` with `vite preview`)
+`pnpm typecheck` (`tsc -b`: app, its Vite config, tests and tool configs) · `pnpm build` (→ `app/dist`) ·
+`pnpm e2e` (needs `pnpm build`; serves `app/dist` with `vite preview`)
