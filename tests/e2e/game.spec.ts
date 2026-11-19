@@ -105,7 +105,7 @@ test("AC7: state saved by the old app loads unchanged (version 1, no version, br
   expect(await scoreOf(page, "Чен")).toBe(-3);
 
   for (const [state, names] of [[V0_STATE, ["Ana", "Boris"]], [DIRTY_STATE, ["Valid"]], ["{not json", []], [NULL_ENTRY_STATE, NULL_ENTRY_SURVIVORS]] as const) {
-    await page.evaluate(([key, value]) => localStorage.setItem(key, value), [STATE_KEY, typeof state === "string" ? state : JSON.stringify(state)] as const);
+    await page.evaluate(([key, value]) => { localStorage.setItem(key, value); }, [STATE_KEY, typeof state === "string" ? state : JSON.stringify(state)] as const);
     await page.reload();
     await expect(page.getByRole("textbox", { name: /^Player name for / })).toHaveCount(names.length);
     for (const name of names) await expect(page.getByRole("textbox", { name: `Player name for ${name}` })).toBeVisible();
@@ -115,7 +115,7 @@ test("AC7: state saved by the old app loads unchanged (version 1, no version, br
 test("AC8: the saved theme is applied on load", async ({ page }) => {
   await openWith(page, V1_STATE, { [THEME_KEY]: "dark" });
   await expect(page.locator("html")).toHaveClass(/dark/);
-  await page.evaluate(([key]) => localStorage.setItem(key, "light"), [THEME_KEY] as const);
+  await page.evaluate(([key]) => { localStorage.setItem(key, "light"); }, [THEME_KEY] as const);
   await page.reload();
   await expect(page.locator("html")).not.toHaveClass(/dark/);
 });

@@ -93,7 +93,7 @@ export default function App() {
     );
 
     observer.observe(leaderboardCardRef.current);
-    return () => observer.disconnect();
+    return () => { observer.disconnect(); };
   }, []);
 
   useEffect(() => {
@@ -229,7 +229,7 @@ export default function App() {
             <Input
               ref={addInputRef}
               value={newPlayerName}
-              onChange={(event) => setNewPlayerName(event.target.value)}
+              onChange={(event) => { setNewPlayerName(event.target.value); }}
               onKeyDown={(event) => {
                 if (event.key === "Enter") {
                   handleAddPlayer();
@@ -347,7 +347,7 @@ export default function App() {
                   <Button
                     variant="outline"
                     className="w-full sm:w-auto"
-                    onClick={() => setIsResetDialogOpen(true)}
+                    onClick={() => { setIsResetDialogOpen(true); }}
                   >
                     <RefreshCw className="mr-2 h-4 w-4" /> Reset scores
                   </Button>
@@ -381,7 +381,7 @@ export default function App() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setIsClearDialogOpen(true)}
+              onClick={() => { setIsClearDialogOpen(true); }}
               aria-label="Clear session"
             >
               <RefreshCw className="h-4 w-4" />
@@ -479,7 +479,7 @@ export default function App() {
                 <Button
                   variant="outline"
                   className="w-full sm:w-auto"
-                  onClick={() => setIsResetDialogOpen(true)}
+                  onClick={() => { setIsResetDialogOpen(true); }}
                 >
                   <RefreshCw className="mr-2 h-4 w-4" /> Reset scores
                 </Button>
@@ -515,7 +515,7 @@ export default function App() {
           <Button
             variant="outline"
             size="icon"
-            onClick={() => setIsClearDialogOpen(true)}
+            onClick={() => { setIsClearDialogOpen(true); }}
             aria-label="Clear session"
             className="shrink-0"
           >
@@ -567,7 +567,7 @@ export default function App() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => setInstallDismissed(true)}
+                      onClick={() => { setInstallDismissed(true); }}
                       className="w-full sm:w-auto"
                     >
                       Dismiss
@@ -673,7 +673,7 @@ export default function App() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setIsResetDialogOpen(true)}
+                    onClick={() => { setIsResetDialogOpen(true); }}
                     disabled={sortedPlayers.length === 0}
                     className="w-full sm:w-auto"
                   >

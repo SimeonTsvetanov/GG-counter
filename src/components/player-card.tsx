@@ -87,7 +87,7 @@ export function PlayerCard({
         <div className="flex items-center gap-2">
           <Input
             value={name}
-            onChange={(event) => setName(event.target.value)}
+            onChange={(event) => { setName(event.target.value); }}
             onBlur={handleNameCommit}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
@@ -120,7 +120,7 @@ export function PlayerCard({
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                  onClick={() => onRemove(player.id)}
+                  onClick={() => { onRemove(player.id); }}
                 >
                   Remove
                 </AlertDialogAction>
@@ -134,7 +134,7 @@ export function PlayerCard({
             variant="ghost"
             size="icon"
             aria-label={`Decrease score for ${player.name}`}
-            onClick={() => onAdjust(player.id, -1)}
+            onClick={() => { onAdjust(player.id, -1); }}
           >
             <Minus className="h-6 w-6" />
           </Button>
@@ -169,7 +169,7 @@ export function PlayerCard({
                 inputMode="numeric"
                 autoFocus
                 value={customAmount}
-                onChange={(event) => setCustomAmount(event.target.value)}
+                onChange={(event) => { setCustomAmount(event.target.value); }}
                 onKeyDown={(event) => {
                   if (event.key === "Enter") {
                     event.preventDefault();
@@ -190,7 +190,7 @@ export function PlayerCard({
             variant="ghost"
             size="icon"
             aria-label={`Increase score for ${player.name}`}
-            onClick={() => onAdjust(player.id, 1)}
+            onClick={() => { onAdjust(player.id, 1); }}
           >
             <Plus className="h-6 w-6" />
           </Button>

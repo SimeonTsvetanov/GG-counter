@@ -37,7 +37,7 @@
 - Reading list: engineering → security §5; migrate §4.
 - Acceptance: clean clone → `pnpm i --frozen-lockfile && pnpm build` works; T-01 tests green; `perf-check --dist dist` recorded in the baseline file.
 - Depends on: T-01
-- [ ] done
+- [x] done — `node_modules`, `dist` and generated files untracked (43 tracked files left); pnpm 12 with the supply-chain policy; `LICENSE` added; clean install + build + 16 e2e green (2026-11-19).
 
 ### T-03 · Forge frame
 - Goal: `AGENTS.md`, `CLAUDE.md`, `STATUS.md`, `LEARNINGS.md`, `CHANGELOG.md`, `SECURITY.md`, `service.json`, `.claude/settings.json`, CI (`ci.yml`, `deploy.yml` with SHA-pinned actions and the `workflow_run` guard, `codeql.yml`), ESLint 10 flat config with the forge rules, `pnpm verify`.

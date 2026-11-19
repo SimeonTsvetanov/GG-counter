@@ -11,5 +11,5 @@ export default defineConfig({
     { name: "desktop", use: { ...devices["Desktop Chrome"] } },
     { name: "phone", use: { ...devices["Pixel 7"] } },
   ],
-  webServer: { command: "npm run preview -- --port 4173 --strictPort", url: "http://localhost:4173/GG-counter/", reuseExistingServer: !process.env.CI },
+  webServer: { command: "pnpm preview --port 4173 --strictPort", url: "http://localhost:4173/GG-counter/", reuseExistingServer: !process.env.CI },
 });
