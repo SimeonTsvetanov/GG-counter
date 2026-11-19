@@ -57,6 +57,23 @@ function makePageInert(isOpen: boolean): void {
   document.getElementById("root")?.toggleAttribute("inert", isOpen);
 }
 
+/**
+ * Enter activates the item that has the focus after Radix's pending focus move. Radix moves focus for
+ * arrow keys and typeahead in a `setTimeout`, but clicks the item under Enter at once; browsers run
+ * input before timers, so a quick ArrowDown + Enter opened the previous item (Help instead of
+ * Settings). Cancelling Radix's click (it skips handlers after preventDefault) and clicking in a timer
+ * queued after Radix's one picks the right item.
+ */
+function activateFocusedItemOnEnter(event: React.KeyboardEvent<HTMLDivElement>): void {
+  if (event.key !== "Enter" || event.defaultPrevented) return;
+  event.preventDefault();
+  const menu = event.currentTarget;
+  window.setTimeout(() => {
+    const item = document.activeElement;
+    if (item instanceof HTMLElement && menu.contains(item) && item.getAttribute("role") === "menuitem") item.click();
+  });
+}
+
 /** Renders the menu button and its grouped entries. */
 export function AppMenu({ runItem, isInstalled, canInstall, variant }: AppMenuProps): React.JSX.Element {
   const trigger = useRef<HTMLButtonElement>(null);
@@ -75,6 +92,7 @@ export function AppMenu({ runItem, isInstalled, canInstall, variant }: AppMenuPr
         sideOffset={8}
         collisionPadding={16}
         className="max-h-[calc(100dvh-5rem)] w-64 overflow-y-auto"
+        onKeyDownCapture={activateFocusedItemOnEnter}
         onCloseAutoFocus={(event) => {
           if (isOpeningDialog.current) event.preventDefault();
           isOpeningDialog.current = false;

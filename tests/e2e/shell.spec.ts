@@ -57,6 +57,28 @@ test("the menu opens and closes with the keyboard and focus comes back to its bu
   await expect(menuButton(page)).toBeFocused();
 });
 
+test("ArrowDown + Enter (and typing a label + Enter) opens the item that has the focus, every time", async ({ page }) => {
+  // Regression (PLAN T-08 review): Radix moves menu focus in a timer, so a quick Enter clicked the old item.
+  await openWith(page);
+  // The second item of the first group is Settings (app.config.ts shell.menu).
+  expect(app.shell.menu[0].items[1]).toBe("settings");
+  const label = "Settings";
+  for (const how of ["ArrowDown", "ArrowDown", "ArrowDown", "type", "type"] as const) {
+    await menuButton(page).focus();
+    await page.keyboard.press("Enter");
+    await expect(page.getByRole("menuitem", { name: "Help" })).toBeFocused();
+    if (how === "ArrowDown") await page.keyboard.press("ArrowDown");
+    else await page.keyboard.type(label);
+    await page.keyboard.press("Enter");
+    const dialog = page.getByRole("dialog", { name: label });
+    await expect(dialog).toBeVisible();
+    await expect(page.getByRole("dialog", { name: "Help" })).toHaveCount(0);
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
+    await expect(menuButton(page)).toBeFocused();
+  }
+});
+
 test("Settings: export → clear my data → import gives back the same game", async ({ page }, testInfo) => {
   await openWith(page, { [NEW_STATE_KEY]: JSON.stringify(V1_STATE) });
   await openFromMenu(page, "Settings");
