@@ -29,7 +29,7 @@
 - Reading list: engineering → testing; flow → migrate §3.4a.
 - Acceptance: AC1–AC8 of SPEC pass against the **unchanged** app; storage round-trip test loads the fixtures.
 - Depends on: —
-- [ ] done
+- [x] done — 8 flows × 2 viewports green on the unchanged app (2026-11-19). Found on the way: empty names add nobody; rename saves on Enter/blur; theme key is `gg-counter-theme`; a `null` player entry loses the whole saved game (fixed in T-04).
 
 ### T-02 · Repo hygiene without behaviour change
 - Goal: untrack `node_modules/` and `dist/`, generated `*.tsbuildinfo`, `vite.config.js/.d.ts`; npm → pnpm with the supply-chain policy; add `LICENSE`.
@@ -72,7 +72,7 @@
 - [ ] done
 
 ### T-07 · Storage namespace with migration
-- Goal: `gg-counter:v1:state` and `gg-counter:v1:theme`; first load copies the old `gg-counter/state` and `theme`, keeps the old values until the new ones are verified; Settings → export/import/clear.
+- Goal: `gg-counter:v1:state` and `gg-counter:v1:theme`; first load copies the old `gg-counter/state` and `gg-counter-theme`, keeps the old values until the new ones are verified; Settings → export/import/clear.
 - Files: `app/src/storage/`.
 - Reading list: engineering → browser-storage; migrate §1.
 - Acceptance: AC7 with fixtures from the old app; a second forge app on the same origin does not see or change the data.

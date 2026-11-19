@@ -14,8 +14,8 @@
 ## 3. Features (as-is; each becomes a characterization test before any change)
 | ID | Feature | Acceptance |
 |---|---|---|
-| F1 | Add a player by name; empty name → "Player N" | AC1: adding "" as the 3rd player creates "Player 3" with score 0 |
-| F2 | Rename and remove a player (remove asks to confirm) | AC2: removed player is gone after reload |
+| F1 | Add a player by name (trimmed); an empty name adds nobody | AC1: "Ana", "  Boris  ", "   " → two players, score 0 |
+| F2 | Rename (saved on Enter or blur, max 32 characters today) and remove a player (remove asks to confirm) | AC2: removed player is gone after reload |
 | F3 | Change a score: +1 / −1 buttons, and a dialog for a custom amount | AC3: +1, −1 and a custom +12 give the exact sum |
 | F4 | Leaderboard sorted by score with 🥇🥈🥉, total score and player count | AC4: order and totals match the scores |
 | F5 | Share the leaderboard as text (Web Share, else clipboard) | AC5: text equals the format in §4 for a fixed game |
@@ -28,8 +28,8 @@
 - Hosting: standard (GitHub Pages). **URL stays `https://simeontsvetanov.github.io/GG-counter/`** (Moni 2026-11-19).
 - Modes after migration: browser only. No URL parameters, no embed, no API, no MCP (DECISIONS 2026-11-19).
 - Storage keys (localStorage, shared origin): `gg-counter/state` =
-  `{ players: [{ id, name, score, createdAt }], lastUpdated, version: 1 }` · `theme` = `light|dark|system`
-  (un-namespaced — collides with any other app on the origin; migrated to a namespaced key, old value kept until verified).
+  `{ players: [{ id, name, score, createdAt }], lastUpdated, version: 1 }` · `gg-counter-theme` = `light|dark` (key removed for "system").
+  Both keys are app-prefixed but not in the forge `id:v1:` format; they are migrated to it with the old values kept until verified.
 - PWA: manifest `id: "gg-counter-pwa-v1"`, `start_url` and `scope` `/GG-counter/`, service worker `sw.js`, cache id `gg-counter`.
 - Share text: `🏆 GG Counter Leaderboard` / one line per player `🥇 1st — Ana (34 pts)` / `🎯 Total score` / `👥 Players` / `🕒 Snapshot`.
 
@@ -50,4 +50,4 @@
 
 ## 9. Acceptance and risks
 - Done when: AC1–AC9 pass on the live URL with data created by the old version; forge checks at 0 FAIL; baseline → after numbers recorded.
-- Risks: installed PWAs during the service-worker change; the un-namespaced `theme` key; removing 2,189 tracked `node_modules` files from git history is **not** planned (only untracking).
+- Risks: installed PWAs during the service-worker change; the storage-key migration; removing 2,189 tracked `node_modules` files from git history is **not** planned (only untracking).
