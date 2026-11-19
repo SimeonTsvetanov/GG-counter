@@ -6,7 +6,9 @@
     "noEmit": false,
     "emitDeclarationOnly": true,
     "outDir": ".tsbuild/tools",
-    "types": ["node"]
+    "types": ["node"],
+    "allowImportingTsExtensions": true
   },
-  "include": ["playwright.config.ts", "tests/**/*.ts"]
+  "include": ["playwright.config.ts", "vitest.config.ts", "tests/**/*.ts", "packages/*/test/**/*.ts"],
+  "references": [{ "path": "./packages/core" }]
 }

@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { formatLeaderboard } from "gg-counter-core";
 import { PlayerCard } from "./components/player-card";
 import { ThemeToggle } from "./components/theme-toggle";
 import { Button } from "./components/ui/button";
@@ -65,7 +66,7 @@ export function App(): React.JSX.Element {
     adjustScore,
     resetScores,
     resetGame,
-    summary,
+    ranking,
   } = useGameState();
   const isOnline = useOnlineStatus();
   const { canInstall, promptInstall, isInstalled } = usePwaInstall();
@@ -76,14 +77,11 @@ export function App(): React.JSX.Element {
   const [isClearDialogOpen, setIsClearDialogOpen] = useState(false);
   const [isLeaderboardInView, setIsLeaderboardInView] = useState(true);
 
-  const leaderId = summary.leader?.id ?? null;
+  const leaderId = ranking.leader?.id ?? null;
   const playerCount = state.players.length;
   const showInstallBanner = canInstall && !isInstalled && !installDismissed;
   const containerClass = "mx-auto w-full max-w-5xl px-0 sm:px-4 lg:px-8";
-  const sortedPlayers = useMemo(
-    () => [...state.players].sort((a, b) => b.score - a.score),
-    [state.players]
-  );
+  const sortedPlayers = ranking.players;
 
   const addInputRef = useRef<HTMLInputElement>(null);
   const addCardRef = useRef<HTMLDivElement>(null);
@@ -112,12 +110,10 @@ export function App(): React.JSX.Element {
   }, [isInstalled]);
 
   const handleAddPlayer = () => {
-    const trimmed = newPlayerName.trim();
-    if (trimmed.length === 0) {
-      return;
+    // Core trims the name and rejects a blank or over-limit one; rejected text stays in the field.
+    if (addPlayer(newPlayerName).ok) {
+      setNewPlayerName("");
     }
-    addPlayer(trimmed);
-    setNewPlayerName("");
   };
 
   const handleShare = async () => {
@@ -125,41 +121,10 @@ export function App(): React.JSX.Element {
       return;
     }
 
-    const medalEmojis = ["🥇", "🥈", "🥉"];
-    const ordinal = (index: number) => {
-      const value = index + 1;
-      const tens = value % 100;
-      if (tens >= 11 && tens <= 13) {
-        return `${String(value)}th`;
-      }
-      switch (value % 10) {
-        case 1:
-          return `${String(value)}st`;
-        case 2:
-          return `${String(value)}nd`;
-        case 3:
-          return `${String(value)}rd`;
-        default:
-          return `${String(value)}th`;
-      }
-    };
-
-    const lines = sortedPlayers.map((player, index) => {
-      const medal = medalEmojis[index] ?? "🎲";
-      return `${medal} ${ordinal(index)} — ${player.name} (${String(
-        player.score
-      )} pts)`;
+    const text = formatLeaderboard({
+      players: state.players,
+      snapshot: new Date().toLocaleString(),
     });
-
-    const text = [
-      "🏆 GG Counter Leaderboard",
-      "",
-      ...lines,
-      "",
-      `🎯 Total score: ${String(summary.totalScore)}`,
-      `👥 Players: ${String(state.players.length)}`,
-      `🕒 Snapshot: ${new Date().toLocaleString()}`,
-    ].join("\n");
 
     const nav = optionalNavigator();
     try {
@@ -620,9 +585,9 @@ export function App(): React.JSX.Element {
                   <CardTitle className="flex items-center gap-2 text-base font-semibold">
                     <Trophy className="h-4 w-4" /> Leaderboard
                   </CardTitle>
-                  {summary.leader ? (
+                  {ranking.leader ? (
                     <span className="text-sm font-medium text-primary">
-                      {summary.leader.name}
+                      {ranking.leader.name}
                     </span>
                   ) : (
                     <span className="text-sm text-muted-foreground">

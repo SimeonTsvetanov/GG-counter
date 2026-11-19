@@ -1,6 +1,6 @@
 {
   "extends": "./tsconfig.base.json",
-  "compilerOptions": { "noEmit": true, "types": ["node"] },
-  "include": ["app/src", "app/*.ts", "tests", "*.ts"],
+  "compilerOptions": { "noEmit": true, "types": ["node"], "allowImportingTsExtensions": true },
+  "include": ["app/src", "app/*.ts", "packages/*/src", "packages/*/test", "tests", "*.ts"],
   "exclude": ["**/node_modules", "**/dist", ".tsbuild"]
 }

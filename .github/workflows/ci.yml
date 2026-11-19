@@ -24,6 +24,7 @@ jobs:
       # `pnpm verify` minus e2e — the browsers are installed in the e2e job only.
       - run: pnpm lint
       - run: pnpm typecheck
+      - run: pnpm test
       - run: pnpm build
       - run: pnpm audit --prod --audit-level high
       # Workspace (PLAN T-04): -r lists the production dependencies of every package (app + core).

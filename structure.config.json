@@ -1,0 +1,7 @@
+{
+  "layers": [
+    { "name": "core", "path": "packages/core", "pure": true, "mayImport": [] },
+    { "name": "app", "path": "app", "mayImport": ["core"] }
+  ],
+  "maxLines": 300
+}

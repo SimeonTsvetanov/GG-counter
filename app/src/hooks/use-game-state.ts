@@ -1,11 +1,24 @@
+// React wrapper around the gg-counter-core game transitions: holds the game in a reducer, saves every
+// change to this browser and derives the ranking. All game rules (limits included) live in core.
 import { useCallback, useEffect, useMemo, useReducer } from "react";
+import {
+  addPlayer as addPlayerToGame,
+  adjustScore as adjustScoreInGame,
+  rank,
+  removePlayer as removePlayerFromGame,
+  renamePlayer as renamePlayerInGame,
+  resetScores as resetScoresInGame,
+  setScore as setScoreInGame,
+  type AddPlayerErrorCode,
+  type GameState,
+  type NewPlayer,
+  type Ranking,
+  type Result,
+} from "gg-counter-core";
 import { clearState, loadState, saveState } from "../lib/storage";
-import type { GameState, Player } from "../types";
-
-// no hard maximum for players
 
 type GameAction =
-  | { type: "add-player"; name: string }
+  | { type: "add-player"; player: NewPlayer }
   | { type: "remove-player"; id: string }
   | { type: "rename-player"; id: string; name: string }
   | { type: "adjust-score"; id: string; delta: number }
@@ -13,97 +26,37 @@ type GameAction =
   | { type: "reset-scores" }
   | { type: "replace"; state: GameState };
 
-function createPlayer(name: string): Player {
-  return {
-    id: crypto.randomUUID(),
-    name,
-    score: 0,
-    createdAt: new Date().toISOString(),
-  };
-}
-
-function ensurePlayerName(name: string, fallbackIndex: number): string {
-  const trimmed = name.trim();
-  return trimmed.length > 0 ? trimmed : `Player ${String(fallbackIndex)}`;
-}
-
-/** Returns `players` with the player `id` replaced by `update(player)`; the others are kept as they are. */
-function updatePlayer(
-  players: readonly Player[],
-  id: string,
-  update: (player: Player) => Player
-): Player[] {
-  return players.map((player) => (player.id === id ? update(player) : player));
+/** Returns the new game, or `state` unchanged when core rejected the input. */
+function valueOr(state: GameState, result: Result<GameState, string>): GameState {
+  return result.ok ? result.value : state;
 }
 
 function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
-    case "replace": {
+    case "replace":
       return action.state;
-    }
-    case "add-player": {
-      const nextIndex = state.players.length + 1;
-      const player = createPlayer(ensurePlayerName(action.name, nextIndex));
-      return {
-        ...state,
-        players: [...state.players, player],
-      };
-    }
-    case "remove-player": {
-      return {
-        ...state,
-        players: state.players.filter((player) => player.id !== action.id),
-      };
-    }
-    case "rename-player": {
-      return {
-        ...state,
-        players: updatePlayer(state.players, action.id, (player) => ({
-          ...player,
-          name: ensurePlayerName(action.name, state.players.indexOf(player) + 1),
-        })),
-      };
-    }
-    case "adjust-score": {
-      return {
-        ...state,
-        players: updatePlayer(state.players, action.id, (player) => ({
-          ...player,
-          score: player.score + action.delta,
-        })),
-      };
-    }
-    case "set-score": {
-      return {
-        ...state,
-        players: updatePlayer(state.players, action.id, (player) => ({
-          ...player,
-          score: action.score,
-        })),
-      };
-    }
-    case "reset-scores": {
-      return {
-        ...state,
-        players: state.players.map((player) => ({ ...player, score: 0 })),
-      };
-    }
+    case "add-player":
+      return valueOr(state, addPlayerToGame(state, action.player));
+    case "remove-player":
+      return removePlayerFromGame(state, action.id);
+    case "rename-player":
+      return valueOr(state, renamePlayerInGame(state, action.id, action.name));
+    case "adjust-score":
+      return valueOr(state, adjustScoreInGame(state, action.id, action.delta));
+    case "set-score":
+      return valueOr(state, setScoreInGame(state, action.id, action.score));
+    case "reset-scores":
+      return resetScoresInGame(state);
     default:
       return state;
   }
 }
 
-/** Live totals derived from the players. */
-export interface GameSummary {
-  totalScore: number;
-  /** The first player with the highest score, or null when there are no players. */
-  leader: Player | null;
-}
-
-/** What {@link useGameState} returns: the game, its actions and the summary. */
+/** What {@link useGameState} returns: the game, its actions and the ranking. */
 export interface GameStateApi {
   state: GameState;
-  addPlayer: (name: string) => void;
+  /** Adds a player; the result says whether core accepted the name (limits, blank name). */
+  addPlayer: (name: string) => Result<GameState, AddPlayerErrorCode>;
   removePlayer: (id: string) => void;
   renamePlayer: (id: string, name: string) => void;
   adjustScore: (id: string, delta: number) => void;
@@ -111,7 +64,8 @@ export interface GameStateApi {
   resetScores: () => void;
   /** Deletes the saved game and starts an empty one. */
   resetGame: () => void;
-  summary: GameSummary;
+  /** Leaderboard order (ties in the order added), total score and leader. */
+  ranking: Ranking;
 }
 
 /** Holds the game in a reducer and saves every change to this browser. */
@@ -122,9 +76,16 @@ export function useGameState(): GameStateApi {
     saveState(() => ({ ...state }));
   }, [state]);
 
-  const addPlayer = useCallback((name: string) => {
-    dispatch({ type: "add-player", name });
-  }, []);
+  const addPlayer = useCallback(
+    (name: string) => {
+      // Id and time are made here, once, so the reducer stays pure (React may run it twice).
+      const player: NewPlayer = { name, id: crypto.randomUUID(), createdAt: new Date().toISOString() };
+      dispatch({ type: "add-player", player });
+      // The reducer applies the same check to the latest game; this tells the caller the outcome now.
+      return addPlayerToGame(state, player);
+    },
+    [state]
+  );
 
   const removePlayer = useCallback((id: string) => {
     dispatch({ type: "remove-player", id });
@@ -151,20 +112,7 @@ export function useGameState(): GameStateApi {
     dispatch({ type: "replace", state: loadState() });
   }, []);
 
-  const summary = useMemo((): GameSummary => {
-    const total = state.players.reduce((acc, player) => acc + player.score, 0);
-    const leader = state.players.reduce<Player | null>((top, player) => {
-      if (!top || player.score > top.score) {
-        return player;
-      }
-      return top;
-    }, null);
-
-    return {
-      totalScore: total,
-      leader,
-    };
-  }, [state.players]);
+  const ranking = useMemo(() => rank(state.players), [state.players]);
 
   return {
     state,
@@ -175,6 +123,6 @@ export function useGameState(): GameStateApi {
     setScore,
     resetScores,
     resetGame,
-    summary,
+    ranking,
   };
 }

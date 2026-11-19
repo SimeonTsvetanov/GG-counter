@@ -26,14 +26,17 @@ Offline score tracker for board-game nights — a free micro-app by Simeon "Moni
 
 ## Where things are (workspace since PLAN T-04)
 ```
+packages/core   gg-counter-core (private) — pure score logic + Vitest/fast-check tests; no DOM/storage/network
 app/            gg-counter-app — the React PWA (Vite): src/app.tsx (main screen), src/components/,
-                src/hooks/, src/lib/storage.ts, src/providers/; src/components/ui/ = vendored shadcn/Radix
+                src/hooks/ (use-game-state wraps core), src/lib/storage.ts (I/O only), src/providers/;
+                src/components/ui/ = vendored shadcn/Radix. Imports core by name (`gg-counter-core`).
 app/public/     icons, favicon             tests/e2e     Playwright (desktop + phone, Chromium)
 tests/fixtures  saved-state fixtures       docs/         SPEC, PLAN, DECISIONS, migration baseline
 app/vite.config.ts  base `/GG-counter/` in production, PWA manifest (id `gg-counter-pwa-v1`)
 ```
 
 ## Commands
-`pnpm i` · `pnpm dev` · `pnpm verify` (lint + typecheck + build + e2e) · `pnpm lint` ·
-`pnpm typecheck` (`tsc -b`: app, its Vite config, tests and tool configs) · `pnpm build` (→ `app/dist`) ·
+`pnpm i` · `pnpm dev` · `pnpm verify` (lint + typecheck + test + build + e2e) · `pnpm lint` ·
+`pnpm typecheck` (`tsc -b`: core, app, Vite config, tests, tool configs) · `pnpm test` (Vitest, core ≥ 90 % lines) ·
+`pnpm build` (→ `app/dist`) · `node …/structure-check.mjs --repo .` (layers in `structure.config.json`) ·
 `pnpm e2e` (needs `pnpm build`; serves `app/dist` with `vite preview`)

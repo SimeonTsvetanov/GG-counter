@@ -1,105 +1,32 @@
-import type { GameState, Player } from "../types";
+// The saved game in this browser's localStorage (key `gg-counter/state`, a contract with installed
+// copies — SPEC §4). This module only reads and writes; checking the value is core's parseSavedState.
+import { GAME_VERSION, createEmptyGame, parseSavedState, type GameState } from "gg-counter-core";
 
 const STORAGE_KEY = "gg-counter/state";
-const STORAGE_VERSION = 1;
-
-const DEFAULT_STATE: GameState = {
-  players: [],
-  lastUpdated: new Date().toISOString(),
-  version: STORAGE_VERSION,
-};
-
-interface RawPlayer {
-  id?: unknown;
-  name?: unknown;
-  score?: unknown;
-  createdAt?: unknown;
-}
-
-interface RawState {
-  players?: unknown;
-  lastUpdated?: unknown;
-  version?: unknown;
-}
-
-function isValidPlayer(raw: RawPlayer): raw is Player {
-  return (
-    typeof raw.id === "string" &&
-    typeof raw.name === "string" &&
-    Number.isFinite(raw.score) &&
-    typeof raw.createdAt === "string"
-  );
-}
-
-function sanitizePlayers(players: unknown): Player[] {
-  if (!Array.isArray(players)) {
-    return [];
-  }
-
-  return players
-    .map((item) => ({
-      id: (item as RawPlayer).id,
-      name: (item as RawPlayer).name,
-      score: Number((item as RawPlayer).score),
-      createdAt: (item as RawPlayer).createdAt,
-    }))
-    .filter(isValidPlayer);
-}
-
-function fromRawState(raw: RawState | null): GameState {
-  if (!raw || typeof raw !== "object") {
-    return DEFAULT_STATE;
-  }
-
-  const version = typeof raw.version === "number" ? raw.version : 0;
-  const players = sanitizePlayers(raw.players);
-  const lastUpdated =
-    typeof raw.lastUpdated === "string"
-      ? raw.lastUpdated
-      : new Date().toISOString();
-
-  if (version !== STORAGE_VERSION) {
-    return {
-      ...DEFAULT_STATE,
-      players,
-      lastUpdated,
-    };
-  }
-
-  return {
-    players,
-    lastUpdated,
-    version,
-  };
-}
 
 /** Reads the saved game, dropping invalid players; a missing or unreadable entry gives a new empty game. */
 export function loadState(): GameState {
+  const now = new Date().toISOString();
   if (typeof window === "undefined") {
-    return DEFAULT_STATE;
+    return createEmptyGame(now);
   }
 
   try {
     const item = window.localStorage.getItem(STORAGE_KEY);
 
     if (!item) {
-      return DEFAULT_STATE;
+      return createEmptyGame(now);
     }
 
-    const parsed = JSON.parse(item) as RawState;
-    const state = fromRawState(parsed);
-
-    if (state.version !== STORAGE_VERSION) {
-      return {
-        ...state,
-        version: STORAGE_VERSION,
-      };
+    const result = parseSavedState(JSON.parse(item), now);
+    if (!result.ok) {
+      console.error("Failed to read state from storage", result.error);
+      return createEmptyGame(now);
     }
-
-    return state;
+    return result.value;
   } catch (error) {
     console.error("Failed to read state from storage", error);
-    return DEFAULT_STATE;
+    return createEmptyGame(now);
   }
 }
 
@@ -113,7 +40,7 @@ export function saveState(getState: () => GameState): void {
     const state = getState();
     const payload: GameState = {
       ...state,
-      version: STORAGE_VERSION,
+      version: GAME_VERSION,
       lastUpdated: new Date().toISOString(),
     };
 

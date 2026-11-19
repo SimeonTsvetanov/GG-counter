@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { Player } from "../types";
+import type { Player } from "gg-counter-core";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";

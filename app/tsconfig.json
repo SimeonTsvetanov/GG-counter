@@ -8,5 +8,5 @@
     "outDir": "../.tsbuild/app"
   },
   "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "references": [{ "path": "../packages/core" }, { "path": "./tsconfig.node.json" }]
 }
