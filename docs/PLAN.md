@@ -147,8 +147,10 @@
 - [ ] done — part done 2026-11-19: sitemap `lastmod` per source (`scripts/sitemap.ts` + tests); second baseline
   `docs/migration/after-2026-11-19.md` (before → after, every forge check on live + local build); GEO snapshot
   `docs/geo/2026-11-19.md`; version 1.0.0 (CHANGELOG dated, What's new shows it); JS budget 125 KB recorded.
-  Open: `docs-writer` user docs; forge `apps.json` entry; release gates still at FAIL — security-check (no meta CSP
-  on `index.html`/`404.html`; React DOM's `innerHTML` in the bundle; GitHub repo settings) and pwa-check manifest id
+  User docs done 2026-11-19: `docs/index.md`, 5 how-tos, `reference/settings.md`, `about/privacy-and-data.md`, 8 generated images,
+  `docs:check` in verify + CI, wiki mirror (`docs-to-wiki.mjs`, `docs-wiki.yml`; runs after the first push).
+  Open: forge `apps.json` entry; release gates still at FAIL — security-check (React DOM's `innerHTML` in the bundle;
+  GitHub repo settings; the meta CSP is done) and pwa-check manifest id
   (kept on purpose); code/legal/ux/security reviews; Moni's "release approved"; tag `v1.0.0` + GitHub release.
 
 ## 4. Follow-ups (dated)

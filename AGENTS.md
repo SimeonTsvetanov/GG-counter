@@ -33,6 +33,9 @@ Offline score tracker for board-game nights — a free micro-app by Simeon "Moni
   shadcn components in `src/components/ui/` map props to those classes; utilities in JSX only place things.
 - Legal texts (PLAN T-10) must match the code: a change to storage, sharing, reporting, hosting or a new third party
   updates `content/legal/privacy.md` (+ its "Last updated") in the same commit; run the forge `compliance-check.mjs`.
+- User docs (PLAN T-14, forge `user-docs`): English pages in `docs/index.md`, `docs/how-to|reference|about/`, written by `docs-writer`
+  at every release; a user-visible change (UI text, limit, setting, flow) updates the page in the same change. Images are generated
+  (`tests/docs/shots.ts` → `pnpm docs:images`, light + dark), never hand-made; UI labels in the pages are copied from `app/src/i18n/en.ts`.
 
 ## Where things are (workspace since PLAN T-04, features since T-05)
 ```
@@ -43,15 +46,19 @@ app/src/        app.tsx (composition root); players/, leaderboard/, session/ (he
                 styles/ (CSS layers), components/ui/ (vendored shadcn/Radix), hooks/, lib/, providers/ (theme), config.ts
 app/test/       storage/, ui/, lib/ unit tests         tests/e2e  Playwright (desktop + phone; en-US, i18n.spec bg-BG)
 design/         tokens.css (forge)                  tests/a11y screens.json for the forge a11y-check (--screens)
+docs/           SPEC, PLAN, DECISIONS (dev) · index.md, how-to/, reference/, about/, images/ = user docs (English)
+tests/docs/     shots.ts + docs-images.spec.ts → docs/images (pnpm docs:images; playwright.docs.config.ts)
 content/legal/  policy sources → scripts/legal.ts → lazy dialogs + standalone pages (scripts/legal-page.ts)
 scripts/        generate.ts, csp (the one meta CSP), seo, sitemap, static-page, config-check, changelog, credits, sw-handover, legal(-page), licenses,
+                check-docs.ts (docs:check), docs-to-wiki.mjs (+ .github/workflows/docs-wiki.yml: docs/ → GitHub Wiki mirror),
                 accent.ts (forge copy), tokens.ts (hex of tokens), og-image.ts; page-assets/ (404 + policy CSS, licences)
 app.config.ts   single source (T-06; `shell` T-08; `l10n.bg` T-09)   app/vite.config.ts  base, head text, manifest, Tailwind
 ```
 
 ## Commands
 `pnpm i` · `pnpm dev` · `pnpm generate` (also before dev/build/verify) · `pnpm og-image` ·
-`pnpm verify` (generate + lint + typecheck + test + build + e2e) · `pnpm lint` ·
-`pnpm typecheck` (`tsc -b`: core, app, Vite config, scripts, tests, tool configs) · `pnpm test` (Vitest: core + app storage ≥ 90 % lines + generator) ·
+`pnpm docs:check` (links, alt text, light/dark twins, orphan images) · `pnpm docs:images` (builds, then writes docs/images light + dark) ·
+`pnpm verify` (generate + lint + typecheck + test + docs:check + build + e2e) · `pnpm lint` ·
+`pnpm typecheck` (`tsc -b`: core, app, Vite config, scripts, tests, tool configs) · `pnpm test` (Vitest: core + app storage ≥ 90 % lines + generator; then `node --test` for docs-to-wiki) ·
 `pnpm build` (→ `app/dist`) · `node …/structure-check.mjs --repo .` (forge defaults) · `node …/a11y-check.mjs <url> --screens tests/a11y/screens.json` ·
 `pnpm e2e` (needs `pnpm build`; serves `app/dist` with `vite preview`)

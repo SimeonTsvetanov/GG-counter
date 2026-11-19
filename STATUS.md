@@ -1,6 +1,6 @@
 # STATUS — GG Counter
 
-**Updated:** 2026-11-19 (T-14 part) · **Phase:** migration into the forge (`flow` → migrate) → release 1.0.0 prepared, not published
+**Updated:** 2026-11-19 (T-14: user docs) · **Phase:** migration into the forge (`flow` → migrate) → release 1.0.0 prepared, not published
 
 ## Done
 - Migration steps 1–4 (baseline, SPEC, DECISIONS, PLAN) approved 2026-11-19. T-01: 8 characterization flows ×
@@ -13,9 +13,11 @@
 - T-14 part: sitemap `lastmod` per source (`scripts/sitemap.ts`); `docs/migration/after-2026-11-19.md` (before → after);
   GEO snapshot `docs/geo/2026-11-19.md`; version 1.0.0 + dated CHANGELOG; JS budget 125 KB gzip recorded.
   336 Vitest, 86 e2e; first-load JS 118.3 KB; a11y 0 FAIL (en + bg); compliance 0 FAIL; structure 13/13.
+- T-14 user docs: `docs/index.md` + 5 how-tos + `reference/settings.md` + `about/privacy-and-data.md`; 8 generated screenshots
+  (4 × light/dark, `tests/docs/shots.ts`); `pnpm docs:check` is in `pnpm verify` and CI; wiki mirror workflow added (not yet run).
 
 ## Next
-- `docs-writer`: user docs (`docs/how-to|reference|about`); forge `apps.json` entry (orchestrator).
+- Forge `apps.json` entry (orchestrator). After the push: Docs → Wiki run — Moni enables Wikis + creates the first wiki page once.
 - Release gates (PLAN T-14): security-check 1 FAIL left — React DOM's own `innerHTML` in the bundle (library code;
   needs a forge-script allowlist); GitHub repo settings (Dependabot updates, private vulnerability reporting,
   ruleset on `main`); reviews. Meta CSP done 2026-11-19 (`scripts/csp.ts`, `tests/e2e/csp.spec.ts`, DECISIONS).

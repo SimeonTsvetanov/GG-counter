@@ -1,6 +1,8 @@
 <div align="center">
   <img src="app/public/favicon.svg" alt="GG Counter Logo" width="120" height="120" />
-  <h1>GG Counter</h1>
+
+# GG Counter
+
   <p>
     <strong>The ultimate offline-first companion for your board game nights.</strong>
   </p>
@@ -12,7 +14,7 @@
     <a href="https://opensource.org/licenses/MIT">
       <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License" />
     </a>
-    <a href="https:// Simeontsvetanov.github.io/GG-counter/">
+    <a href="https://simeontsvetanov.github.io/GG-counter/">
       <img src="https://img.shields.io/badge/PWA-Ready-success?style=flat-square&logo=pwa" alt="PWA Ready" />
     </a>
   </p>
@@ -36,8 +38,12 @@ Built with **Modern Web Technologies**, it acts as a "Good Neighbor" PWA, co-exi
 - **🔌 Offline First**: Works perfectly without an internet connection.
 - **⚡ Blazing Fast**: Built with Vite and React for instant load times.
 - **🎨 Minimal Design**: Clean UI that lets you focus on the game.
-- **🌙 Dark Mode**: Easy on the eyes for late-night gaming sessions.
+- **🌙 Dark Mode**: Comfortable for late-night gaming sessions.
 - **💾 Auto-Save**: Scores are persisted locally, so you never lose progress.
+
+## 📖 Documentation
+
+How to use GG Counter, step by step: **[User documentation](docs/index.md)** — [add players](docs/how-to/manage-players.md), [change scores](docs/how-to/change-scores.md), [share the leaderboard](docs/how-to/share-leaderboard.md), [back up your data](docs/how-to/manage-your-data.md), [install and use offline](docs/how-to/install-app.md), and the [settings and limits](docs/reference/settings.md).
 
 ## 🛠️ Tech Stack
 

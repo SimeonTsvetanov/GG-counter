@@ -16,9 +16,11 @@
     "preview": "pnpm -F gg-counter-app preview",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc -b",
-    "test": "vitest run --coverage",
+    "test": "vitest run --coverage && node --test scripts/*.test.mjs",
     "e2e": "playwright test",
-    "verify": "pnpm generate && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm e2e"
+    "docs:check": "node scripts/check-docs.ts",
+    "docs:images": "pnpm build && playwright test -c playwright.docs.config.ts --pass-with-no-tests",
+    "verify": "pnpm generate && pnpm lint && pnpm typecheck && pnpm test && pnpm docs:check && pnpm build && pnpm e2e"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
