@@ -9,7 +9,18 @@ type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
 };
 
-export function usePwaInstall() {
+/** What {@link usePwaInstall} returns. */
+export interface PwaInstall {
+  /** True while the browser offers an install prompt. */
+  canInstall: boolean;
+  isInstalled: boolean;
+  /** Shows the browser's install prompt; resolves to true when the user accepted. */
+  promptInstall: () => Promise<boolean>;
+  dismiss: () => void;
+}
+
+/** Captures the browser's install prompt (`beforeinstallprompt`) so the app can offer it later. */
+export function usePwaInstall(): PwaInstall {
   const [promptEvent, setPromptEvent] =
     useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);

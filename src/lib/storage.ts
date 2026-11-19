@@ -73,6 +73,7 @@ function fromRawState(raw: RawState | null): GameState {
   };
 }
 
+/** Reads the saved game, dropping invalid players; a missing or unreadable entry gives a new empty game. */
 export function loadState(): GameState {
   if (typeof window === "undefined") {
     return DEFAULT_STATE;
@@ -102,7 +103,8 @@ export function loadState(): GameState {
   }
 }
 
-export function saveState(getState: () => GameState) {
+/** Saves the game with the current version and timestamp; a storage error is logged, never thrown. */
+export function saveState(getState: () => GameState): void {
   if (typeof window === "undefined") {
     return;
   }
@@ -121,7 +123,8 @@ export function saveState(getState: () => GameState) {
   }
 }
 
-export function clearState() {
+/** Removes the saved game from this browser. */
+export function clearState(): void {
   if (typeof window === "undefined") {
     return;
   }

@@ -1,0 +1,15 @@
+{
+  "name": "gg-counter",
+  "summary": "Offline score tracker for board-game nights",
+  "type": "standard",
+  "inputs": [],
+  "outputs": [],
+  "core": null,
+  "mcpLocal": null,
+  "app": "https://simeontsvetanov.github.io/GG-counter/",
+  "api": null,
+  "mcp": null,
+  "llms": null,
+  "status": "migrating",
+  "version": "0.1.0"
+}

@@ -58,11 +58,11 @@ git clone https://github.com/SimeonTsvetanov/GG-counter.git
 # Navigate to the directory
 cd GG-counter
 
-# Install dependencies
-npm install
+# Install dependencies (pnpm via Corepack: `corepack enable`)
+pnpm install
 
 # Start development
-npm run dev
+pnpm dev
 ```
 
 ## 🤝 Support

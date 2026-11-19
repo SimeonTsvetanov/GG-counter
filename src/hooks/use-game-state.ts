@@ -22,9 +22,18 @@ function createPlayer(name: string): Player {
   };
 }
 
-function ensurePlayerName(name: string, fallbackIndex: number) {
+function ensurePlayerName(name: string, fallbackIndex: number): string {
   const trimmed = name.trim();
-  return trimmed.length > 0 ? trimmed : `Player ${fallbackIndex}`;
+  return trimmed.length > 0 ? trimmed : `Player ${String(fallbackIndex)}`;
+}
+
+/** Returns `players` with the player `id` replaced by `update(player)`; the others are kept as they are. */
+function updatePlayer(
+  players: readonly Player[],
+  id: string,
+  update: (player: Player) => Player
+): Player[] {
+  return players.map((player) => (player.id === id ? update(player) : player));
 }
 
 function gameReducer(state: GameState, action: GameAction): GameState {
@@ -49,43 +58,28 @@ function gameReducer(state: GameState, action: GameAction): GameState {
     case "rename-player": {
       return {
         ...state,
-        players: state.players.map((player) =>
-          player.id === action.id
-            ? {
-                ...player,
-                name: ensurePlayerName(
-                  action.name,
-                  state.players.indexOf(player) + 1
-                ),
-              }
-            : player
-        ),
+        players: updatePlayer(state.players, action.id, (player) => ({
+          ...player,
+          name: ensurePlayerName(action.name, state.players.indexOf(player) + 1),
+        })),
       };
     }
     case "adjust-score": {
       return {
         ...state,
-        players: state.players.map((player) =>
-          player.id === action.id
-            ? {
-                ...player,
-                score: player.score + action.delta,
-              }
-            : player
-        ),
+        players: updatePlayer(state.players, action.id, (player) => ({
+          ...player,
+          score: player.score + action.delta,
+        })),
       };
     }
     case "set-score": {
       return {
         ...state,
-        players: state.players.map((player) =>
-          player.id === action.id
-            ? {
-                ...player,
-                score: action.score,
-              }
-            : player
-        ),
+        players: updatePlayer(state.players, action.id, (player) => ({
+          ...player,
+          score: action.score,
+        })),
       };
     }
     case "reset-scores": {
@@ -99,7 +93,29 @@ function gameReducer(state: GameState, action: GameAction): GameState {
   }
 }
 
-export function useGameState() {
+/** Live totals derived from the players. */
+export interface GameSummary {
+  totalScore: number;
+  /** The first player with the highest score, or null when there are no players. */
+  leader: Player | null;
+}
+
+/** What {@link useGameState} returns: the game, its actions and the summary. */
+export interface GameStateApi {
+  state: GameState;
+  addPlayer: (name: string) => void;
+  removePlayer: (id: string) => void;
+  renamePlayer: (id: string, name: string) => void;
+  adjustScore: (id: string, delta: number) => void;
+  setScore: (id: string, score: number) => void;
+  resetScores: () => void;
+  /** Deletes the saved game and starts an empty one. */
+  resetGame: () => void;
+  summary: GameSummary;
+}
+
+/** Holds the game in a reducer and saves every change to this browser. */
+export function useGameState(): GameStateApi {
   const [state, dispatch] = useReducer(gameReducer, loadState());
 
   useEffect(() => {
@@ -135,7 +151,7 @@ export function useGameState() {
     dispatch({ type: "replace", state: loadState() });
   }, []);
 
-  const summary = useMemo(() => {
+  const summary = useMemo((): GameSummary => {
     const total = state.players.reduce((acc, player) => acc + player.score, 0);
     const leader = state.players.reduce<Player | null>((top, player) => {
       if (!top || player.score > top.score) {

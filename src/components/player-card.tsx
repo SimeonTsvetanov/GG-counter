@@ -36,6 +36,7 @@ interface PlayerCardProps {
   className?: string;
 }
 
+/** One player's card: editable name, remove (with confirmation) and score controls. */
 export function PlayerCard({
   player,
   isLeader,
@@ -43,7 +44,7 @@ export function PlayerCard({
   onRemove,
   onAdjust,
   className,
-}: PlayerCardProps) {
+}: PlayerCardProps): React.JSX.Element {
   const [name, setName] = useState(player.name);
   const [customAmount, setCustomAmount] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);

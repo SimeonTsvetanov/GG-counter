@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 
+/** A theme choice; `system` follows the operating system. */
 export type Theme = "light" | "dark" | "system";
 
 interface ThemeProviderProps {
@@ -17,7 +18,8 @@ interface ThemeProviderProps {
   storageKey?: string;
 }
 
-interface ThemeContextValue {
+/** What {@link useTheme} returns. */
+export interface ThemeContextValue {
   theme: Theme;
   resolvedTheme: Theme;
   setTheme: Dispatch<SetStateAction<Theme>>;
@@ -40,11 +42,12 @@ function resolveTheme(theme: Theme): Theme {
   return theme;
 }
 
+/** Applies the chosen theme to `<html>`, remembers it under `storageKey` and shares it via {@link useTheme}. */
 export function ThemeProvider({
   children,
   defaultTheme = "system",
   storageKey = "theme",
-}: ThemeProviderProps) {
+}: ThemeProviderProps): React.JSX.Element {
   const [theme, setTheme] = useState<Theme>(() => {
     if (typeof window === "undefined") {
       return defaultTheme;
@@ -111,7 +114,8 @@ export function ThemeProvider({
   );
 }
 
-export function useTheme() {
+/** Returns the current theme and its setter; throws when used outside {@link ThemeProvider}. */
+export function useTheme(): ThemeContextValue {
   const context = useContext(ThemeContext);
 
   if (!context) {

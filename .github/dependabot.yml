@@ -1,0 +1,14 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule: { interval: weekly }
+    cooldown: { default-days: 1 }
+    groups: { minor-and-patch: { update-types: [minor, patch] } }
+    ignore:
+      # @types/node follows the Node version we run (engines >=22, CI node 24) — bump both on purpose.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule: { interval: monthly }

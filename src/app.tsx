@@ -47,7 +47,16 @@ import meepleIconUrl from "../meeple-plus.svg?url";
 
 // no hard limit on players
 
-export default function App() {
+/**
+ * lib.dom types `navigator.share` and `navigator.clipboard` as always present, but browsers omit
+ * them (Web Share on most desktops, Clipboard outside secure contexts) — so feature-detect.
+ */
+function optionalNavigator(): Partial<Navigator> | undefined {
+  return typeof navigator === "undefined" ? undefined : navigator;
+}
+
+/** The whole GG Counter screen: players, scores, leaderboard, share and install banner. */
+export function App(): React.JSX.Element {
   const {
     state,
     addPlayer,
@@ -86,8 +95,8 @@ export default function App() {
     }
 
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsLeaderboardInView(entry?.isIntersecting ?? true);
+      (entries) => {
+        setIsLeaderboardInView(entries.at(0)?.isIntersecting ?? true);
       },
       { threshold: 0.15 }
     );
@@ -121,25 +130,25 @@ export default function App() {
       const value = index + 1;
       const tens = value % 100;
       if (tens >= 11 && tens <= 13) {
-        return `${value}th`;
+        return `${String(value)}th`;
       }
       switch (value % 10) {
         case 1:
-          return `${value}st`;
+          return `${String(value)}st`;
         case 2:
-          return `${value}nd`;
+          return `${String(value)}nd`;
         case 3:
-          return `${value}rd`;
+          return `${String(value)}rd`;
         default:
-          return `${value}th`;
+          return `${String(value)}th`;
       }
     };
 
     const lines = sortedPlayers.map((player, index) => {
       const medal = medalEmojis[index] ?? "🎲";
-      return `${medal} ${ordinal(index)} — ${player.name} (${
+      return `${medal} ${ordinal(index)} — ${player.name} (${String(
         player.score
-      } pts)`;
+      )} pts)`;
     });
 
     const text = [
@@ -147,20 +156,21 @@ export default function App() {
       "",
       ...lines,
       "",
-      `🎯 Total score: ${summary.totalScore}`,
-      `👥 Players: ${state.players.length}`,
+      `🎯 Total score: ${String(summary.totalScore)}`,
+      `👥 Players: ${String(state.players.length)}`,
       `🕒 Snapshot: ${new Date().toLocaleString()}`,
     ].join("\n");
 
+    const nav = optionalNavigator();
     try {
-      if (typeof navigator !== "undefined" && navigator.share) {
-        await navigator.share({ title: "GG Counter session", text });
+      if (nav?.share) {
+        await nav.share({ title: "GG Counter session", text });
         setIsLeaderboardDialogOpen(false);
         return;
       }
 
-      if (typeof navigator !== "undefined" && navigator.clipboard) {
-        await navigator.clipboard.writeText(text);
+      if (nav?.clipboard) {
+        await nav.clipboard.writeText(text);
         setIsLeaderboardDialogOpen(false);
         if (typeof window !== "undefined") {
           window.alert("Session summary copied to clipboard.");
@@ -171,9 +181,9 @@ export default function App() {
       console.error("Sharing failed", error);
     }
 
-    if (typeof navigator !== "undefined" && navigator.clipboard) {
+    if (nav?.clipboard) {
       try {
-        await navigator.clipboard.writeText(text);
+        await nav.clipboard.writeText(text);
         setIsLeaderboardDialogOpen(false);
         if (typeof window !== "undefined") {
           window.alert("Session summary copied to clipboard.");

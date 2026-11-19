@@ -10,7 +10,8 @@ import {
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "../providers/theme-provider";
 
-export function ThemeToggle() {
+/** Menu button that switches between light, dark and system theme. */
+export function ThemeToggle(): React.JSX.Element {
   const { theme, setTheme } = useTheme();
 
   const handleChange = (value: string) => {

@@ -4,6 +4,12 @@ import { DIRTY_STATE, NULL_ENTRY_STATE, STATE_KEY, THEME_KEY, V0_STATE, V1_STATE
 // Characterization tests: they describe what GG Counter did before the forge migration
 // (docs/SPEC.md AC1–AC8) and must stay green through every migration step.
 
+/** Turns a fixture into the stored string: `null` = nothing saved, strings are stored as they are (broken JSON). */
+function toStoredValue(state: unknown): string | null {
+  if (state === null) return null;
+  return typeof state === "string" ? state : JSON.stringify(state);
+}
+
 /** Opens the app with `state` already saved, as an existing user would have it. */
 async function openWith(page: Page, state: unknown, extra: Record<string, string> = {}) {
   await page.addInitScript(([key, value, more]) => {
@@ -11,7 +17,7 @@ async function openWith(page: Page, state: unknown, extra: Record<string, string
     sessionStorage.setItem("seeded", "1");
     if (value !== null) localStorage.setItem(key, value);
     for (const [k, v] of Object.entries(more)) localStorage.setItem(k, v);
-  }, [STATE_KEY, state === null ? null : typeof state === "string" ? state : JSON.stringify(state), extra] as const);
+  }, [STATE_KEY, toStoredValue(state), extra] as const);
   await page.goto("./");
 }
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
-export function useOnlineStatus() {
+/** Returns whether the browser reports a network connection; updates on online/offline events. */
+export function useOnlineStatus(): boolean {
   const [isOnline, setIsOnline] = useState(
     typeof navigator === "undefined" ? true : navigator.onLine
   );

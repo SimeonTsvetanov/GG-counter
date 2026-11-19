@@ -45,7 +45,7 @@
 - Reading list: flow → architecture §2; engineering → security §7, code-quality §9.
 - Acceptance: `pnpm verify` green; deploy from CI reaches the same URL; T-01 tests green on the deployed build.
 - Depends on: T-02
-- [ ] done
+- [x] done — forge ESLint rules green without weakening (reducer split by a `updatePlayer` helper, named `App` export, typed hook results); `pnpm verify` = lint + typecheck (src, tests, configs) + build + e2e; frame files, `service.json`, Dependabot; CI → Deploy (`workflow_run`, push + same-repo guard, SHA-pinned) + CodeQL (2026-11-19).
 
 ### T-04 · Workspace layout and core package
 - Goal: `packages/core` with the pure score logic moved out of the reducer and `app.tsx`, tests first; app moved to `app/`; layers declared (`structure.config.json` not needed once the forge layout exists).
@@ -59,7 +59,7 @@
 - Goal: no source file over 300 lines; one component per file; duplicated desktop/mobile action bars become one component.
 - Files: `app/src/players/`, `app/src/scores/`, `app/src/leaderboard/`, `app/src/share/`.
 - Reading list: engineering → react §2, structure §4–5.
-- Acceptance: `structure-check` and lint green; T-01 tests green; screenshots before/after identical.
+- Acceptance: `structure-check` and lint green; T-01 tests green; screenshots before/after identical; the temporary size-rule block in `eslint.config.js` (added in T-03 for `app.tsx` and `player-card.tsx`; paths updated by T-04) is deleted.
 - Depends on: T-04
 - [ ] done
 

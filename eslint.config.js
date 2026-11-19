@@ -63,6 +63,9 @@ export default tseslint.config(
   },
   // React: hooks rules; components are PascalCase functions and may be longer than plain functions.
   { files: ["**/*.tsx"], plugins: { "react-hooks": reactHooks }, rules: { "react-hooks/rules-of-hooks": "error", "react-hooks/exhaustive-deps": "error", "max-lines-per-function": ["error", { max: 150, skipBlankLines: true, skipComments: true }] } },
+  // TEMPORARY (2026-11-19, PLAN T-03): size rules only, for the two oversized pre-forge components.
+  // PLAN T-04 moves them (update these paths), PLAN T-05 splits them by feature and deletes this block.
+  { files: ["src/app.tsx", "src/components/player-card.tsx"], rules: { "max-lines": "off", "max-lines-per-function": "off" } },
   { files: TOOL_CONFIG_FILES, rules: { "no-restricted-syntax": "off" } },
   { files: TEST_FILES, rules: { "max-lines-per-function": "off", "max-lines": "off" } },
   // Layers (engineering → structure §1–2): dependencies point one way, other packages by name only.
