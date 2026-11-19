@@ -16,8 +16,8 @@
    in your browser on this device** — the author cannot see, access, back up or recover it.
    Clearing your browser data, uninstalling the app, or the browser freeing up space can delete it
    permanently; use **Export my data** in Settings to keep a copy. Anyone with access to this
-   device and browser may be able to see it. {App} has no server: nothing you type is sent to the
-   author.
+   device and browser may be able to see it. {App} has no server: nothing you enter is sent to the
+   author unless you choose to send a problem report or an email.
 5. **Acceptable use.** Don't use the app for unlawful purposes, to infringe others' rights, or in
    a way that overloads or disrupts the service. The app may be changed or discontinued at any
    time without notice.

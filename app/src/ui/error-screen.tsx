@@ -55,6 +55,7 @@ export function ErrorScreen({ error }: { error: Error }): React.JSX.Element {
       <p className="text-sm">
         <a className="text-primary underline-offset-4 hover:underline" href={mailtoUrl(report)}>{t("shell.report.email")}</a>
       </p>
+      <p className="text-xs text-muted-foreground">{t("shell.report.public")}</p>
       <p role="status" className="min-h-5 text-sm text-muted-foreground">{status}</p>
       <details className="rounded-lg bg-muted/50 p-3 text-xs">
         <summary className="cursor-pointer font-medium">{t("shell.error.details")}</summary>

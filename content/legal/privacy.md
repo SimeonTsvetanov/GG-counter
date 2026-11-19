@@ -38,7 +38,8 @@
   applies). **Send by email** opens your own email app with the text filled in; nothing is sent
   until you send it. If you leave "Add technical details" ticked, the report also contains the
   app version, your browser's user agent (browser, version and operating system), the screen size, whether the app is installed,
-  your browser's language and the time — never your game or player names. A report from the
+  your browser's language and the time — not your game or player names (you can see every detail
+  before you send). A report from the
   error screen also contains the error message and where in the app's code it happened.
 - **Links to other sites:** links to GitHub, LinkedIn and Buy Me a Coffee open those sites,
   which have their own privacy policies.
@@ -55,17 +56,16 @@ and to a GitHub issue you submit.
   included — to answer you and to fix the problem you report.
 - **Legal basis:** legitimate interest in answering the messages people send and in keeping
   {App} working (Art. 6(1)(f) GDPR).
-- **Recipients:** Google (the email provider of the contact address); for issues, GitHub, which
-  publishes them.
-- **Transfers outside the EU:** Google and GitHub are in the USA; safeguard: the EU–US Data
-  Privacy Framework.
+- **Recipients:** Google (provider of the contact mailbox); for issues, GitHub, which hosts and
+  publishes them under its own privacy statement.
+- **Transfers outside the EU:** Google and GitHub may process this data in the USA. Both state
+  that they take part in the EU–US Data Privacy Framework (Commission adequacy decision of
+  10 July 2023); see their privacy statements.
 - **Retention:** emails are deleted at the latest one month after the conversation ends. Public
-  GitHub issues stay until you delete them or ask us to remove them.
+  GitHub issues stay public until we delete them; you can edit your text on GitHub at any time or
+  ask us at {email} to delete the issue.
 - **Your rights:** access, rectification, erasure, restriction, objection and data portability —
   write to {email}. You can also complain to the Commission for Personal Data Protection (КЗЛД),
   2 Prof. Tsvetan Lazarov Blvd, 1592 Sofia, kzld@cpdp.bg.
 
-- **Email to the contact address:** if you write to {email}, your message and address are used
-  only to answer you, are not shared with anyone, and are deleted at the latest one month after
-  the conversation ends.
 - **Contact:** {email}

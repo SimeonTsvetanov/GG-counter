@@ -52,3 +52,6 @@ copies keep working.
 - The repo `LICENSE` and `third-party-licenses.txt` are generated (current year, full licence texts).
 - All app texts in one English dictionary, ready for a second language; the menu and footer come
   from `app.config.ts`; the service worker and its tests follow the forge PWA rules.
+
+### Fixed
+- The offline banner no longer says changes "will sync" — nothing is synced; your game stays on this device.

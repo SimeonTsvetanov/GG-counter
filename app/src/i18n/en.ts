@@ -54,7 +54,7 @@ export const en = {
       dark: "Dark",
     },
     status: {
-      offline: "You are offline. Changes are saved locally and will sync when you reconnect.",
+      offline: "You are offline. Everything keeps working, and your game is saved on this device.",
       installOffer: "Install {{name}} for quicker access and offline support.",
       install: "Install app",
     },

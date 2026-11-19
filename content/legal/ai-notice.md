@@ -3,5 +3,6 @@
 **AI notice** — Last updated: 19 November 2026
 
 **Built with AI tools.** This app was designed and built by Simeon Tsvetanov with the help of AI
-coding tools (such as Claude). All code was reviewed and is maintained by the author. The app
+coding tools (such as GitHub Copilot and Claude). The author is responsible for the code and
+maintains it. The app
 itself does not use AI to keep score, and nothing you do here is sent to an AI service.
