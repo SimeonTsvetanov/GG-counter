@@ -1,6 +1,6 @@
 # SPEC — GG Counter
 
-> Status: draft (as-is behaviour + the 2026-11-19 migration decisions) · written by `/migrate-app`
+> Status: **approved 2026-11-19 by Moni** (as-is behaviour + the 2026-11-19 migration decisions) · written by `/migrate-app`
 > from the code at `83fd838`. Facts only; "TO CONFIRM" marks what Moni must confirm.
 
 ## 1. Problem and users
@@ -9,7 +9,7 @@
 - Example: add "Ana", "Boris" → tap +/− or enter "+12" → leaderboard shows 🥇 Ana 34, 🥈 Boris 27.
 
 ## 2. Reuse
-- Catalog: none reused. After migration `packages/core` holds the score logic for the app and MCP.
+- Catalog: none reused. After migration `packages/core` holds the score logic (private package).
 
 ## 3. Features (as-is; each becomes a characterization test before any change)
 | ID | Feature | Acceptance |
@@ -26,7 +26,7 @@
 
 ## 4. Usage modes and public interfaces (must not change — migrate §1)
 - Hosting: standard (GitHub Pages). **URL stays `https://simeontsvetanov.github.io/GG-counter/`** (Moni 2026-11-19).
-- Modes after migration: browser · MCP local (new). No URL parameters, no embed, no API today.
+- Modes after migration: browser only. No URL parameters, no embed, no API, no MCP (DECISIONS 2026-11-19).
 - Storage keys (localStorage, shared origin): `gg-counter/state` =
   `{ players: [{ id, name, score, createdAt }], lastUpdated, version: 1 }` · `theme` = `light|dark|system`
   (un-namespaced — collides with any other app on the origin; migrated to a namespaced key, old value kept until verified).
@@ -42,11 +42,11 @@
 - Accent today `#1F4ED8`; logo `public/favicon.svg` (meeple). Screens: one main screen, dialogs.
 
 ## 7. Limits and performance
-- Limits today: none in code (players, name length, score range) — TO CONFIRM: 50 players, 40-character names, scores −999,999…999,999.
+- Limits (Moni 2026-11-19): 50 players, 40-character names, scores −999,999…999,999 — for new input; older saved games load unchanged.
 - Targets: LCP ≤ 2.5 s, INP ≤ 200 ms, CLS ≤ 0.1; critical path ≤ 170 KB compressed; first-load JS budget for Level 2 TO CONFIRM after the first clean build.
 
 ## 8. Legal and AI layers
-- New: Terms, Privacy, AI notice, Legal notice, Support pages and Help (Moni 2026-11-19). No personal data processed by us; contact email TO CONFIRM. MIT licence (README states it; no LICENSE file in the repo — add).
+- New: Terms, Privacy, AI notice, Legal notice, Support pages and Help (Moni 2026-11-19). No personal data processed by us; contact email tsvetanov.simeon@gmail.com (Moni 2026-11-19). MIT licence (README states it; no LICENSE file in the repo — add).
 
 ## 9. Acceptance and risks
 - Done when: AC1–AC9 pass on the live URL with data created by the old version; forge checks at 0 FAIL; baseline → after numbers recorded.

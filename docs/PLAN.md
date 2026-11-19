@@ -1,16 +1,15 @@
 # PLAN — GG Counter (migration into the forge)
 
-> Status: draft — waiting for Moni ("plan approved"). Based on `docs/SPEC.md` (as-is + decisions of
+> Status: **approved 2026-11-19 by Moni** ("go, you decide"). Based on `docs/SPEC.md` (as-is + decisions of
 > 2026-11-19) and `docs/migration/baseline-2026-11-19.md`. Order follows `flow` → migrate §3.4:
 > every task ends green and deployable; the live URL, saved data and installed copies keep working.
 
 ## 1. Architecture (target)
-### core (`@simeonts/gg-counter-core`)
+### core (`gg-counter-core`, private workspace package — not published)
 - Pure functions + Zod schemas: `addPlayer`, `removePlayer`, `renamePlayer`, `adjustScore`, `setScore`,
   `resetScores`, `rank` (order, ties, totals), `formatLeaderboard` (share text), `parseSavedState`
   (reads version 1 exactly as today). Results are typed (`{ ok, value } | { ok, error }`).
-### mcp (`@simeonts/gg-counter-mcp`)
-- Tool `rank_scores` (read-only, all four annotation hints) — TO CONFIRM in DECISIONS.
+### mcp — none (DECISIONS 2026-11-19).
 ### app (PWA, Level 2 — React)
 - `app/src/<feature>/` split of today's `app.tsx` (772 lines): players, score dialog, leaderboard, share.
 - Storage through one module; keys namespaced `gg-counter:v1:*` with a one-time read of the old keys.
@@ -104,13 +103,8 @@
 - Depends on: T-08
 - [ ] done
 
-### T-11 · Local MCP server
-- Goal: `packages/mcp` with `rank_scores`, tests, README; listed in `app.config`, Help and llms.txt.
-- Files: `packages/mcp/**`, `publish.yml`.
-- Reading list: engineering → mcp, security §3.
-- Acceptance: `security-check` passes the tool-hint check; MCP client test lists and calls the tool.
-- Depends on: T-04
-- [ ] done
+### T-11 · (removed — no MCP server, DECISIONS 2026-11-19)
+- [x] done
 
 ### T-12 · Design tokens and Tailwind 4
 - Goal: `design/tokens.css` from the forge; Tailwind 4 `@theme` mapped to the tokens; accent contrast checked. Visual change expected — Moni reviews screenshots.
@@ -126,7 +120,7 @@
 - [ ] done
 
 ### T-14 · User docs, second baseline, release
-- Goal: `docs-writer` pages, `docs/migration/after-<date>.md` next to the baseline, GEO snapshot, `apps.json` entry in the forge, release with the full checklist; first npm publish by Moni (Codespace), then trusted publishing.
+- Goal: `docs-writer` pages, `docs/migration/after-<date>.md` next to the baseline, GEO snapshot, `apps.json` entry in the forge, release with the full checklist (nothing is published to npm).
 - Reading list: flow → release, migrate §3.6.
 - Acceptance: all release gates 0 FAIL; before → after table in the report; Moni's "release approved".
 - Depends on: T-01…T-12
