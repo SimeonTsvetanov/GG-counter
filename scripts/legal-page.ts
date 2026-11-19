@@ -6,6 +6,7 @@
 import type { AppConfig, ShellItemId } from "../app.config.ts";
 import { en } from "../app/src/i18n/en.ts";
 import { isPolicyPage, type LegalBlock, type LegalDocument, type LegalInline } from "../app/src/ui/legal-document.ts";
+import { cspMetaTag } from "./csp.ts";
 import { escapeHtml } from "./seo.ts";
 import { TOKENS_CSS, themeColorMetas } from "./tokens.ts";
 
@@ -33,12 +34,6 @@ document.querySelectorAll("[data-email-user]").forEach(function (a) {
 });
 `;
 }
-
-/**
- * Meta CSP of the template page: only our own files; theme-init.js and year.js are external
- * scripts, so no inline script or style is needed.
- */
-const CSP = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'self'; object-src 'none'; form-action 'self'";
 
 /** Returns the date the way the English page writes it: "19 November 2026". */
 export function englishDate(isoDate: string): string {
@@ -107,10 +102,13 @@ function footerHtml(app: AppConfig): string {
     </footer>`;
 }
 
-/** Returns the head of a policy page: CSP, title, description, canonical, icon, style and scripts. */
+/**
+ * Returns the head of a policy page: the app's meta CSP (scripts/csp.ts — theme-init.js and year.js
+ * are external files, so no inline script or style), title, description, canonical, icon, style and scripts.
+ */
 function headHtml(app: AppConfig, doc: LegalDocument): string {
   const base = app.basePath;
-  return `<meta http-equiv="Content-Security-Policy" content="${CSP}" />
+  return `${cspMetaTag()}
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />

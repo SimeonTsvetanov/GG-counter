@@ -9,6 +9,7 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { VitePWA, type ManifestOptions } from "vite-plugin-pwa";
 import { app as config, l10n, type AppConfig } from "../app.config.ts";
+import { cspMetaTag } from "../scripts/csp.ts";
 import { OG_IMAGE, headTags } from "../scripts/seo.ts";
 import { noscriptHtml, pageInfoHtml } from "../scripts/static-page.ts";
 import { whatsNew } from "../scripts/changelog.ts";
@@ -20,8 +21,9 @@ import { THEME_BACKGROUND } from "../scripts/tokens.ts";
 const app: AppConfig = config;
 
 /**
- * Fills the markers of index.html from app.config.ts: `<!--app-head-->` (title, meta, Open Graph,
- * JSON-LD), `<!--app-noscript-->` and `<!--app-page-info-->` (h1, answer, steps, FAQ) — seo-geo §2–5.
+ * Fills the markers of index.html from app.config.ts: `<!--app-csp-->` (the meta CSP of
+ * scripts/csp.ts, security §1), `<!--app-head-->` (title, meta, Open Graph, JSON-LD),
+ * `<!--app-noscript-->` and `<!--app-page-info-->` (h1, answer, steps, FAQ) — seo-geo §2–5.
  */
 function appHtml(): Plugin {
   return {
@@ -29,8 +31,11 @@ function appHtml(): Plugin {
     transformIndexHtml: {
       order: "pre",
       // Replacer functions: "$&" or "$'" in config text must not be expanded by String.replace.
-      handler: (html) =>
+      handler: (html, ctx) =>
         html
+          // Build only: the dev server injects inline scripts and styles (React Refresh preamble, CSS
+          // HMR) that the policy forbids; e2e and the security check run on the build.
+          .replace("<!--app-csp-->", () => (ctx.server === undefined ? cspMetaTag() : ""))
           .replace("%APP_LANG%", () => app.languages[0])
           .replace("<!--app-head-->", () => headTags(app))
           .replace("<!--app-noscript-->", () => noscriptHtml(app))
@@ -174,6 +179,11 @@ export default defineConfig(({ mode }) => {
         devOptions: { enabled: false },
       }),
     ],
+    resolve: {
+      // Radix's scroll lock injects <style> elements that the meta CSP blocks (style-src 'self'); the
+      // stand-in adopts the same CSS as a constructed stylesheet instead (DECISIONS 2026-11-19).
+      alias: { "react-style-singleton": fileURLToPath(new URL("./src/lib/style-singleton.ts", import.meta.url)) },
+    },
     server: {
       port: 5173,
     },

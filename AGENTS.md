@@ -41,10 +41,10 @@ app/src/        app.tsx (composition root); players/, leaderboard/, session/ (he
                 ui/ = app shell (menu + lazy header menus, shell dialogs, Settings, footer, toasts, pwa.ts, error screen);
                 i18n/ (en.ts = every UI text, bg.ts lazy, no JSX string literals); storage/ (the only storage access);
                 styles/ (CSS layers), components/ui/ (vendored shadcn/Radix), hooks/, lib/, providers/ (theme), config.ts
-app/test/       storage/ + ui/ unit tests           tests/e2e  Playwright (desktop + phone; en-US, i18n.spec bg-BG)
+app/test/       storage/, ui/, lib/ unit tests         tests/e2e  Playwright (desktop + phone; en-US, i18n.spec bg-BG)
 design/         tokens.css (forge)                  tests/a11y screens.json for the forge a11y-check (--screens)
 content/legal/  policy sources → scripts/legal.ts → lazy dialogs + standalone pages (scripts/legal-page.ts)
-scripts/        generate.ts, seo, sitemap, static-page, config-check, changelog, credits, sw-handover, legal(-page), licenses,
+scripts/        generate.ts, csp (the one meta CSP), seo, sitemap, static-page, config-check, changelog, credits, sw-handover, legal(-page), licenses,
                 accent.ts (forge copy), tokens.ts (hex of tokens), og-image.ts; page-assets/ (404 + policy CSS, licences)
 app.config.ts   single source (T-06; `shell` T-08; `l10n.bg` T-09)   app/vite.config.ts  base, head text, manifest, Tailwind
 ```

@@ -16,8 +16,9 @@
 
 ## Next
 - `docs-writer`: user docs (`docs/how-to|reference|about`); forge `apps.json` entry (orchestrator).
-- Release gates (PLAN T-14): security-check FAIL — meta CSP on `index.html`/`404.html`, React DOM `innerHTML` in the
-  bundle, GitHub repo settings (Dependabot updates, private vulnerability reporting, ruleset on `main`); reviews.
+- Release gates (PLAN T-14): security-check 1 FAIL left — React DOM's own `innerHTML` in the bundle (library code;
+  needs a forge-script allowlist); GitHub repo settings (Dependabot updates, private vulnerability reporting,
+  ruleset on `main`); reviews. Meta CSP done 2026-11-19 (`scripts/csp.ts`, `tests/e2e/csp.spec.ts`, DECISIONS).
 - Moni: screenshot matrix (T-12), `legal-reviewer` items (DECISIONS T-10), "release approved", then tag `v1.0.0`.
 - T-13 (Radix → Base UI) optional — Moni decides. Old-key removal release not before 2026-12-19 (PLAN §4).
 

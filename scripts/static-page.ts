@@ -11,6 +11,7 @@
  */
 import type { AppConfig } from "../app.config.ts";
 import { en } from "../app/src/i18n/en.ts";
+import { cspMetaTag } from "./csp.ts";
 import { escapeHtml } from "./seo.ts";
 import { TOKENS_CSS, themeColorMetas } from "./tokens.ts";
 
@@ -60,7 +61,8 @@ export function noscriptHtml(app: AppConfig): string {
 
 /**
  * Returns 404.html: GitHub Pages serves it with status 404 for every unknown path, so its asset
- * URLs are absolute, it is `noindex`, and it links back to the app (seo-geo §6).
+ * URLs are absolute, it is `noindex`, and it links back to the app (seo-geo §6). Its meta CSP comes
+ * first (security §1): the service worker also answers offline navigations with this page.
  */
 export function notFoundHtml(app: AppConfig): string {
   const base = app.basePath;
@@ -68,6 +70,7 @@ export function notFoundHtml(app: AppConfig): string {
   return `<!DOCTYPE html>
 <html lang="${app.languages[0]}">
   <head>
+    ${cspMetaTag()}
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="robots" content="noindex" />

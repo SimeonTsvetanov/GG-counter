@@ -72,3 +72,8 @@ same author. The address, your saved games and installed copies keep working.
 
 ### Fixed
 - The offline banner no longer says changes "will sync" — nothing is synced; your game stays on this device.
+
+### Security
+- Every page (the app, the policy pages and "Page not found") has a strict content security policy:
+  the browser loads only the app's own files and refuses scripts, styles and connections from
+  anywhere else, which blocks most ways injected code could run.
