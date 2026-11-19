@@ -77,7 +77,7 @@
 - Reading list: engineering → browser-storage; migrate §1.
 - Acceptance: AC7 with fixtures from the old app; a second forge app on the same origin does not see or change the data.
 - Depends on: T-06
-- [ ] done
+- [x] done — `app/src/storage/` is the only code that touches localStorage (ESLint rule): keys `gg-counter:v1:state|theme|migrated`, a one-time copy of the old keys verified by read-back and marked per item (old keys kept), memory fallback with typed results when storage is blocked or full, `exportData`/`importData`/`clearData` for T-08's Settings; `public/theme-init.js` (generated) applies the saved theme before the first paint; 62 new unit tests (module 100 % lines) + 8 e2e (2026-11-19).
 
 ### T-08 · Shell: menu, Settings, Help, What's new, update toast, error screen
 - Goal: the required frame in React, generated from `app.config.ts`; `registerType: "prompt"` with an update toast instead of silent auto-update; confirm dialogs keep their current wording.
@@ -123,5 +123,9 @@
 - Goal: `docs-writer` pages, `docs/migration/after-<date>.md` next to the baseline, GEO snapshot, `apps.json` entry in the forge, release with the full checklist (nothing is published to npm).
 - Reading list: flow → release, migrate §3.6.
 - Acceptance: all release gates 0 FAIL; before → after table in the report; Moni's "release approved".
+- Old storage keys (planned in T-07, 2026-11-19): `gg-counter/state` and `gg-counter-theme` stay untouched until a
+  later release of their own, at least 30 days after the T-07 code is live. That release deletes an old key only
+  when the marker `gg-counter:v1:migrated` lists its item (the new value was written and read back equal) — never
+  while the marker is missing — and drops the fallback in `theme-init.js`; `clearData` already removes them.
 - Depends on: T-01…T-12
 - [ ] done

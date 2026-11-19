@@ -1,8 +1,12 @@
 import { expect, test, type Page } from "@playwright/test";
-import { DIRTY_STATE, NULL_ENTRY_STATE, STATE_KEY, THEME_KEY, V0_STATE, V1_STATE } from "../../packages/core/test/fixtures/saved-state";
+import { DIRTY_STATE, MIGRATED_KEY, NEW_STATE_KEY, NEW_THEME_KEY, NULL_ENTRY_STATE, STATE_KEY, THEME_KEY, V0_STATE, V1_STATE } from "../../packages/core/test/fixtures/saved-state";
 
 // Characterization tests: they describe what GG Counter did before the forge migration
-// (docs/SPEC.md AC1–AC8) and must stay green through every migration step.
+// (docs/SPEC.md AC1–AC8) and must stay green through every migration step. They seed the pre-forge
+// keys, so since PLAN T-07 they also prove the one-time copy to the `gg-counter:v1:*` keys.
+
+/** The namespaced keys; removing them makes the next load behave like the first load after an update. */
+const NEW_KEYS = [NEW_STATE_KEY, NEW_THEME_KEY, MIGRATED_KEY] as const;
 
 /** Turns a fixture into the stored string: `null` = nothing saved, strings are stored as they are (broken JSON). */
 function toStoredValue(state: unknown): string | null {
@@ -29,7 +33,8 @@ async function addPlayer(page: Page, name: string) {
 /** A null entry is dropped and the valid players survive (fixed in PLAN T-04; the old app lost the whole game). */
 const NULL_ENTRY_SURVIVORS: readonly string[] = ["Ana"];
 
-const saved = (page: Page) => page.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? "null") as { players: { name: string; score: number }[]; version: number } | null, STATE_KEY);
+// Since PLAN T-07 the app writes only the namespaced key, so the saved game is read from there.
+const saved = (page: Page) => page.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? "null") as { players: { name: string; score: number }[]; version: number } | null, NEW_STATE_KEY);
 const scoreOf = async (page: Page, name: string) => (await saved(page))?.players.find((p) => p.name === name)?.score;
 
 test("AC1: adding players; an empty name adds nobody", async ({ page }) => {
@@ -111,7 +116,8 @@ test("AC7: state saved by the old app loads unchanged (version 1, no version, br
   expect(await scoreOf(page, "Чен")).toBe(-3);
 
   for (const [state, names] of [[V0_STATE, ["Ana", "Boris"]], [DIRTY_STATE, ["Valid"]], ["{not json", []], [NULL_ENTRY_STATE, NULL_ENTRY_SURVIVORS]] as const) {
-    await page.evaluate(([key, value]) => { localStorage.setItem(key, value); }, [STATE_KEY, typeof state === "string" ? state : JSON.stringify(state)] as const);
+    // As saved by the old app on a device the new app has not opened yet (PLAN T-07: the new key wins once it exists).
+    await page.evaluate(([key, value, newKeys]) => { for (const k of newKeys) localStorage.removeItem(k); localStorage.setItem(key, value); }, [STATE_KEY, typeof state === "string" ? state : JSON.stringify(state), NEW_KEYS] as const);
     await page.reload();
     await expect(page.getByRole("textbox", { name: /^Player name for / })).toHaveCount(names.length);
     for (const name of names) await expect(page.getByRole("textbox", { name: `Player name for ${name}` })).toBeVisible();
@@ -121,7 +127,8 @@ test("AC7: state saved by the old app loads unchanged (version 1, no version, br
 test("AC8: the saved theme is applied on load", async ({ page }) => {
   await openWith(page, V1_STATE, { [THEME_KEY]: "dark" });
   await expect(page.locator("html")).toHaveClass(/dark/);
-  await page.evaluate(([key]) => { localStorage.setItem(key, "light"); }, [THEME_KEY] as const);
+  // As saved by the old app on a device the new app has not opened yet (PLAN T-07: the new key wins once it exists).
+  await page.evaluate(([key, newKeys]) => { for (const k of newKeys) localStorage.removeItem(k); localStorage.setItem(key, "light"); }, [THEME_KEY, NEW_KEYS] as const);
   await page.reload();
   await expect(page.locator("html")).not.toHaveClass(/dark/);
 });

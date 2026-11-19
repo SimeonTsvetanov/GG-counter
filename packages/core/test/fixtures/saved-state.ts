@@ -4,6 +4,12 @@
 export const STATE_KEY = "gg-counter/state";
 export const THEME_KEY = "gg-counter-theme"; // "light" | "dark"; the key is removed for "system"
 
+// The namespaced keys written since PLAN T-07 (`<app.id>:v1:<name>`, app/src/storage/keys.ts); the
+// pre-forge keys above are copied to them once and left untouched.
+export const NEW_STATE_KEY = "gg-counter:v1:state";
+export const NEW_THEME_KEY = "gg-counter:v1:theme"; // JSON: "\"light\"" | "\"dark\""; removed for "system"
+export const MIGRATED_KEY = "gg-counter:v1:migrated"; // { migratedAt, sourceVersion, items }
+
 /** Version 1 — what every current user has. */
 export const V1_STATE = {
   players: [

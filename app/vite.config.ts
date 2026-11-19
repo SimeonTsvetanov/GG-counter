@@ -88,6 +88,8 @@ export default defineConfig(({ mode }) => {
 
   return {
     base,
+    // The storage namespace (app/src/storage/keys.ts) comes from app.config.ts, like everything else.
+    define: { __APP_ID__: JSON.stringify(app.id) },
     plugins: [
       appHtml(),
       pagesNotFound(base),

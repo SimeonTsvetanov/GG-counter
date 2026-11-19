@@ -9,6 +9,6 @@
     "types": ["node"],
     "allowImportingTsExtensions": true
   },
-  "include": ["playwright.config.ts", "vitest.config.ts", "app.config.ts", "scripts/**/*.ts", "tests/**/*.ts", "packages/*/test/**/*.ts"],
-  "references": [{ "path": "./packages/core" }]
+  "include": ["playwright.config.ts", "vitest.config.ts", "app.config.ts", "scripts/**/*.ts", "tests/**/*.ts", "packages/*/test/**/*.ts", "app/test/**/*.ts"],
+  "references": [{ "path": "./packages/core" }, { "path": "./app" }]
 }

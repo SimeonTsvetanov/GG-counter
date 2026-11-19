@@ -1,6 +1,6 @@
 // React wrapper around the gg-counter-core game transitions: holds the game in a reducer, saves every
-// change to this browser and derives the ranking. All game rules (limits included) live in core.
-import { useCallback, useEffect, useMemo, useReducer } from "react";
+// change to this browser (app/src/storage) and derives the ranking. All game rules live in core.
+import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import {
   addPlayer as addPlayerToGame,
   adjustScore as adjustScoreInGame,
@@ -15,7 +15,7 @@ import {
   type Ranking,
   type Result,
 } from "gg-counter-core";
-import { clearState, loadState, saveState } from "../lib/storage";
+import { readGame, removeGame, writeGame } from "../storage/game";
 
 type GameAction =
   | { type: "add-player"; player: NewPlayer }
@@ -70,11 +70,16 @@ export interface GameStateApi {
 
 /** Holds the game in a reducer and saves every change to this browser. */
 export function useGameState(): GameStateApi {
-  const [state, dispatch] = useReducer(gameReducer, loadState());
+  const [savedGame] = useState(readGame);
+  const [state, dispatch] = useReducer(gameReducer, savedGame);
 
   useEffect(() => {
-    saveState(() => ({ ...state }));
-  }, [state]);
+    // because writing back an unchanged load would create the new key and so hide a pre-forge game
+    // the migration could not read (storage/migrate.ts); every change is saved.
+    if (state === savedGame) return;
+    const saved = writeGame(state);
+    if (!saved.ok) console.error("Failed to persist state", saved.error);
+  }, [state, savedGame]);
 
   const addPlayer = useCallback(
     (name: string) => {
@@ -108,8 +113,8 @@ export function useGameState(): GameStateApi {
   }, []);
 
   const resetGame = useCallback(() => {
-    clearState();
-    dispatch({ type: "replace", state: loadState() });
+    removeGame();
+    dispatch({ type: "replace", state: readGame() });
   }, []);
 
   const ranking = useMemo(() => rank(state.players), [state.players]);

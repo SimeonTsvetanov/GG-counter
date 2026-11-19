@@ -1,3 +1,5 @@
+// The theme choice (light / dark / system) for the whole app: the class on <html> and the saved
+// choice (app/src/storage/theme.ts). public/theme-init.js sets the same class before the first paint.
 import {
   createContext,
   type Dispatch,
@@ -8,14 +10,11 @@ import {
   useMemo,
   useState,
 } from "react";
-
-/** A theme choice; `system` follows the operating system. */
-export type Theme = "light" | "dark" | "system";
+import { readTheme, writeTheme, type Theme } from "../storage/theme";
 
 interface ThemeProviderProps {
   children: ReactNode;
   defaultTheme?: Theme;
-  storageKey?: string;
 }
 
 /** What {@link useTheme} returns. */
@@ -42,20 +41,12 @@ function resolveTheme(theme: Theme): Theme {
   return theme;
 }
 
-/** Applies the chosen theme to `<html>`, remembers it under `storageKey` and shares it via {@link useTheme}. */
+/** Applies the chosen theme to `<html>`, saves it in this browser and shares it via {@link useTheme}. */
 export function ThemeProvider({
   children,
   defaultTheme = "system",
-  storageKey = "theme",
 }: ThemeProviderProps): React.JSX.Element {
-  const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof window === "undefined") {
-      return defaultTheme;
-    }
-
-    const stored = window.localStorage.getItem(storageKey) as Theme | null;
-    return stored ?? defaultTheme;
-  });
+  const [theme, setTheme] = useState<Theme>(() => readTheme() ?? defaultTheme);
   const [resolvedTheme, setResolvedTheme] = useState<Theme>(() =>
     resolveTheme(theme)
   );
@@ -72,12 +63,9 @@ export function ThemeProvider({
     element.classList.add(next);
     setResolvedTheme(next);
 
-    if (theme === "system") {
-      window.localStorage.removeItem(storageKey);
-    } else {
-      window.localStorage.setItem(storageKey, theme);
-    }
-  }, [theme, storageKey]);
+    // "system" removes the saved value (writeTheme), as before; a refused save keeps the theme for this session.
+    writeTheme(theme);
+  }, [theme]);
 
   useEffect(() => {
     if (typeof window === "undefined") {

@@ -19,13 +19,13 @@ Offline score tracker for board-game nights — a free micro-app by Simeon "Moni
   a test to get green (the temporary size-rule block was removed in PLAN T-05).
 - The e2e tests in `tests/e2e/` are characterization tests of the pre-forge behaviour — a change
   that breaks one is a behaviour change and needs a SPEC/DECISIONS entry first.
-- Saved data: `localStorage` keys `gg-counter/state` and `gg-counter-theme` are read by installed
-  copies — never rename or reshape them outside PLAN T-07.
+- Saved data: only `app/src/storage/` touches browser storage (ESLint rule). Keys `gg-counter:v1:state|theme|migrated`;
+  the pre-forge `gg-counter/state` and `gg-counter-theme` are copied once and never written — removal per PLAN T-14.
 - Moni corrects/dislikes something → apply it and add an entry to `LEARNINGS.md`.
 - Decisions → `docs/DECISIONS.md` (date · decision · reason) the same day. Update `STATUS.md` (≤ 30 lines).
-- Never hand-edit generated files: `app/public/{sitemap.xml,llms.txt,robots.txt,404.html,not-found.css}`
+- Never hand-edit generated files: `app/public/{sitemap.xml,llms.txt,robots.txt,404.html,not-found.css,theme-init.js}`
   (git-ignored, `pnpm generate`) and the head/page text of `app/index.html` (filled at build from the
-  `<!--app-*-->` markers). Edit `app.config.ts` or `scripts/seo.ts` / `scripts/static-page.ts` instead.
+  `<!--app-*-->` markers). Edit `app.config.ts` or `scripts/seo.ts` / `static-page.ts` / `theme-init.ts` instead.
   `app/public/og-image.png` is committed: `pnpm og-image` after a name, tagline, accent or logo change.
 
 ## Where things are (workspace since PLAN T-04, features since T-05)
@@ -35,8 +35,9 @@ packages/core   gg-counter-core (private) — pure score logic + Vitest/fast-che
 app/            gg-counter-app — the React PWA (Vite): src/app.tsx (composition root), feature folders
                 src/players/, src/leaderboard/, src/session/ (header, action bar, confirmations), src/share/;
                 src/components/ (theme toggle, status banner), src/hooks/ (use-game-state wraps core),
-                src/lib/ (storage I/O, layout classes), src/providers/; src/components/ui/ = vendored shadcn/Radix.
-                Imports core by name (`gg-counter-core`).
+                src/storage/ (localStorage: game, theme, migration, export/import/clear; tests in app/test/storage/),
+                src/lib/ (layout classes), src/providers/; src/components/ui/ = vendored shadcn/Radix.
+                Imports core by name (`gg-counter-core`; fixtures for tests: `gg-counter-core/test-fixtures`).
 app/public/     icons, favicon, og-image   tests/e2e     Playwright (desktop + phone, Chromium)
 docs/           SPEC, PLAN, DECISIONS, migration baseline
 app.config.ts   single source (PLAN T-06)  scripts/      generate.ts, seo.ts, static-page.ts, config-check.ts (+ tests), og-image.ts
@@ -46,6 +47,6 @@ app/vite.config.ts  base from app.config (`/GG-counter/` in production), head/pa
 ## Commands
 `pnpm i` · `pnpm dev` · `pnpm generate` (also before dev/build/verify) · `pnpm og-image` ·
 `pnpm verify` (generate + lint + typecheck + test + build + e2e) · `pnpm lint` ·
-`pnpm typecheck` (`tsc -b`: core, app, Vite config, scripts, tests, tool configs) · `pnpm test` (Vitest: core ≥ 90 % lines + generator) ·
+`pnpm typecheck` (`tsc -b`: core, app, Vite config, scripts, tests, tool configs) · `pnpm test` (Vitest: core + app storage ≥ 90 % lines + generator) ·
 `pnpm build` (→ `app/dist`) · `node …/structure-check.mjs --repo .` (layers in `structure.config.json`) ·
 `pnpm e2e` (needs `pnpm build`; serves `app/dist` with `vite preview`)

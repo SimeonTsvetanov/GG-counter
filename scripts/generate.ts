@@ -1,7 +1,7 @@
 /**
  * Generates the search and agent files from app.config.ts (app-shell §1). Run: `pnpm generate`
  * (also before dev, build and verify). Writes git-ignored files into app/public/: sitemap.xml,
- * llms.txt, robots.txt, 404.html and not-found.css. The static <head> and page text of
+ * llms.txt, robots.txt, 404.html, not-found.css and theme-init.js. The static <head> and page text of
  * app/index.html are filled at build time by app/vite.config.ts from the same functions.
  * Never hand-edit the outputs.
  */
@@ -12,6 +12,7 @@ import { app, type AppConfig } from "../app.config.ts";
 import { llmsTxt, pageLastmod, robotsTxt, sitemapXml } from "./seo.ts";
 import { notFoundHtml } from "./static-page.ts";
 import { configProblems } from "./config-check.ts";
+import { themeInitScript } from "./theme-init.ts";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const publicDir = join(root, "app", "public");
@@ -38,5 +39,6 @@ writePublic("llms.txt", llmsTxt(config));
 writePublic("robots.txt", robotsTxt(config));
 writePublic("404.html", notFoundHtml(config));
 copyFileSync(join(root, "scripts", "page-assets", "not-found.css"), join(publicDir, "not-found.css"));
+writePublic("theme-init.js", themeInitScript(config));
 
-console.log(`generate: done for ${config.id} (sitemap.xml, llms.txt, robots.txt, 404.html, not-found.css)`);
+console.log(`generate: done for ${config.id} (sitemap.xml, llms.txt, robots.txt, 404.html, not-found.css, theme-init.js)`);
