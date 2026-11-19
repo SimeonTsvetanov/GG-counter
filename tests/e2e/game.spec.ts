@@ -26,8 +26,8 @@ async function addPlayer(page: Page, name: string) {
   await page.getByRole("button", { name: "Add", exact: true }).click();
 }
 
-/** Today a null entry loses the whole game (see the fixture); PLAN T-04 changes this to ["Ana"]. */
-const NULL_ENTRY_SURVIVORS: readonly string[] = [];
+/** A null entry is dropped and the valid players survive (fixed in PLAN T-04; the old app lost the whole game). */
+const NULL_ENTRY_SURVIVORS: readonly string[] = ["Ana"];
 
 const saved = (page: Page) => page.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? "null") as { players: { name: string; score: number }[]; version: number } | null, STATE_KEY);
 const scoreOf = async (page: Page, name: string) => (await saved(page))?.players.find((p) => p.name === name)?.score;

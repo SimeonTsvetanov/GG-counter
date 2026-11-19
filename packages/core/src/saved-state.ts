@@ -1,5 +1,6 @@
-// Reads the saved game (`gg-counter/state`) exactly as the pre-forge app did (SPEC F7, AC7): the
-// app parses the JSON, this module checks the value. Saved games beyond today's limits load unchanged.
+// Reads the saved game (`gg-counter/state`) as the pre-forge app did (SPEC F7, AC7), except that a null
+// player entry no longer loses the whole game. The app parses the JSON, this module checks the value.
+// Saved games beyond today's limits load unchanged.
 import { GAME_VERSION, type GameState, type Player } from "./game.ts";
 import { fail, ok, type Result } from "./result.ts";
 
@@ -48,14 +49,13 @@ function toPlayer(entry: unknown): Player | null {
  * @param raw - The value parsed from storage.
  * @param now - ISO 8601 time used when the saved `lastUpdated` is missing.
  * @remarks Like the pre-forge app: the `version` field is not checked (missing, 0 or 1 load the same
- * way and come back as version 1); players with a wrong field type are dropped, the others kept;
+ * way and come back as version 1); entries that are not players (wrong field types, null) are
+ * dropped, the others kept — the pre-forge loader lost the whole game on a null entry (fixed in PLAN T-04);
  * scores go through `Number()` so numeric strings load; extra fields are not kept.
  */
 export function parseSavedState(raw: unknown, now: string): Result<GameState, SavedStateErrorCode> {
   if (!isObject(raw)) return fail("SAVED_STATE_INVALID", "The saved game is not an object.");
   const entries: readonly unknown[] = Array.isArray(raw.players) ? raw.players : [];
-  // Pre-forge defect kept until PLAN T-04 (c): the old loader threw on a null entry and lost the whole game.
-  if (entries.some((entry) => entry == null)) return fail("SAVED_STATE_INVALID", "The saved game has an empty player entry.");
   const players = entries.map(toPlayer).filter((player) => player !== null);
   const lastUpdated = typeof raw.lastUpdated === "string" ? raw.lastUpdated : now;
   return ok({ players, lastUpdated, version: GAME_VERSION });

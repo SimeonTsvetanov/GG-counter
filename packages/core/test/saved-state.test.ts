@@ -60,8 +60,9 @@ describe("parseSavedState (examples)", () => {
   it("entries that are numbers, strings or arrays are dropped", () => {
     expect(namesOf({ players: [7, "Ana", [V1_STATE.players[0]], V1_STATE.players[1]] })).toEqual(["Boris"]);
   });
-  it("pre-forge defect kept until PLAN T-04 (c): a null entry makes the whole game unreadable", () => {
-    expect(read(NULL_ENTRY_STATE)).toBe("SAVED_STATE_INVALID");
+  it("regression (PLAN T-01 finding): a null entry is dropped and the valid players survive", () => {
+    expect(read(NULL_ENTRY_STATE)).toEqual({ players: [V1_STATE.players[0]], lastUpdated: NOW, version: 1 });
+    expect(namesOf({ players: [null, V1_STATE.players[1], null] })).toEqual(["Boris"]);
   });
   it("a value whose Number() conversion throws is dropped, not thrown", () => {
     const score = { valueOf: (): never => { throw new Error("boom"); } };

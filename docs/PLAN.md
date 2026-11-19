@@ -53,7 +53,7 @@
 - Reading list: engineering → structure §1–5, §7; code-quality §2–6.
 - Acceptance: `structure-check` 0 FAIL; core ≥ 90 % line coverage incl. fast-check properties for `parseSavedState`; T-01 tests green; moves and behaviour changes in separate commits.
 - Depends on: T-03
-- [ ] done
+- [x] done — pnpm workspace: app moved to `app/` (`gg-counter-app`, `git mv`), `packages/core` = `gg-counter-core` (players, scores, ranking, share text, `parseSavedState`; limits for new input) with 90 Vitest/fast-check tests at 100 % lines; app imports core by name; layers in `structure.config.json`; one behaviour change: a `null` player entry is dropped instead of losing the game (2026-11-19).
 
 ### T-05 · Split `app.tsx` by feature
 - Goal: no source file over 300 lines; one component per file; duplicated desktop/mobile action bars become one component.

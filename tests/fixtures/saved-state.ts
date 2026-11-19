@@ -25,7 +25,7 @@ export const DIRTY_STATE = {
 };
 
 /**
- * Known defect of the pre-forge app: one `null` entry makes the loader throw, so the whole game is
- * shown as empty (and then overwritten). PLAN T-04 fixes it — the valid players must survive.
+ * A `null` entry among the players. The pre-forge app's loader threw on it and showed (then saved) an
+ * empty game; since PLAN T-04 the entry is dropped and the valid players survive.
  */
 export const NULL_ENTRY_STATE = { players: [V1_STATE.players[0], null], version: 1 };
