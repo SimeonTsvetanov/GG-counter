@@ -1,5 +1,6 @@
 // Vite build of the GG Counter PWA. Base path, static head, page text and manifest values come from
-// app.config.ts (PLAN T-06); service-worker settings are unchanged until PLAN T-08.
+// app.config.ts (PLAN T-06); What's new and About read CHANGELOG.md and the shipped packages at build
+// time; the service worker follows pwa §3–5 since PLAN T-08 (prompt updates, offline-only fallback).
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { defineConfig, type Plugin } from "vite";
@@ -8,6 +9,9 @@ import { VitePWA, type ManifestOptions } from "vite-plugin-pwa";
 import { app as config, type AppConfig } from "../app.config.ts";
 import { OG_IMAGE, headTags } from "../scripts/seo.ts";
 import { noscriptHtml, pageInfoHtml } from "../scripts/static-page.ts";
+import { whatsNew } from "../scripts/changelog.ts";
+import { appCredits } from "../scripts/credits.ts";
+import { SW_HANDOVER_FILE } from "../scripts/sw-handover.ts";
 
 const app: AppConfig = config;
 
@@ -57,6 +61,33 @@ function pagesNotFound(base: string): Plugin {
   };
 }
 
+/** Cookie with which an e2e test asks `vite preview` for the next deploy's sw.js (tests/e2e/pwa.spec.ts). */
+const NEXT_DEPLOY_COOKIE = /(?:^|;\s*)e2e-next-deploy=(\w+)/;
+
+/**
+ * `vite preview` only (GitHub Pages never runs it): with the cookie `e2e-next-deploy=<id>` sw.js gets a
+ * comment added, so the browser sees a new service worker — how the e2e test makes a new version wait
+ * (Playwright cannot intercept the service worker's own script request).
+ */
+function previewNextDeploy(base: string): Plugin {
+  return {
+    name: "gg-counter-preview-next-deploy",
+    configurePreviewServer(server) {
+      const script = join(resolve(server.config.root, server.config.build.outDir), "sw.js");
+      server.middlewares.use((req, res, next) => {
+        const deploy = NEXT_DEPLOY_COOKIE.exec(req.headers.cookie ?? "")?.[1];
+        if (deploy === undefined || req.url?.split("?")[0] !== `${base}sw.js`) {
+          next();
+          return;
+        }
+        res.setHeader("content-type", "text/javascript; charset=utf-8");
+        res.setHeader("cache-control", "no-cache");
+        res.end(`${readFileSync(script, "utf8")}\n// e2e next deploy ${deploy}\n`);
+      });
+    },
+  };
+}
+
 /**
  * Returns the web app manifest. id, start_url, scope, name, short_name, colours and icons are a
  * contract with installed copies (SPEC §4): same values as the pre-forge manifest.
@@ -89,27 +120,46 @@ export default defineConfig(({ mode }) => {
   return {
     base,
     // The storage namespace (app/src/storage/keys.ts) comes from app.config.ts, like everything else.
-    define: { __APP_ID__: JSON.stringify(app.id) },
+    define: {
+      __APP_ID__: JSON.stringify(app.id),
+      __CHANGELOG__: JSON.stringify(whatsNew(readFileSync(new URL("../CHANGELOG.md", import.meta.url), "utf8"))),
+      __CREDITS__: JSON.stringify(appCredits(new URL("./", import.meta.url))),
+    },
     plugins: [
       appHtml(),
       pagesNotFound(base),
+      previewNextDeploy(base),
       react(),
       VitePWA({
-        registerType: "autoUpdate",
+        // pwa §5: a new version waits for the user's Reload (update toast in app/src/ui/), never reloads
+        // by itself; registration happens in app/src/ui/pwa.ts, so no injected registerSW.js.
+        registerType: "prompt",
+        injectRegister: false,
         manifest: pwaManifest(base),
         workbox: {
+          // Same cache id, file name (sw.js) and scope as the pre-forge worker: installed copies update in place.
+          cacheId: app.id,
           globPatterns: ["**/*.{js,css,html,svg,png,webp,ico}"],
           // The social image is for link previews only, never needed offline (pwa §3).
           globIgnores: [OG_IMAGE.file],
-          cacheId: "gg-counter",
           cleanupOutdatedCaches: true,
+          ignoreURLParametersMatching: [/.*/],
+          // pwa §4: no navigateFallback (it would answer every unknown address with the app, online
+          // too, e.g. sitemap.xml). Precached pages win; other navigations go to the network and only
+          // when that fails (offline) our 404 page answers.
+          navigateFallback: null,
+          runtimeCaching: [
+            {
+              urlPattern: ({ request }) => request.mode === "navigate",
+              handler: "NetworkOnly",
+              options: { precacheFallback: { fallbackURL: `${base}404.html` } },
+            },
+          ],
+          // Lets the first update away from the pre-T-08 auto-update worker take over without
+          // waiting for every window to close (scripts/sw-handover.ts).
+          importScripts: [SW_HANDOVER_FILE],
         },
-        includeAssets: [
-          "favicon.svg",
-          "icons/icon-192x192.svg",
-          "icons/icon-512x512.svg",
-          "icons/icon-maskable.svg",
-        ],
+        devOptions: { enabled: false },
       }),
     ],
     server: {

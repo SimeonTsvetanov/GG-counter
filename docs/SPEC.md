@@ -15,14 +15,16 @@
 | ID | Feature | Acceptance |
 |---|---|---|
 | F1 | Add a player by name (trimmed); an empty name adds nobody | AC1: "Ana", "  Boris  ", "   " → two players, score 0 |
-| F2 | Rename (saved on Enter or blur, max 32 characters today) and remove a player (remove asks to confirm) | AC2: removed player is gone after reload |
+| F2 | Rename (saved on Enter or blur; max 40 characters since PLAN T-08, was 32) and remove a player (remove asks to confirm) | AC2: removed player is gone after reload |
 | F3 | Change a score: +1 / −1 buttons, and a dialog for a custom amount | AC3: +1, −1 and a custom +12 give the exact sum |
 | F4 | Leaderboard sorted by score with 🥇🥈🥉, total score and player count | AC4: order and totals match the scores |
 | F5 | Share the leaderboard as text (Web Share, else clipboard) | AC5: text equals the format in §4 for a fixed game |
 | F6 | Reset all scores (confirm) and clear the session (confirm) | AC6: reset keeps players at 0; clear removes all |
 | F7 | Everything is saved on the device and restored after reload | AC7: state written by the **old** app loads unchanged in the new one |
-| F8 | Light / dark / system theme | AC8: choice survives reload |
-| F9 | Installable PWA, works offline; online/offline indicator | AC9: loads offline after first visit; installed copy keeps working after the update |
+| F8 | Light / dark / system theme (Settings; the header theme button from 640 px up — phones use Settings since T-08) | AC8: choice survives reload |
+| F9 | Installable PWA, works offline; online/offline indicator; a new version waits for the user's Reload (T-08) | AC9: loads offline after first visit; installed copy keeps working after the update |
+| F10 | App shell (T-08): menu (Help, Settings, What's new, Share app, Install app, Report a problem, About, Support ☕, Source code), footer (version → What's new, More free tools, © current year), update toast, error screen | AC10: menu opens/closes with the keyboard; Settings export → clear → import gives back the same game; the error screen replaces a crash |
+| F11 | Limit messages (T-08): too many players, name too long, score out of range say why under the field; a blank name or a non-number is still ignored silently | AC11: each limit shows its message and changes nothing |
 
 ## 4. Usage modes and public interfaces (must not change — migrate §1)
 - Hosting: standard (GitHub Pages). **URL stays `https://simeontsvetanov.github.io/GG-counter/`** (Moni 2026-11-19).
@@ -34,7 +36,7 @@
 - Share text: `🏆 GG Counter Leaderboard` / one line per player `🥇 1st — Ana (34 pts)` / `🎯 Total score` / `👥 Players` / `🕒 Snapshot`.
 
 ## 5. Data and storage
-- Stored: players and scores, theme → tier: prefs (localStorage) · export/import: no today (added by the shell's Settings).
+- Stored: players and scores, theme, the last version whose What's new was seen (`gg-counter:v1:last-seen-version`, T-08) → tier: prefs (localStorage) · export/import/clear: Settings → Your data (T-08), file `gg-counter-data-YYYY-MM-DD.json`; an import is checked through core and confirmed before it replaces the game.
 - Nothing leaves the device; no analytics, no network calls except loading the app.
 
 ## 6. UI

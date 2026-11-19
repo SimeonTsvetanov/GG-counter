@@ -1,5 +1,5 @@
 // The storage module's "my data" functions (engineering → browser-storage §3, §8): export, import and
-// clear this app's data. Called by Settings (PLAN T-08). The game, theme and migration have their own
+// clear this app's data. Called by Settings and the error screen (PLAN T-08). The game, theme and migration have their own
 // files next to this one; nothing outside app/src/storage touches localStorage (ESLint rule).
 import { parseSavedState, type GameState, type Result } from "gg-counter-core";
 import { APP_ID, STORAGE_KEYS, isOwnKey } from "./keys";
@@ -36,7 +36,8 @@ export type ImportErrorCode =
   | "IMPORT_INVALID"
   | StorageErrorCode;
 
-type ImportResult = Result<AppData, ImportErrorCode>;
+/** What {@link checkImport} and {@link importData} return. */
+export type ImportResult = Result<AppData, ImportErrorCode>;
 
 /** Returns a rejected import with a stable code and an English message. */
 function rejected(code: ImportErrorCode, message: string): ImportResult {
@@ -62,8 +63,13 @@ export function exportData(now: string = new Date().toISOString()): DataExport {
   };
 }
 
-/** Returns the data in an export file's text, or why it cannot be imported; checks every field. */
-function parseExport(text: string, now: string): ImportResult {
+/**
+ * Returns the data in an export file's text, or why it cannot be imported; checks every field and
+ * changes nothing (Settings shows the result before asking to replace the game).
+ *
+ * @param now - ISO 8601 time for a game without `lastUpdated`; defaults to the current time.
+ */
+export function checkImport(text: string, now: string = new Date().toISOString()): ImportResult {
   if (text.length > MAX_IMPORT_CHARS) return rejected("IMPORT_TOO_BIG", "The file is too big to be a GG Counter export.");
   let raw: unknown;
   try {
@@ -101,7 +107,7 @@ function restore(key: string, previous: string | null): void {
  * @returns The imported data (for the UI to show), or a typed error; on any error nothing is changed.
  */
 export function importData(text: string, now: string = new Date().toISOString()): ImportResult {
-  const parsed = parseExport(text, now);
+  const parsed = checkImport(text, now);
   if (!parsed.ok) return parsed;
   const previous = { state: readRaw(STORAGE_KEYS.state), theme: readRaw(STORAGE_KEYS.theme) };
   // The game goes first: it is the big value, so a full storage fails before anything changed.

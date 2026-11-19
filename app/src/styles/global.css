@@ -22,7 +22,8 @@
   --destructive-foreground: oklch(0.985 0.002 247.839);
   --border: oklch(0.928 0.006 264.531);
   --input: oklch(0.928 0.006 264.531);
-  --ring: oklch(0.707 0.022 261.325);
+  /* Focus indicator: the accent, 6.7:1 on the background (accessibility §2, PLAN T-08). */
+  --ring: #1f4ed8;
   --radius: 0.625rem;
 }
 
@@ -42,10 +43,12 @@
   --accent: oklch(0.278 0.033 256.848);
   --accent-foreground: oklch(0.985 0.002 247.839);
   --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.985 0.002 247.839);
+  /* Dark text on the light red: white was under 4.5:1 (axe color-contrast, PLAN T-08). */
+  --destructive-foreground: oklch(0.13 0.028 261.692);
   --border: oklch(1 0 0 / 0.14);
   --input: oklch(1 0 0 / 0.18);
-  --ring: oklch(0.551 0.027 264.364);
+  /* A lighter accent for dark surfaces: 7.6:1 on the background, 6.7:1 on cards. */
+  --ring: #7c9cf5;
 }
 
 @layer base {
@@ -62,6 +65,13 @@
 
   button {
     user-select: none;
+  }
+
+  /* One focus indicator everywhere (links, <summary>, checkboxes; components set the same with
+     utilities): the browser default is near-black, under 3:1 on the dark theme (accessibility §3). */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
   }
 }
 

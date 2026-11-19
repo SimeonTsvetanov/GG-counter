@@ -17,3 +17,4 @@ app/public/robots.txt
 app/public/404.html
 app/public/not-found.css
 app/public/theme-init.js
+app/public/sw-handover.js

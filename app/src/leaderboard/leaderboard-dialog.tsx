@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from "../components/ui/dialog";
 import { PodiumList } from "./podium-list";
+import { t } from "../i18n";
 
 /** Props of {@link LeaderboardDialog}. */
 interface LeaderboardDialogProps {
@@ -43,9 +44,9 @@ export function LeaderboardDialog({
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Leaderboard</DialogTitle>
+          <DialogTitle>{t("app.leaderboard.title")}</DialogTitle>
           <DialogDescription>
-            Highlights from the current session
+            {t("app.leaderboard.highlights")}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
@@ -53,7 +54,7 @@ export function LeaderboardDialog({
             players={players.slice(0, 3)}
             empty={
               <p className="text-sm text-muted-foreground">
-                No players yet. Add someone to get started.
+                {t("app.leaderboard.emptyDialog")}
               </p>
             }
           />
@@ -65,7 +66,7 @@ export function LeaderboardDialog({
                   className="flex items-center justify-between rounded-md bg-muted/40 px-3 py-1.5 text-xs shadow-sm"
                 >
                   <span className="flex items-center gap-2">
-                    🎲 {index + 4} — {player.name}
+                    {t("app.leaderboard.rankRowDialog", { rank: index + 4, name: player.name })}
                   </span>
                   <span className="text-muted-foreground">
                     {player.score}
@@ -81,17 +82,17 @@ export function LeaderboardDialog({
             variant="secondary"
             className="w-full sm:w-auto"
           >
-            <Share2 className="mr-2 h-4 w-4" /> Share
+            <Share2 className="mr-2 h-4 w-4" /> {t("app.leaderboard.share")}
           </Button>
           <Button
             variant="outline"
             className="w-full sm:w-auto"
             onClick={onRequestReset}
           >
-            <RefreshCw className="mr-2 h-4 w-4" /> Reset scores
+            <RefreshCw className="mr-2 h-4 w-4" /> {t("app.leaderboard.reset")}
           </Button>
           <DialogClose asChild>
-            <Button className="w-full sm:w-auto">OK</Button>
+            <Button className="w-full sm:w-auto">{t("app.leaderboard.ok")}</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

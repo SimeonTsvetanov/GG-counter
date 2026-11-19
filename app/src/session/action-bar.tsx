@@ -1,10 +1,14 @@
-// The header's session actions (Leaderboard, Add player, Share, Clear session, Theme). One component
-// for both header layouts; they differ only in the button style and an optional leading button.
+// The header's actions (Leaderboard, Add player, Share, Clear session, Theme, Menu). One component for
+// both header layouts; they differ only in the button style and an optional leading button. The theme
+// button is shown from the `sm` breakpoint up; on phones the theme is in Menu → Settings (app-shell §2,
+// DECISIONS 2026-11-19), so the phone header keeps the same number of buttons as before.
 import type { Player } from "gg-counter-core";
 import { Plus, RefreshCw, Share2, Trophy } from "lucide-react";
 import { ThemeToggle } from "../components/theme-toggle";
 import { Button } from "../components/ui/button";
+import { t } from "../i18n";
 import { LeaderboardDialog } from "../leaderboard/leaderboard-dialog";
+import { AppMenu, type AppMenuProps } from "../ui/app-menu";
 
 /** What the session actions do; the main screen owns the state behind them. */
 export interface SessionActions {
@@ -28,6 +32,8 @@ export interface ActionBarProps {
   /** State of the Leaderboard dialog, shared by both header layouts. */
   leaderboard: { open: boolean; onOpenChange: (open: boolean) => void; players: readonly Player[] };
   actions: SessionActions;
+  /** The app menu at the end of the bar (its button takes the bar's style). */
+  menu: Omit<AppMenuProps, "variant">;
   /** Optional button placed before the actions. */
   children?: React.ReactNode;
 }
@@ -39,6 +45,7 @@ export function ActionBar({
   buttonClassName,
   leaderboard,
   actions,
+  menu,
   children,
 }: ActionBarProps): React.JSX.Element {
   return (
@@ -50,7 +57,7 @@ export function ActionBar({
         onShare={actions.onShare}
         onRequestReset={actions.onRequestReset}
       >
-        <Button variant={variant} size="icon" aria-label="Open leaderboard">
+        <Button variant={variant} size="icon" aria-label={t("app.header.leaderboard")}>
           <Trophy className="h-4 w-4" />
         </Button>
       </LeaderboardDialog>
@@ -59,7 +66,7 @@ export function ActionBar({
         variant={variant}
         size="icon"
         onClick={actions.onQuickAdd}
-        aria-label="Add player"
+        aria-label={t("app.header.addPlayer")}
         className={buttonClassName}
       >
         <Plus className="h-4 w-4" />
@@ -69,7 +76,7 @@ export function ActionBar({
         variant={variant}
         size="icon"
         onClick={actions.onShare}
-        aria-label="Share session"
+        aria-label={t("app.header.share")}
         className={buttonClassName}
       >
         <Share2 className="h-4 w-4" />
@@ -79,13 +86,14 @@ export function ActionBar({
         variant={variant}
         size="icon"
         onClick={actions.onRequestClear}
-        aria-label="Clear session"
+        aria-label={t("app.header.clear")}
         className={buttonClassName}
       >
         <RefreshCw className="h-4 w-4" />
       </Button>
 
-      <ThemeToggle />
+      <ThemeToggle className="hidden sm:inline-flex" />
+      <AppMenu {...menu} variant={variant} />
     </div>
   );
 }

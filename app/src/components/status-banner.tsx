@@ -1,15 +1,21 @@
 // Banner under the header: the offline notice and the "Install GG Counter" offer (PWA install prompt).
 import { useState } from "react";
 import { Download } from "lucide-react";
+import { app } from "../config";
 import { useOnlineStatus } from "../hooks/use-online-status";
-import { usePwaInstall } from "../hooks/use-pwa-install";
+import type { PwaInstall } from "../hooks/use-pwa-install";
+import { t } from "../i18n";
 import { CONTAINER_CLASS } from "../lib/layout";
 import { Button } from "./ui/button";
 
-/** Shows the offline notice and/or the install offer; renders nothing when neither applies. */
-export function StatusBanner(): React.JSX.Element | null {
+/**
+ * Shows the offline notice and/or the install offer; renders nothing when neither applies.
+ *
+ * @param install - the browser's install prompt, shared with Menu → Install app.
+ */
+export function StatusBanner({ install }: { install: PwaInstall }): React.JSX.Element | null {
   const isOnline = useOnlineStatus();
-  const { canInstall, promptInstall, isInstalled } = usePwaInstall();
+  const { canInstall, promptInstall, isInstalled } = install;
   const [installDismissed, setInstallDismissed] = useState(false);
   const showInstallBanner = canInstall && !isInstalled && !installDismissed;
 
@@ -32,13 +38,12 @@ export function StatusBanner(): React.JSX.Element | null {
           <div className="space-y-2 text-sm">
             {!isOnline && (
               <p className="font-medium text-destructive">
-                You are offline. Changes are saved locally and will sync
-                when you reconnect.
+                {t("shell.status.offline")}
               </p>
             )}
             {showInstallBanner && (
               <p className="font-medium">
-                Install GG Counter for quicker access and offline support.
+                {t("shell.status.installOffer", { name: app.name })}
               </p>
             )}
           </div>
@@ -50,7 +55,7 @@ export function StatusBanner(): React.JSX.Element | null {
                 onClick={handleInstallRequest}
                 className="w-full sm:w-auto"
               >
-                <Download className="mr-2 h-4 w-4" /> Install app
+                <Download className="mr-2 h-4 w-4" /> {t("shell.status.install")}
               </Button>
             )}
             {showInstallBanner && (
@@ -60,7 +65,7 @@ export function StatusBanner(): React.JSX.Element | null {
                 onClick={() => { setInstallDismissed(true); }}
                 className="w-full sm:w-auto"
               >
-                Dismiss
+                {t("shell.dismiss")}
               </Button>
             )}
           </div>

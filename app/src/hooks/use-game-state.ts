@@ -13,7 +13,9 @@ import {
   type GameState,
   type NewPlayer,
   type Ranking,
+  type RenamePlayerErrorCode,
   type Result,
+  type ScoreErrorCode,
 } from "gg-counter-core";
 import { readGame, removeGame, writeGame } from "../storage/game";
 
@@ -58,19 +60,26 @@ export interface GameStateApi {
   /** Adds a player; the result says whether core accepted the name (limits, blank name). */
   addPlayer: (name: string) => Result<GameState, AddPlayerErrorCode>;
   removePlayer: (id: string) => void;
-  renamePlayer: (id: string, name: string) => void;
-  adjustScore: (id: string, delta: number) => void;
+  /** Renames a player; the result says whether core accepted the name (limits, blank name). */
+  renamePlayer: (id: string, name: string) => Result<GameState, RenamePlayerErrorCode>;
+  /** Changes a score; the result says whether core accepted it (score range). */
+  adjustScore: (id: string, delta: number) => Result<GameState, ScoreErrorCode>;
   setScore: (id: string, score: number) => void;
   resetScores: () => void;
   /** Deletes the saved game and starts an empty one. */
   resetGame: () => void;
+  /**
+   * Shows the game saved in storage now (after Settings → Import or Clear my data) without saving it
+   * again, so a cleared game is not written back as an empty one.
+   */
+  reloadFromStorage: () => void;
   /** Leaderboard order (ties in the order added), total score and leader. */
   ranking: Ranking;
 }
 
 /** Holds the game in a reducer and saves every change to this browser. */
 export function useGameState(): GameStateApi {
-  const [savedGame] = useState(readGame);
+  const [savedGame, setSavedGame] = useState(readGame);
   const [state, dispatch] = useReducer(gameReducer, savedGame);
 
   useEffect(() => {
@@ -92,29 +101,37 @@ export function useGameState(): GameStateApi {
     [state]
   );
 
-  const removePlayer = useCallback((id: string) => {
-    dispatch({ type: "remove-player", id });
-  }, []);
+  const removePlayer = useCallback((id: string) => { dispatch({ type: "remove-player", id }); }, []);
 
-  const renamePlayer = useCallback((id: string, name: string) => {
-    dispatch({ type: "rename-player", id, name });
-  }, []);
+  const renamePlayer = useCallback(
+    (id: string, name: string) => {
+      dispatch({ type: "rename-player", id, name });
+      return renamePlayerInGame(state, id, name);
+    },
+    [state]
+  );
 
-  const adjustScore = useCallback((id: string, delta: number) => {
-    dispatch({ type: "adjust-score", id, delta });
-  }, []);
+  const adjustScore = useCallback(
+    (id: string, delta: number) => {
+      dispatch({ type: "adjust-score", id, delta });
+      return adjustScoreInGame(state, id, delta);
+    },
+    [state]
+  );
 
-  const setScore = useCallback((id: string, score: number) => {
-    dispatch({ type: "set-score", id, score });
-  }, []);
+  const setScore = useCallback((id: string, score: number) => { dispatch({ type: "set-score", id, score }); }, []);
 
-  const resetScores = useCallback(() => {
-    dispatch({ type: "reset-scores" });
-  }, []);
+  const resetScores = useCallback(() => { dispatch({ type: "reset-scores" }); }, []);
 
   const resetGame = useCallback(() => {
     removeGame();
     dispatch({ type: "replace", state: readGame() });
+  }, []);
+
+  const reloadFromStorage = useCallback(() => {
+    const stored = readGame();
+    setSavedGame(stored);
+    dispatch({ type: "replace", state: stored });
   }, []);
 
   const ranking = useMemo(() => rank(state.players), [state.players]);
@@ -128,6 +145,7 @@ export function useGameState(): GameStateApi {
     setScore,
     resetScores,
     resetGame,
+    reloadFromStorage,
     ranking,
   };
 }

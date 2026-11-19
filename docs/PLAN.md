@@ -85,7 +85,7 @@
 - Reading list: app-shell → app-shell, help-docs, error-pages; pwa → pwa.
 - Acceptance: `pwa-check` 0 FAIL; `a11y-check` 0 FAIL in light and dark; offline reload works.
 - Depends on: T-07
-- [ ] done
+- [x] done — shell in `app/src/ui/` from `app.config.ts` `shell`: menu (keyboard, inert page), Settings (theme, export → import with core check + confirm, Clear my data), Help, What's new (CHANGELOG at build time, once after an update), About + credits, Report a problem (GitHub issue or email), footer, toasts, error boundary screen; limit messages; all texts in `app/src/i18n/en.ts`; `registerType: "prompt"` + update toast, offline-only 404 fallback, `sw-handover.js` for copies on the old auto-update worker (checked with a real update); a11y-check 0 FAIL light + dark (axe included); pwa-check 1 FAIL = manifest id `gg-counter-pwa-v1` kept on purpose (DECISIONS); 222 Vitest, 52 e2e; first-load JS 118.8 KB gzip (2026-11-19).
 
 ### T-09 · English + Bulgarian
 - Goal: every string through i18next; language choice in Settings; one English URL for crawlers.

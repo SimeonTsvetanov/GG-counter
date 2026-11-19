@@ -1,5 +1,6 @@
 // The top three of the leaderboard with 🥇🥈🥉 — shared by the leaderboard card and dialog.
 import type { Player } from "gg-counter-core";
+import { t } from "../i18n";
 
 const MEDALS = ["🥇", "🥈", "🥉"];
 
@@ -26,7 +27,7 @@ export function PodiumList({ players, empty }: PodiumListProps): React.JSX.Eleme
                 {MEDALS[index]} {player.name}
               </span>
               <span className="text-sm text-muted-foreground">
-                {player.score} pts
+                {t("app.leaderboard.points", { score: player.score })}
               </span>
             </div>
           ))}

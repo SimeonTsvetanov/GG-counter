@@ -12,6 +12,7 @@ import {
   AlertDialogTrigger,
 } from "../components/ui/alert-dialog";
 import { Button } from "../components/ui/button";
+import { t } from "../i18n";
 
 /** Props of {@link RemovePlayerButton}. */
 interface RemovePlayerButtonProps {
@@ -28,7 +29,7 @@ export function RemovePlayerButton({ playerName, onConfirm }: RemovePlayerButton
         <Button
           variant="ghost"
           size="icon"
-          aria-label={`Remove ${playerName}`}
+          aria-label={t("app.players.remove", { name: playerName })}
           className="text-destructive hover:text-destructive"
         >
           <Trash2 className="h-5 w-5" />
@@ -36,18 +37,18 @@ export function RemovePlayerButton({ playerName, onConfirm }: RemovePlayerButton
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Remove player?</AlertDialogTitle>
+          <AlertDialogTitle>{t("app.players.removeTitle")}</AlertDialogTitle>
           <AlertDialogDescription>
-            This removes {playerName} and their score.
+            {t("app.players.removeMessage", { name: playerName })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{t("shell.cancel")}</AlertDialogCancel>
           <AlertDialogAction
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             onClick={onConfirm}
           >
-            Remove
+            {t("app.players.removeConfirm")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

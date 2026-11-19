@@ -1,5 +1,6 @@
 // The GG Counter main screen — the composition root: it owns the game state and the dialog state
-// shared between the header, the player cards and the leaderboard card.
+// shared between the header, the player cards and the leaderboard card, and places the app shell
+// (menu, shell dialogs, footer, toasts — app/src/ui, PLAN T-08) around them.
 import { useRef, useState } from "react";
 import { StatusBanner } from "./components/status-banner";
 import { useGameState } from "./hooks/use-game-state";
@@ -13,6 +14,12 @@ import { AppHeader } from "./session/app-header";
 import { ClearSessionDialog } from "./session/clear-session-dialog";
 import { ResetScoresDialog } from "./session/reset-scores-dialog";
 import { shareLeaderboard } from "./share/share-leaderboard";
+import { useTheme } from "./providers/theme-provider";
+import { t } from "./i18n";
+import { AppFooter } from "./ui/app-footer";
+import { CrashTestHook } from "./ui/error-boundary";
+import { ShellDialogs } from "./ui/shell-dialogs";
+import { useAppShell } from "./ui/use-app-shell";
 
 /** Share of the leaderboard card that must be on screen for the full header layout. */
 const LEADERBOARD_IN_VIEW_THRESHOLD = 0.15;
@@ -20,6 +27,8 @@ const LEADERBOARD_IN_VIEW_THRESHOLD = 0.15;
 /** The whole GG Counter screen: players, scores, leaderboard, share, install banner, how it works and FAQ. */
 export function App(): React.JSX.Element {
   const game = useGameState();
+  const shell = useAppShell();
+  const { setTheme } = useTheme();
   const [isLeaderboardDialogOpen, setIsLeaderboardDialogOpen] = useState(false);
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
   const [isClearDialogOpen, setIsClearDialogOpen] = useState(false);
@@ -56,9 +65,10 @@ export function App(): React.JSX.Element {
             players: game.ranking.players,
           }}
           actions={actions}
+          menu={{ runItem: shell.runItem, isInstalled: shell.install.isInstalled, canInstall: shell.install.canInstall }}
         />
 
-        <StatusBanner />
+        <StatusBanner install={shell.install} />
 
         <main className="flex-1">
           <div className={`${CONTAINER_CLASS} flex flex-col gap-6 py-6`}>
@@ -84,20 +94,7 @@ export function App(): React.JSX.Element {
           </div>
         </main>
 
-        <footer className="mt-auto border-t bg-background/80">
-          <div
-            className={`${CONTAINER_CLASS} flex items-center justify-center py-4 text-xs text-muted-foreground`}
-          >
-            <a
-              href="https://buymeacoffee.com/simeontsvetanov"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-center hover:text-foreground transition-colors"
-            >
-              If you support me &quot;May the dice be with you&quot;
-            </a>
-          </div>
-        </footer>
+        <AppFooter runItem={shell.runItem} />
       </div>
 
       <ResetScoresDialog
@@ -111,12 +108,26 @@ export function App(): React.JSX.Element {
       <ClearSessionDialog
         open={isClearDialogOpen}
         onOpenChange={setIsClearDialogOpen}
-        description="This removes all players and scores. You cannot undo this action."
+        description={t("app.session.clearFromHeader")}
         onConfirm={() => {
           game.resetGame();
           setIsClearDialogOpen(false);
         }}
       />
+      <ShellDialogs
+        dialog={shell.dialog}
+        openDialog={shell.openDialog}
+        onClose={shell.closeDialog}
+        onImported={(data) => {
+          game.reloadFromStorage();
+          setTheme(data.theme);
+        }}
+        onCleared={() => {
+          game.reloadFromStorage();
+          setTheme("system");
+        }}
+      />
+      <CrashTestHook />
     </div>
   );
 }

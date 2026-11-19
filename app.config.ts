@@ -22,6 +22,31 @@ export interface ManifestConfig {
   readonly themeColor: string;
 }
 
+/**
+ * The entries the app shell knows (app-shell §3). Each id has a label (`shell.menu.items.<id>` in
+ * app/src/i18n/en.ts) and an action (app/src/ui/menu-items.ts); both are checked by the compiler,
+ * so a new entry (PLAN T-10: terms, privacy, ai-notice, legal-notice, contact) is one id + its page.
+ */
+export type ShellItemId = "help" | "settings" | "whats-new" | "share-app" | "install" | "report" | "about" | "support" | "source";
+
+/** One group of the menu, in the order of app-shell §3 (Use · App · About · Support). */
+export interface MenuGroup {
+  readonly id: "use" | "app" | "about" | "support";
+  readonly items: readonly ShellItemId[];
+}
+
+/** The app frame: menu groups, footer links and the support links (app-shell §3, §7). */
+export interface ShellConfig {
+  /** Only the entries that apply to this app (app-shell rule 9): no service modes, no legal pages yet. */
+  readonly menu: readonly MenuGroup[];
+  /** Footer links after the version link (which opens What's new); T-10 adds the policy pages. */
+  readonly footer: readonly ShellItemId[];
+  /** Our own Buy Me a Coffee link — no widget script (app-shell rule 8). */
+  readonly buyMeACoffee: string;
+  /** "More free tools": the GitHub list of Moni's apps until the hub site exists (app-shell §7). */
+  readonly moreTools: string;
+}
+
 /** Everything user-facing that the generator and the build read. */
 export interface AppConfig {
   /** kebab-case; storage namespace (PLAN T-07) and package names. */
@@ -53,6 +78,7 @@ export interface AppConfig {
   readonly features: readonly string[];
   /** 5–7 real questions; each answer stands alone (names the app). */
   readonly faq: readonly FaqItem[];
+  readonly shell: ShellConfig;
   readonly seo: {
     /** Search Console token for `google-site-verification`; null = no meta tag. */
     readonly googleVerification: string | null;
@@ -133,5 +159,16 @@ export const app = {
       a: "Yes, for any game scored in points, such as Carcassonne, Star Realms, card games or a quiz night. GG Counter adds and subtracts the points you enter; it does not know the rules of any game.",
     },
   ],
+  shell: {
+    menu: [
+      { id: "use", items: ["help", "settings", "whats-new"] },
+      { id: "app", items: ["share-app", "install", "report"] },
+      { id: "about", items: ["about"] },
+      { id: "support", items: ["support", "source"] },
+    ],
+    footer: ["support"],
+    buyMeACoffee: "https://buymeacoffee.com/simeontsvetanov",
+    moreTools: "https://github.com/SimeonTsvetanov?tab=repositories&q=simeonts-microapp",
+  },
   seo: { googleVerification: null, contentUpdated: "2026-11-19" },
 } as const satisfies AppConfig;

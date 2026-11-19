@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { CARD_WIDTH_CLASS } from "../lib/layout";
+import { t } from "../i18n";
 import { ClearSessionDialog } from "../session/clear-session-dialog";
 import { PodiumList } from "./podium-list";
 
@@ -43,7 +44,7 @@ export function LeaderboardCard({
       <Card className="border-0 shadow-lg">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-base font-semibold">
-            <Trophy className="h-4 w-4" /> Leaderboard
+            <Trophy className="h-4 w-4" /> {t("app.leaderboard.title")}
           </CardTitle>
           {ranking.leader ? (
             <span className="text-sm font-medium text-primary">
@@ -51,7 +52,7 @@ export function LeaderboardCard({
             </span>
           ) : (
             <span className="text-sm text-muted-foreground">
-              No players yet
+              {t("app.leaderboard.noPlayers")}
             </span>
           )}
         </CardHeader>
@@ -60,7 +61,7 @@ export function LeaderboardCard({
             players={ranking.players.slice(0, 3)}
             empty={
               <CardDescription>
-                Add players to populate the leaderboard.
+                {t("app.leaderboard.emptyCard")}
               </CardDescription>
             }
           />
@@ -72,7 +73,7 @@ export function LeaderboardCard({
                   className="flex items-center justify-between rounded-md bg-muted/40 px-3 py-1 shadow-sm"
                 >
                   <span>
-                    {index + 4}. {player.name}
+                    {t("app.leaderboard.rankRow", { rank: index + 4, name: player.name })}
                   </span>
                   <span>{player.score}</span>
                 </div>
@@ -88,7 +89,7 @@ export function LeaderboardCard({
             disabled={isEmpty}
             className="w-full sm:w-auto"
           >
-            <Share2 className="mr-2 h-4 w-4" /> Share
+            <Share2 className="mr-2 h-4 w-4" /> {t("app.leaderboard.share")}
           </Button>
           <Button
             variant="outline"
@@ -97,10 +98,10 @@ export function LeaderboardCard({
             disabled={isEmpty}
             className="w-full sm:w-auto"
           >
-            <RefreshCw className="mr-2 h-4 w-4" /> Reset scores
+            <RefreshCw className="mr-2 h-4 w-4" /> {t("app.leaderboard.reset")}
           </Button>
           <ClearSessionDialog
-            description="This deletes all players and scores. You cannot undo this action."
+            description={t("app.session.clearFromCard")}
             onConfirm={onClear}
           >
             <Button
@@ -108,7 +109,7 @@ export function LeaderboardCard({
               size="sm"
               className="w-full sm:w-auto"
             >
-              Clear session
+              {t("app.header.clear")}
             </Button>
           </ClearSessionDialog>
         </CardFooter>

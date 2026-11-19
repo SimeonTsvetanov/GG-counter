@@ -1,8 +1,8 @@
 // Shares the session leaderboard as text (core `formatLeaderboard`): Web Share first, else the
 // clipboard. Used by the header Share button, the leaderboard dialog and the leaderboard card.
 import { formatLeaderboard, type Player } from "gg-counter-core";
-
-const COPIED_MESSAGE = "Session summary copied to clipboard.";
+import { app } from "../config";
+import { t } from "../i18n";
 
 /**
  * lib.dom types `navigator.share` and `navigator.clipboard` as always present, but browsers omit
@@ -24,7 +24,7 @@ async function copyToClipboard({ clipboard, text, onShared }: CopyRequest): Prom
   await clipboard.writeText(text);
   onShared();
   if (typeof window !== "undefined") {
-    window.alert(COPIED_MESSAGE);
+    window.alert(t("app.copiedSummary"));
   }
 }
 
@@ -45,7 +45,7 @@ export async function shareLeaderboard(players: readonly Player[], onShared: () 
   const nav = optionalNavigator();
   try {
     if (nav?.share) {
-      await nav.share({ title: "GG Counter session", text });
+      await nav.share({ title: t("app.shareTitle", { name: app.name }), text });
       onShared();
       return;
     }

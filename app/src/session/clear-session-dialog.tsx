@@ -11,6 +11,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "../components/ui/alert-dialog";
+import { t } from "../i18n";
 
 /** Props of {@link ClearSessionDialog}. */
 interface ClearSessionDialogProps {
@@ -37,16 +38,16 @@ export function ClearSessionDialog({
       {children !== undefined && <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>}
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Clear session?</AlertDialogTitle>
+          <AlertDialogTitle>{t("app.session.clearTitle")}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{t("shell.cancel")}</AlertDialogCancel>
           <AlertDialogAction
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             onClick={onConfirm}
           >
-            Clear
+            {t("app.session.clearConfirm")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

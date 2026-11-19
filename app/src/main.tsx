@@ -4,6 +4,8 @@ import { App } from "./app";
 import "./styles/global.css";
 import { ThemeProvider } from "./providers/theme-provider";
 import { migrateLegacyStorage } from "./storage/migrate";
+import { ErrorBoundary } from "./ui/error-boundary";
+import { ToastProvider } from "./ui/toast";
 
 const rootElement = document.getElementById("root");
 
@@ -16,8 +18,13 @@ migrateLegacyStorage();
 
 createRoot(rootElement).render(
   <StrictMode>
-    <ThemeProvider defaultTheme="system">
-      <App />
-    </ThemeProvider>
+    {/* Outermost, so even a crash in the providers shows the error screen, never a blank page. */}
+    <ErrorBoundary>
+      <ThemeProvider defaultTheme="system">
+        <ToastProvider>
+          <App />
+        </ToastProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   </StrictMode>
 );

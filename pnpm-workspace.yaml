@@ -7,7 +7,11 @@ packages:
 minimumReleaseAge: 1440        # don't install versions younger than 1 day
 minimumReleaseAgeExclude: []   # urgent fixes only, each with a DECISIONS line: - pkg@1.2.3
 trustPolicy: no-downgrade      # refuse a version whose publishing trust level dropped
-trustPolicyExclude: []         # only with a recorded decision
+trustPolicyExclude:            # only with a recorded decision
+  # Forge template, Moni's decision 2026-11-05 (forge DECISIONS; here DECISIONS 2026-11-19, PLAN T-08):
+  # Google's workbox-build 7.4.1 (via vite-plugin-pwa 2.0.0) depends on this single-maintainer fork
+  # published without provenance. Exact version only; removed once workbox stops depending on it.
+  - '@trickfilm400/rollup-plugin-off-main-thread@3.0.0-pre1'
 blockExoticSubdeps: true       # no git/tarball sources for transitive dependencies
 
 # The ONLY packages allowed to run install scripts. Unlisted = blocked.

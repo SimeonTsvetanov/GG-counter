@@ -123,6 +123,37 @@ describe("importData", () => {
   });
 });
 
+describe("checkImport (Settings checks a file before asking to replace the game)", () => {
+  it("returns the file's data without changing anything", async () => {
+    const storage = useStorage(new FakeStorage({ [NEW_STATE_KEY]: JSON.stringify(V0_STATE), ...OTHER_APPS }));
+    const before = storage.snapshot();
+    const { checkImport } = await start();
+    expect(checkImport(exportText(), NOW)).toEqual({ ok: true, value: { state: V1_STATE, theme: "dark" } });
+    expect(storage.snapshot()).toEqual(before);
+  });
+
+  it("gives the same error code as importData for a bad file", async () => {
+    useStorage(new FakeStorage());
+    const { checkImport, importData } = await start();
+    for (const text of ["{not json", exportText({ app: "other" }), exportText({ schemaVersion: 2 }), exportText({}, { theme: "blue" })]) {
+      const checked = checkImport(text, NOW);
+      expect(checked.ok).toBe(false);
+      expect(checked).toEqual(importData(text, NOW));
+    }
+  });
+
+  it("property: never throws and agrees with importData on what is accepted", async () => {
+    useStorage(new FakeStorage());
+    const { checkImport, importData } = await start();
+    const anyExport = fc.record({ app: fc.constantFrom("gg-counter", "x"), schemaVersion: fc.constantFrom(1, 2), exportedAt: fc.string(), data: fc.anything() });
+    fc.assert(
+      fc.property(fc.oneof(fc.string(), anyExport.map((value) => JSON.stringify(value))), (text) => {
+        expect(checkImport(text, NOW).ok).toBe(importData(text, NOW).ok);
+      })
+    );
+  });
+});
+
 describe("clearData", () => {
   it("removes the new keys, the marker and the pre-forge keys — nothing else on the origin", async () => {
     const storage = useStorage(new FakeStorage({

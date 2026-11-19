@@ -9,6 +9,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../components/ui/alert-dialog";
+import { t } from "../i18n";
 
 /** Props of {@link ResetScoresDialog}. */
 interface ResetScoresDialogProps {
@@ -24,16 +25,15 @@ export function ResetScoresDialog({ open, onOpenChange, onConfirm }: ResetScores
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Reset all scores?</AlertDialogTitle>
+          <AlertDialogTitle>{t("app.session.resetTitle")}</AlertDialogTitle>
           <AlertDialogDescription>
-            This will set every player's score to zero without removing
-            players.
+            {t("app.session.resetMessage")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{t("shell.cancel")}</AlertDialogCancel>
           <AlertDialogAction onClick={onConfirm}>
-            Reset
+            {t("app.session.resetConfirm")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
