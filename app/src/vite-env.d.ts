@@ -18,3 +18,6 @@ declare const __CREDITS__: readonly { readonly name: string; readonly license: s
 
 /** `l10n.bg` of app.config.ts (app/vite.config.ts and vitest.config.ts `define`), used by app/src/i18n/bg.ts only. */
 declare const __APP_TEXT_BG__: import("../../app.config.ts").AppText;
+
+/** The policy pages of content/legal (scripts/legal.ts), used by app/src/ui/legal-dialog.tsx only. */
+declare const __LEGAL__: readonly import("./ui/legal-document").LegalDocument[];

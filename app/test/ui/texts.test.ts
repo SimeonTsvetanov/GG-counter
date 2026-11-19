@@ -80,6 +80,7 @@ describe("dialogFromHash", () => {
   });
 
   it("ignores other hashes", () => {
-    for (const hash of ["", "#", "#terms", "#Help", "#help-install"]) expect(dialogFromHash(hash)).toBeNull();
+    // "#terms" was here until PLAN T-10 made every policy page a dialog (app-shell §3 deep links).
+    for (const hash of ["", "#", "#cookies", "#Help", "#help-install", "#Privacy"]) expect(dialogFromHash(hash)).toBeNull();
   });
 });

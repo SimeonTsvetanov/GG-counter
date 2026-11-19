@@ -1,0 +1,150 @@
+/* policy-page.css — style of the standalone policy pages (scripts/legal-page.ts, PLAN T-10).
+   The pages cannot load the app's hashed CSS bundle, so the tokens below repeat the app's colours
+   from app/src/styles/global.css, like not-found.css; both move to design/tokens.css in PLAN T-12.
+   theme-init.js puts the saved theme's class on <html>; without JavaScript the system theme applies. */
+@layer tokens, base, layout, components, overrides;
+
+@layer tokens {
+  /* light-dark() picks by color-scheme: the saved choice (class) wins, else the system theme. */
+  :root {
+    color-scheme: light dark;
+    --page-bg: light-dark(oklch(0.967 0.003 264.542), oklch(0.13 0.028 261.692));
+    --surface: light-dark(oklch(1 0 0), oklch(0.21 0.034 264.665));
+    --text: light-dark(oklch(0.13 0.028 261.692), oklch(0.985 0.002 247.839));
+    --text-secondary: light-dark(oklch(0.551 0.027 264.364), oklch(0.707 0.022 261.325));
+    /* The accent as text and focus ring: light 6.7:1 on the surface; dark 6.7:1 on the surface (accessibility §2). */
+    --accent-text: light-dark(#1f4ed8, #7c9cf5);
+    --shadow: light-dark(oklch(0 0 0 / 0.08), oklch(0 0 0 / 0.4)) 0 1px 3px, light-dark(oklch(0 0 0 / 0.06), transparent) 0 4px 16px;
+    --radius: 0.625rem;
+    --space-2: 0.5rem;
+    --space-4: 1rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --measure: 42rem;
+
+    &.light {
+      color-scheme: light;
+    }
+
+    &.dark {
+      color-scheme: dark;
+    }
+  }
+}
+
+@layer base {
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background: var(--page-bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Links without underline, accent + semibold (forge DECISIONS 2026-11-06, Moni). */
+  a {
+    color: var(--accent-text);
+    font-weight: 600;
+    text-decoration: none;
+
+    &:focus-visible {
+      outline: 2px solid var(--accent-text);
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+  }
+}
+
+@layer layout {
+  .policy-header {
+    padding: max(var(--space-4), env(safe-area-inset-top)) var(--space-4) 0;
+  }
+
+  .policy {
+    width: min(100% - 2 * var(--space-4), var(--measure));
+    margin: var(--space-6) auto;
+  }
+
+  .policy-footer {
+    width: min(100% - 2 * var(--space-4), var(--measure));
+    margin: 0 auto;
+    padding-bottom: max(var(--space-8), env(safe-area-inset-bottom));
+    /* Full text colour: the secondary grey is under 4.5:1 on the tinted page (axe, PLAN T-10). */
+    color: var(--text);
+    font-size: 0.875rem;
+    text-align: center;
+  }
+}
+
+@layer components {
+  /* || Components: brand link (back to the app) */
+  .policy-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 2.75rem;
+    color: var(--text);
+    font-size: 1.0625rem;
+  }
+
+  /* || Components: policy text card */
+  .policy-body {
+    padding: clamp(var(--space-4), 4vw, var(--space-8));
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    /* Long URLs and emails never overflow the card (Moni 2026-11-08). */
+    overflow-wrap: anywhere;
+
+    & h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      line-height: 1.2;
+      text-wrap: balance;
+    }
+
+    & h2 {
+      margin: var(--space-8) 0 0;
+      font-size: 1.25rem;
+      text-wrap: balance;
+    }
+
+    & li + li {
+      margin-top: var(--space-2);
+    }
+
+    /* Links inside sentences are underlined: the dark accent is 2.5:1 against the body text, so
+       colour alone is not enough (WCAG 1.4.1); the footer links stand alone and stay plain. */
+    & a {
+      text-decoration: underline;
+      text-underline-offset: 0.2em;
+    }
+  }
+
+  .policy-updated {
+    margin-top: var(--space-2);
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+  }
+
+  /* || Components: footer links (same order as the app footer) */
+  .policy-nav {
+    margin-bottom: var(--space-2);
+    line-height: 2.75;
+  }
+}
+
+@layer overrides {
+  @media print {
+    .policy-header,
+    .policy-nav {
+      display: none;
+    }
+
+    .policy-body {
+      box-shadow: none;
+    }
+  }
+}

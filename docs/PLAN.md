@@ -106,7 +106,13 @@
 - Reading list: app-shell → legal-pages.
 - Acceptance: `compliance-check` 0 FAIL; `legal-reviewer` verdict; contact email confirmed by Moni.
 - Depends on: T-08
-- [ ] done
+- [x] done — `content/legal/{terms,privacy,ai-notice,legal-notice,support}.md` from the forge templates, checked
+  against the code; `scripts/legal.ts` (Markdown subset → data, placeholders from app.config.ts) feeds the lazy
+  `legal-dialog.tsx` (4.8 KB gzip chunk) and `scripts/legal-page.ts` (standalone `/GG-counter/<page>/`, meta CSP,
+  year.js for year + email, `policy-page.css`); menu About group + footer via `app.config.ts` `shell`, deep links,
+  Help → Privacy / Support, About → `third-party-licenses.txt` (`scripts/licenses.ts`, 55 packages, upstream texts
+  for 2 packages without one); sitemap + llms.txt list the pages; `LICENSE` generated; 315 Vitest, 86 e2e;
+  compliance-check 0 FAIL; first-load JS 136.8 KB gzip (2026-11-19). `legal-reviewer` verdict still open.
 
 ### T-11 · (removed — no MCP server, DECISIONS 2026-11-19)
 - [x] done

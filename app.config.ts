@@ -38,10 +38,24 @@ export interface ManifestConfig {
 
 /**
  * The entries the app shell knows (app-shell §3). Each id has a label (`shell.menu.items.<id>` in
- * app/src/i18n/en.ts) and an action (app/src/ui/menu-items.ts); both are checked by the compiler,
- * so a new entry (PLAN T-10: terms, privacy, ai-notice, legal-notice, contact) is one id + its page.
+ * app/src/i18n/en.ts) and an action (app/src/ui/shell-items.ts); both are checked by the compiler.
+ * The policy entries (PLAN T-10) open content/legal/<page>.md as a dialog; `contact` opens the Support page.
  */
-export type ShellItemId = "help" | "settings" | "whats-new" | "share-app" | "install" | "report" | "about" | "support" | "source";
+export type ShellItemId =
+  | "help"
+  | "settings"
+  | "whats-new"
+  | "share-app"
+  | "install"
+  | "report"
+  | "about"
+  | "terms"
+  | "privacy"
+  | "ai-notice"
+  | "legal-notice"
+  | "contact"
+  | "support"
+  | "source";
 
 /** One group of the menu, in the order of app-shell §3 (Use · App · About · Support). */
 export interface MenuGroup {
@@ -51,9 +65,12 @@ export interface MenuGroup {
 
 /** The app frame: menu groups, footer links and the support links (app-shell §3, §7). */
 export interface ShellConfig {
-  /** Only the entries that apply to this app (app-shell rule 9): no service modes, no legal pages yet. */
+  /** Only the entries that apply to this app (app-shell rule 9): no service modes. */
   readonly menu: readonly MenuGroup[];
-  /** Footer links after the version link (which opens What's new); T-10 adds the policy pages. */
+  /**
+   * Footer links before the version line, in the order of the standalone policy pages' own footer
+   * (WCAG 3.2.6 consistent help; scripts/legal-page.ts).
+   */
   readonly footer: readonly ShellItemId[];
   /** Our own Buy Me a Coffee link — no widget script (app-shell rule 8). */
   readonly buyMeACoffee: string;
@@ -83,7 +100,8 @@ export interface AppConfig {
   readonly languages: readonly LanguageCode[];
   /** Accent / theme colour (hex). */
   readonly accent: string;
-  readonly author: { readonly name: string; readonly github: string };
+  /** Legal notice, Privacy and Support (legal-pages §2, §6); taken from TeamSync's app.config.ts (forge DECISIONS 2026-11-06: LinkedIn in every app). */
+  readonly author: { readonly name: string; readonly country: string; readonly github: string; readonly linkedin: string };
   /** Asked from Moni (DECISIONS 2026-11-19); used by the legal pages (PLAN T-10). */
   readonly contact: { readonly email: string };
   readonly manifest: ManifestConfig;
@@ -119,7 +137,12 @@ export const app = {
   version: "0.1.0",
   languages: ["en", "bg"],
   accent: "#1F4ED8",
-  author: { name: "Simeon Tsvetanov", github: "https://github.com/SimeonTsvetanov" },
+  author: {
+    name: "Simeon Tsvetanov",
+    country: "Bulgaria",
+    github: "https://github.com/SimeonTsvetanov",
+    linkedin: "https://www.linkedin.com/in/simeon-tsvetanov-a00963159",
+  },
   contact: { email: "tsvetanov.simeon@gmail.com" },
   manifest: {
     id: "gg-counter-pwa-v1",
@@ -178,10 +201,10 @@ export const app = {
     menu: [
       { id: "use", items: ["help", "settings", "whats-new"] },
       { id: "app", items: ["share-app", "install", "report"] },
-      { id: "about", items: ["about"] },
+      { id: "about", items: ["about", "terms", "privacy", "ai-notice", "legal-notice", "contact"] },
       { id: "support", items: ["support", "source"] },
     ],
-    footer: ["support"],
+    footer: ["terms", "privacy", "ai-notice", "legal-notice", "contact", "support"],
     buyMeACoffee: "https://buymeacoffee.com/simeontsvetanov",
     moreTools: "https://github.com/SimeonTsvetanov?tab=repositories&q=simeonts-microapp",
   },

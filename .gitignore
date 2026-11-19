@@ -18,3 +18,12 @@ app/public/404.html
 app/public/not-found.css
 app/public/theme-init.js
 app/public/sw-handover.js
+# Policy pages and licence texts (PLAN T-10): generated from content/legal/*.md and node_modules
+app/public/terms/
+app/public/privacy/
+app/public/ai-notice/
+app/public/legal-notice/
+app/public/support/
+app/public/policy-page.css
+app/public/year.js
+app/public/third-party-licenses.txt

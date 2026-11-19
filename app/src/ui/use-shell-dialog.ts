@@ -1,10 +1,11 @@
-// Which shell dialog is open (Help, Settings, What's new, About, Report a problem), who opened it (focus
-// returns there, accessibility §4) and deep links: `#help`, `#settings`… open the dialog (app-shell §3,
-// §10) and the hash is removed again so closing it leaves a clean address.
+// Which shell dialog is open (Help, Settings, What's new, About, Report a problem, the policy pages), who
+// opened it (focus returns there, accessibility §4) and deep links: `#help`, `#settings`, `#privacy`… open
+// the dialog (app-shell §3, §10) and the hash is removed again so closing it leaves a clean address.
 import { useCallback, useEffect, useState } from "react";
+import { POLICY_PAGES } from "./legal-document";
 
-/** The dialogs of the app shell. PLAN T-10 adds the policy pages here. */
-export const SHELL_DIALOGS = ["help", "settings", "whats-new", "about", "report"] as const;
+/** The dialogs of the app shell; each policy page is a dialog too (PLAN T-10). */
+export const SHELL_DIALOGS = ["help", "settings", "whats-new", "about", "report", ...POLICY_PAGES] as const;
 
 /** One of {@link SHELL_DIALOGS}. */
 export type ShellDialogId = (typeof SHELL_DIALOGS)[number];

@@ -1,8 +1,9 @@
 // Vite build of the GG Counter PWA. Base path, static head, page text and manifest values come from
-// app.config.ts (PLAN T-06); What's new and About read CHANGELOG.md and the shipped packages at build
-// time; the service worker follows pwa §3–5 since PLAN T-08 (prompt updates, offline-only fallback).
+// app.config.ts (PLAN T-06); What's new, About and the policy dialogs read CHANGELOG.md, the shipped
+// packages and content/legal at build time; the service worker follows pwa §3–5 since PLAN T-08 (prompt updates, offline-only fallback).
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA, type ManifestOptions } from "vite-plugin-pwa";
@@ -11,6 +12,7 @@ import { OG_IMAGE, headTags } from "../scripts/seo.ts";
 import { noscriptHtml, pageInfoHtml } from "../scripts/static-page.ts";
 import { whatsNew } from "../scripts/changelog.ts";
 import { appCredits } from "../scripts/credits.ts";
+import { readLegalDocuments } from "../scripts/legal.ts";
 import { SW_HANDOVER_FILE } from "../scripts/sw-handover.ts";
 
 const app: AppConfig = config;
@@ -126,6 +128,8 @@ export default defineConfig(({ mode }) => {
       __APP_TEXT_BG__: JSON.stringify(l10n.bg),
       __CHANGELOG__: JSON.stringify(whatsNew(readFileSync(new URL("../CHANGELOG.md", import.meta.url), "utf8"))),
       __CREDITS__: JSON.stringify(appCredits(new URL("./", import.meta.url))),
+      // The policy pages (PLAN T-10): used only by the lazy legal dialog, so they ship in its chunk.
+      __LEGAL__: JSON.stringify(readLegalDocuments(app, fileURLToPath(new URL("../content/legal", import.meta.url)))),
     },
     plugins: [
       appHtml(),

@@ -1,6 +1,6 @@
 // Renders the open shell dialog. Each dialog is its own chunk (React.lazy), loaded when first opened,
-// so Help, Settings, What's new, About and Report cost nothing at first load (performance §1); the
-// service worker precaches the chunks, so they open offline too.
+// so Help, Settings, What's new, About, Report and the policy pages cost nothing at first load
+// (performance §1); the service worker precaches the chunks, so they open offline too.
 import { lazy, Suspense } from "react";
 import type { AppData } from "../storage";
 import type { OpenShellDialog, ShellDialogId } from "./use-shell-dialog";
@@ -10,6 +10,7 @@ const SettingsDialog = lazy(() => import("./settings-dialog").then((module) => (
 const WhatsNewDialog = lazy(() => import("./whats-new-dialog").then((module) => ({ default: module.WhatsNewDialog })));
 const AboutDialog = lazy(() => import("./about-dialog").then((module) => ({ default: module.AboutDialog })));
 const ReportDialog = lazy(() => import("./report-dialog").then((module) => ({ default: module.ReportDialog })));
+const LegalDialog = lazy(() => import("./legal-dialog").then((module) => ({ default: module.LegalDialog })));
 
 /** Props of {@link ShellDialogs}. */
 export interface ShellDialogsProps {
@@ -34,6 +35,12 @@ function OpenDialog({ dialog, openDialog, onClose, onImported, onCleared }: Shel
       return <AboutDialog {...common} openDialog={openDialog} />;
     case "report":
       return <ReportDialog {...common} />;
+    case "terms":
+    case "privacy":
+    case "ai-notice":
+    case "legal-notice":
+    case "support":
+      return <LegalDialog {...common} page={dialog.id} openDialog={openDialog} />;
     default:
       return dialog.id satisfies never;
   }

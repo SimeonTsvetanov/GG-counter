@@ -25,6 +25,7 @@
 | F9 | Installable PWA, works offline; online/offline indicator; a new version waits for the user's Reload (T-08) | AC9: loads offline after first visit; installed copy keeps working after the update |
 | F10 | App shell (T-08): menu (Help, Settings, What's new, Share app, Install app, Report a problem, About, Support ☕, Source code), footer (version → What's new, More free tools, © current year), update toast, error screen | AC10: menu opens/closes with the keyboard; Settings export → clear → import gives back the same game; the error screen replaces a crash |
 | F11 | Limit messages (T-08): too many players, name too long, score out of range say why under the field; a blank name or a non-number is still ignored silently | AC11: each limit shows its message and changes nothing |
+| F12 | Policy pages (T-10): Terms, Privacy, AI notice, Legal notice, Support (menu "Contact") from `content/legal/*.md` — dialogs in the menu (About group), the footer, Help and by deep link `#terms`…; standalone English pages `/GG-counter/<page>/` (in the sitemap, precached); full licence texts `third-party-licenses.txt` (About) | AC12: each entry opens from the menu and the footer with the keyboard; each page loads directly and offline and links back to the app |
 
 ## 4. Usage modes and public interfaces (must not change — migrate §1)
 - Hosting: standard (GitHub Pages). **URL stays `https://simeontsvetanov.github.io/GG-counter/`** (Moni 2026-11-19).
@@ -55,7 +56,13 @@
 - Targets: LCP ≤ 2.5 s, INP ≤ 200 ms, CLS ≤ 0.1; critical path ≤ 170 KB compressed; first-load JS budget for Level 2 TO CONFIRM after the first clean build.
 
 ## 8. Legal and AI layers
-- New: Terms, Privacy, AI notice, Legal notice, Support pages and Help (Moni 2026-11-19). No personal data processed by us; contact email tsvetanov.simeon@gmail.com (Moni 2026-11-19). MIT licence (README states it; no LICENSE file in the repo — add).
+- Terms, Privacy, AI notice (Variant A: built with AI tools; no AI feature, so no EU AI Act Art. 50 duties), Legal notice,
+  Support (T-10, `content/legal/*.md`, English only, matched to the code on 2026-11-19). Game data never reaches us; the
+  only controller layers are an email to the contact address (also "Send by email") and a GitHub issue the user submits —
+  Privacy has the GDPR Art. 13 block for them (retention: emails ≤ 1 month after the conversation). Contact email
+  tsvetanov.simeon@gmail.com (Moni 2026-11-19); provider Simeon Tsvetanov, Bulgaria. No cookie banner (only strictly
+  necessary on-device storage). MIT `LICENSE` generated (2025–current year) + `third-party-licenses.txt`. Not legal
+  advice: open lawyer items in DECISIONS 2026-11-19 (T-10).
 
 ## 9. Acceptance and risks
 - Done when: AC1–AC9 pass on the live URL with data created by the old version; forge checks at 0 FAIL; baseline → after numbers recorded.

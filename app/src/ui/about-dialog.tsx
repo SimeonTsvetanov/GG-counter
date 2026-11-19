@@ -1,5 +1,6 @@
 // About (app-shell §9): what the app does, who made it, version and licence, source and changelog
-// links, and the open-source packages it ships (scripts/credits.ts → __CREDITS__, build time).
+// links, and the open-source packages it ships (scripts/credits.ts → __CREDITS__, build time) with a link
+// to their full licence texts (third-party-licenses.txt, scripts/licenses.ts).
 import { app } from "../config";
 import { appText, t } from "../i18n";
 import { ShellDialog } from "./shell-dialog";
@@ -41,6 +42,8 @@ export function AboutDialog({ onClose, opener, openDialog }: AboutDialogProps): 
             </li>
           ))}
         </ul>
+        {/* Full licence texts: MIT, Apache-2.0 and OFL require them with every copy (legal-pages §5). */}
+        <a className={LINK_CLASS} href="./third-party-licenses.txt">{t("shell.about.licenses")}</a>
       </div>
     </ShellDialog>
   );

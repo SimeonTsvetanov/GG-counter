@@ -23,10 +23,14 @@ Offline score tracker for board-game nights — a free micro-app by Simeon "Moni
   the pre-forge `gg-counter/state` and `gg-counter-theme` are copied once and never written — removal per PLAN T-14.
 - Moni corrects/dislikes something → apply it and add an entry to `LEARNINGS.md`.
 - Decisions → `docs/DECISIONS.md` (date · decision · reason) the same day. Update `STATUS.md` (≤ 30 lines).
-- Never hand-edit generated files: `app/public/{sitemap.xml,llms.txt,robots.txt,404.html,not-found.css,theme-init.js,sw-handover.js}`
-  (git-ignored, `pnpm generate`) and the head/page text of `app/index.html` (filled at build from the
-  `<!--app-*-->` markers). Edit `app.config.ts` or `scripts/seo.ts` / `static-page.ts` / `theme-init.ts` instead.
+- Never hand-edit generated files: `app/public/{sitemap.xml,llms.txt,robots.txt,404.html,not-found.css,theme-init.js,sw-handover.js}`,
+  the policy pages `app/public/{terms,privacy,ai-notice,legal-notice,support}/`, `policy-page.css`, `year.js`,
+  `third-party-licenses.txt` (git-ignored, `pnpm generate`), the repo `LICENSE` (committed, generated) and the head/page
+  text of `app/index.html` (filled at build from the `<!--app-*-->` markers). Edit `app.config.ts`, `content/legal/*.md`
+  or `scripts/seo.ts` / `static-page.ts` / `theme-init.ts` / `legal*.ts` / `licenses.ts` instead.
   `app/public/og-image.png` is committed: `pnpm og-image` after a name, tagline, accent or logo change.
+- Legal texts (PLAN T-10) must match the code: a change to storage, sharing, reporting, hosting or a new third party
+  updates `content/legal/privacy.md` (+ its "Last updated") in the same commit; run the forge `compliance-check.mjs`.
 
 ## Where things are (workspace since PLAN T-04, features since T-05)
 ```
@@ -45,10 +49,14 @@ app/            gg-counter-app — the React PWA (Vite): src/app.tsx (compositio
                 tests in app/test/storage/, UI logic tests in app/test/ui/),
                 src/lib/ (layout classes), src/providers/; src/components/ui/ = vendored shadcn/Radix.
                 Imports core by name (`gg-counter-core`; fixtures for tests: `gg-counter-core/test-fixtures`).
+content/legal/  policy sources (Terms, Privacy, AI notice, Legal notice, Support; English; PLAN T-10) → scripts/legal.ts →
+                in-app dialogs (src/ui/legal-dialog.tsx, lazy, `__LEGAL__`) + standalone pages (scripts/legal-page.ts)
 app/public/     icons, favicon, og-image   tests/e2e     Playwright (desktop + phone, Chromium; locale en-US, i18n.spec bg-BG)
 docs/           SPEC, PLAN, DECISIONS, migration baseline
 app.config.ts   single source (PLAN T-06; `shell` = menu/footer, T-08)  scripts/  generate.ts, seo.ts, static-page.ts,
-                config-check.ts, changelog.ts (What's new), credits.ts (About), sw-handover.ts (+ tests), og-image.ts
+                config-check.ts, changelog.ts (What's new), credits.ts (About), sw-handover.ts, legal.ts + legal-page.ts
+                (policy pages), licenses.ts (third-party-licenses.txt, LICENSE) (+ tests), og-image.ts;
+                page-assets/ (not-found.css, policy-page.css, LICENSE.mit, licenses/ = upstream texts for packages without one)
 app/vite.config.ts  base from app.config (`/GG-counter/` in production), head/page text, PWA manifest (id `gg-counter-pwa-v1`)
 ```
 

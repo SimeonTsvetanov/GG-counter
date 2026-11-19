@@ -127,12 +127,22 @@ export function pageLastmod(app: AppConfig, changelog: string): string {
   return release !== undefined && release > app.seo.contentUpdated ? release : app.seo.contentUpdated;
 }
 
-/** Returns sitemap.xml with the one canonical URL (no priority/changefreq — ignored by Google). */
-export function sitemapXml(app: AppConfig, lastmod: string): string {
+/** A page below the app URL for the sitemap: its path (e.g. "privacy/") and its own last change. */
+export interface SitemapPage {
+  readonly path: string;
+  readonly lastmod: string;
+}
+
+/**
+ * Returns sitemap.xml: the canonical app URL, then `pages` (the policy pages, PLAN T-10), each with
+ * its own `lastmod` (seo-geo §6); no priority/changefreq — ignored by Google.
+ */
+export function sitemapXml(app: AppConfig, lastmod: string, pages: readonly SitemapPage[] = []): string {
   return [
     `<?xml version="1.0" encoding="UTF-8"?>`,
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
     `  <url><loc>${app.url}</loc><lastmod>${lastmod}</lastmod></url>`,
+    ...pages.map((page) => `  <url><loc>${app.url}${page.path}</loc><lastmod>${page.lastmod}</lastmod></url>`),
     `</urlset>`,
     "",
   ].join("\n");
@@ -181,6 +191,8 @@ export function llmsTxt(app: AppConfig): string {
     "",
     "## Optional",
     `- [Changelog](${app.repo}/blob/main/CHANGELOG.md): user-visible changes by version`,
+    `- [Privacy](${app.url}privacy/): what ${app.name} stores, where, and how to delete it`,
+    `- [Terms](${app.url}terms/): conditions of use`,
     "",
   ].join("\n");
 }

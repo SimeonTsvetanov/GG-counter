@@ -25,6 +25,11 @@ copies keep working.
   problem instead of a blank page.
 - How it works and FAQ on the page: below the leaderboard, five steps and seven common questions
   with answers (free, offline, where scores are saved, how many players, sharing, installing).
+- Terms, Privacy, AI notice, Legal notice and a Support page: in the menu (About) and the footer, as
+  dialogs inside the app and as pages of their own (`/GG-counter/privacy/` …) that work offline and
+  print well. They say exactly what the app stores on your device and how to delete it. The texts
+  are in English; in Bulgarian the labels are translated and say so.
+- About links to the full licence texts of every open-source package the app includes.
 - Search and share preview: a page title and description, a preview image for links shared in
   chats and social apps, and a real "Page not found" page for wrong addresses.
 
@@ -44,5 +49,6 @@ copies keep working.
 - Tests that lock today's behaviour, pnpm, the licence file, lint rules and CI that deploys only
   after the checks pass.
 - One storage module for the app with tested export, import and clear functions (used by Settings later).
+- The repo `LICENSE` and `third-party-licenses.txt` are generated (current year, full licence texts).
 - All app texts in one English dictionary, ready for a second language; the menu and footer come
   from `app.config.ts`; the service worker and its tests follow the forge PWA rules.

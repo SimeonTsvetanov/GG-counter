@@ -1,6 +1,6 @@
-// What each menu/footer entry of app.config.ts `shell` does (app-shell §3): open a shell dialog, share
-// the app, install it, or follow a link. Record<ShellItemId, …> makes the compiler ask for every new
-// id, so PLAN T-10 adds a legal page as one config id + one entry here + its dialog.
+// What each menu/footer entry of app.config.ts `shell` does (app-shell §3): open a shell dialog (the
+// policy pages too, PLAN T-10), share the app, install it, or follow a link. Record<ShellItemId, …>
+// makes the compiler ask for every new id.
 import { useCallback } from "react";
 import { app, type ShellItemId } from "../config";
 import type { PwaInstall } from "../hooks/use-pwa-install";
@@ -23,6 +23,12 @@ export const SHELL_ITEMS: Readonly<Record<ShellItemId, ShellItemTarget>> = {
   "whats-new": { kind: "dialog", dialog: "whats-new" },
   about: { kind: "dialog", dialog: "about" },
   report: { kind: "dialog", dialog: "report" },
+  terms: { kind: "dialog", dialog: "terms" },
+  privacy: { kind: "dialog", dialog: "privacy" },
+  "ai-notice": { kind: "dialog", dialog: "ai-notice" },
+  "legal-notice": { kind: "dialog", dialog: "legal-notice" },
+  // "Contact" in the menu and footer (app-shell §3) is the Support page (legal-pages §1).
+  contact: { kind: "dialog", dialog: "support" },
   "share-app": { kind: "share-app" },
   install: { kind: "install" },
   support: { kind: "link", href: app.shell.buyMeACoffee },

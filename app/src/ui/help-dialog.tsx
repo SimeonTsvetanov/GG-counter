@@ -1,6 +1,7 @@
 // Help (app-shell → help-docs §1): only the categories that apply to GG Counter — what it does, quick
-// start, features, install, privacy, limits, FAQ, contact. Texts come from app.config.ts (in the UI
-// language, PLAN T-09) and the dictionary, and are precached, so Help works offline. Sections are <details>; all open on wide screens.
+// start, features, install, privacy (→ the Privacy page), limits, FAQ, contact (→ Report, Support page).
+// Texts come from app.config.ts (in the UI language, PLAN T-09) and the dictionary, and are precached,
+// so Help works offline. Sections are <details>; all open on wide screens.
 import { useEffect, useRef, type ReactNode } from "react";
 import { MAX_NAME_LENGTH, MAX_PLAYERS, MAX_SCORE, MIN_SCORE } from "gg-counter-core";
 import { app } from "../config";
@@ -14,9 +15,12 @@ export interface HelpDialogProps {
   readonly opener: HTMLElement | null;
   /** Section id to open and scroll to (e.g. "install" from Menu → Install app). */
   readonly section?: string;
-  /** Opens another shell dialog (Report a problem from Contact & support). */
+  /** Opens another shell dialog (Report a problem and Support from Contact & support, Privacy). */
   readonly openDialog: (id: ShellDialogId) => void;
 }
+
+/** Buttons that read as links, 44 px tall (target size, accessibility §1). */
+const TEXT_BUTTON_CLASS = "min-h-11 text-primary underline-offset-4 hover:underline";
 
 /** Wide screens show every section open (help-docs §3: tabs on desktop, accordion on phones). */
 const WIDE_QUERY = "(min-width: 900px)";
@@ -64,6 +68,7 @@ export function HelpDialog({ onClose, opener, section, openDialog }: HelpDialogP
         <Section id="privacy" title={t("shell.help.privacy")} isOpen={isOpen("privacy")}>
           <p>{t("shell.help.privacyText", { name: app.name })}</p>
           <p>{t("shell.help.privacyData")}</p>
+          <button type="button" className={TEXT_BUTTON_CLASS} onClick={() => { openDialog("privacy"); }}>{t("shell.help.privacyLink")}</button>
         </Section>
         <Section id="limits" title={t("shell.help.limits")} isOpen={isOpen("limits")}>
           <ul className="list-disc space-y-1 pl-5">
@@ -84,8 +89,11 @@ export function HelpDialog({ onClose, opener, section, openDialog }: HelpDialogP
         </Section>
         <Section id="contact" title={t("shell.help.contact")} isOpen={isOpen("contact")}>
           <p className="flex flex-wrap gap-x-4 gap-y-2">
-            <button type="button" className="min-h-11 text-primary underline-offset-4 hover:underline" onClick={() => { openDialog("report"); }}>
+            <button type="button" className={TEXT_BUTTON_CLASS} onClick={() => { openDialog("report"); }}>
               {t("shell.menu.items.report")}
+            </button>
+            <button type="button" className={TEXT_BUTTON_CLASS} onClick={() => { openDialog("support"); }}>
+              {t("shell.help.contactLink")}
             </button>
             <a className="inline-flex min-h-11 items-center text-primary underline-offset-4 hover:underline" href={app.shell.buyMeACoffee} target="_blank" rel="noopener noreferrer">
               {t("shell.menu.items.support")}

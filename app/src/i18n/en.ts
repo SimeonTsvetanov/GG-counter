@@ -32,6 +32,11 @@ export const en = {
         install: "Install app",
         report: "Report a problem",
         about: "About",
+        terms: "Terms",
+        privacy: "Privacy",
+        "ai-notice": "AI notice",
+        "legal-notice": "Legal notice",
+        contact: "Contact",
         support: "Support me ☕",
         source: "Source code on GitHub",
       },
@@ -96,6 +101,8 @@ export const en = {
       privacy: "Privacy & your data",
       privacyText: "{{name}} saves players, scores and your settings only in this browser on this device. Nothing is sent anywhere: no account, no cookies, no analytics.",
       privacyData: "Settings → Your data exports the game to a file, imports it again on any device, or deletes everything.",
+      privacyLink: "Read the privacy policy",
+      contactLink: "Support page",
       limits: "Limits & troubleshooting",
       limitPlayers: "Up to {{max}} players per game.",
       limitName: "Names can be up to {{max}} characters.",
@@ -116,7 +123,21 @@ export const en = {
       builtBy: "Made by {{author}}.",
       version: "Version {{version}} · free and open source (MIT licence).",
       credits: "Made with these open-source projects",
+      licenses: "Full licence texts",
       github: "GitHub",
+    },
+    // The policy pages (PLAN T-10): their text is English only in every UI language (app-shell → i18n §4);
+    // titles equal the first line of content/legal/<page>.md (app/test/ui/legal.test.ts).
+    legal: {
+      titles: {
+        terms: "Terms & Conditions",
+        privacy: "Privacy",
+        "ai-notice": "AI notice",
+        "legal-notice": "Legal notice",
+        support: "Support",
+      },
+      updated: "Last updated: {{date}}.",
+      openPage: "Open as a page",
     },
     report: {
       title: "Report a problem",
