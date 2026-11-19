@@ -150,7 +150,8 @@ test("Help, What's new, About and Report a problem open from the menu with their
 
   await openFromMenu(page, "What's new");
   const whatsNew = page.getByRole("dialog", { name: "What's new" });
-  await expect(whatsNew.getByRole("heading", { name: "Latest changes" })).toBeVisible();
+  // The newest numbered release is this build's version (release chapter §7: What's new shows it).
+  await expect(whatsNew.getByRole("heading", { name: new RegExp(`^${app.version.replace(/\./g, "\\.")} · \\d{4}-\\d{2}-\\d{2}$`) })).toBeVisible();
   await expect(whatsNew.getByRole("listitem").first()).toBeVisible();
   await page.keyboard.press("Escape");
 

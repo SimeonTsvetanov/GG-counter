@@ -144,4 +144,16 @@
   when the marker `gg-counter:v1:migrated` lists its item (the new value was written and read back equal) — never
   while the marker is missing — and drops the fallback in `theme-init.js`; `clearData` already removes them.
 - Depends on: T-01…T-12
-- [ ] done
+- [ ] done — part done 2026-11-19: sitemap `lastmod` per source (`scripts/sitemap.ts` + tests); second baseline
+  `docs/migration/after-2026-11-19.md` (before → after, every forge check on live + local build); GEO snapshot
+  `docs/geo/2026-11-19.md`; version 1.0.0 (CHANGELOG dated, What's new shows it); JS budget 125 KB recorded.
+  Open: `docs-writer` user docs; forge `apps.json` entry; release gates still at FAIL — security-check (no meta CSP
+  on `index.html`/`404.html`; React DOM's `innerHTML` in the bundle; GitHub repo settings) and pwa-check manifest id
+  (kept on purpose); code/legal/ux/security reviews; Moni's "release approved"; tag `v1.0.0` + GitHub release.
+
+## 4. Follow-ups (dated)
+- **Not before 2026-12-19** — old-key removal release (T-14 rule above, DECISIONS 2026-11-19): delete
+  `gg-counter/state` / `gg-counter-theme` only where `gg-counter:v1:migrated` lists the item; drop the `theme-init.js`
+  fallback; CHANGELOG + Privacy "Last updated" in the same commit.
+- Lighthouse budgets in CI (`lighthouserc.json` from the forge template) — would make the 125 KB JS budget and LCP/CLS
+  automatic; needs its own task (DECISIONS 2026-11-19, JS budget).

@@ -3,8 +3,10 @@
 All notable user-facing changes. Format: Keep a Changelog · SemVer.
 
 ## [Unreleased]
-The app is being migrated into the forge (`docs/PLAN.md`): the URL, saved games and installed
-copies keep working.
+
+## [1.0.0] - 2026-11-19
+The first numbered release: GG Counter now follows the same standard as the other free tools by the
+same author. The address, your saved games and installed copies keep working.
 
 ### Added
 - Bulgarian: the whole app in Bulgarian (Settings → Language: English or Български). English stays

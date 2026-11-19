@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { app as config, type AppConfig } from "../app.config.ts";
-import { escapeHtml, headTags, latestReleaseDate, llmsTxt, pageLastmod, pageTitle, robotsTxt, sitemapXml, structuredData } from "./seo.ts";
+import { escapeHtml, headTags, llmsTxt, pageTitle, robotsTxt, structuredData } from "./seo.ts";
 
 const app: AppConfig = config;
 
@@ -66,30 +66,6 @@ describe("structuredData", () => {
   it("FAQPage questions and answers equal the visible FAQ", () => {
     expect(faqPage.mainEntity.map((q) => q.name)).toEqual(app.faq.map((f) => f.q));
     expect(faqPage.mainEntity.map((q) => q.acceptedAnswer.text)).toEqual(app.faq.map((f) => f.a));
-  });
-});
-
-describe("latestReleaseDate and pageLastmod", () => {
-  it("skips Unreleased and returns the newest dated release", () => {
-    const changelog = "# Changelog\n\n## [Unreleased]\n- x\n\n## [1.2.0] - 2026-10-01\n- y\n\n## [1.1.0] - 2026-09-01\n- z\n";
-    expect(latestReleaseDate(changelog)).toBe("2026-10-01");
-    expect(latestReleaseDate("## [Unreleased]\n- First version.\n")).toBeUndefined();
-  });
-
-  it("takes the newer of the config date and the latest release — never today by default", () => {
-    const withDate = (contentUpdated: string): AppConfig => ({ ...app, seo: { ...app.seo, contentUpdated } });
-    expect(pageLastmod(withDate("2026-11-19"), "## [Unreleased]\n")).toBe("2026-11-19");
-    expect(pageLastmod(withDate("2026-11-19"), "## [1.0.0] - 2026-12-02\n")).toBe("2026-12-02");
-    expect(pageLastmod(withDate("2026-11-19"), "## [0.9.0] - 2026-10-01\n")).toBe("2026-11-19");
-  });
-});
-
-describe("sitemapXml", () => {
-  it("lists the one canonical URL with its lastmod and nothing else", () => {
-    const xml = sitemapXml(app, "2026-11-19");
-    expect(xml).toContain(`<url><loc>${app.url}</loc><lastmod>2026-11-19</lastmod></url>`);
-    expect(xml.match(/<url>/g)).toHaveLength(1);
-    expect(xml).not.toMatch(/priority|changefreq|\?lang=/);
   });
 });
 

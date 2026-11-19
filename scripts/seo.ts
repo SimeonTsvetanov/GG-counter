@@ -1,14 +1,13 @@
 /**
  * Search and agent files built from app.config.ts (growth → seo-geo §2–8). Pure functions, used by
- * scripts/generate.ts (sitemap.xml, robots.txt, llms.txt) and app/vite.config.ts (the static head).
+ * scripts/generate.ts (robots.txt, llms.txt) and app/vite.config.ts (the static head); sitemap.xml is
+ * scripts/sitemap.ts.
  */
 import type { AppConfig } from "../app.config.ts";
 import { themeColorMetas } from "./tokens.ts";
 
 /** The committed social image (seo-geo §3: 1200×630 PNG; made by `pnpm og-image`). */
 export const OG_IMAGE = { file: "og-image.png", width: 1200, height: 630, type: "image/png" } as const;
-
-const ISO_DATE = /\d{4}-\d{2}-\d{2}/;
 
 /** Named crawler groups of the forge robots.txt template (seo-geo §7). */
 const ROBOTS_GROUPS: readonly { readonly title: string; readonly agents: readonly string[] }[] = [
@@ -108,47 +107,6 @@ export function headTags(app: AppConfig): string {
   ].join("\n    ");
 }
 
-/** Returns the date (YYYY-MM-DD) of the newest dated release in a Keep-a-Changelog file, if any. */
-export function latestReleaseDate(changelog: string): string | undefined {
-  for (const heading of changelog.match(/^## .*$/gm) ?? []) {
-    if (/unreleased/i.test(heading)) continue;
-    const date = ISO_DATE.exec(heading)?.[0];
-    if (date) return date;
-  }
-  return undefined;
-}
-
-/**
- * Returns the sitemap `lastmod` of the app page: the newer of the config's `contentUpdated` and
- * the latest dated CHANGELOG release — the real last change, never the build date (seo-geo §6).
- */
-export function pageLastmod(app: AppConfig, changelog: string): string {
-  const release = latestReleaseDate(changelog);
-  // ISO dates compare correctly as strings.
-  return release !== undefined && release > app.seo.contentUpdated ? release : app.seo.contentUpdated;
-}
-
-/** A page below the app URL for the sitemap: its path (e.g. "privacy/") and its own last change. */
-export interface SitemapPage {
-  readonly path: string;
-  readonly lastmod: string;
-}
-
-/**
- * Returns sitemap.xml: the canonical app URL, then `pages` (the policy pages, PLAN T-10), each with
- * its own `lastmod` (seo-geo §6); no priority/changefreq — ignored by Google.
- */
-export function sitemapXml(app: AppConfig, lastmod: string, pages: readonly SitemapPage[] = []): string {
-  return [
-    `<?xml version="1.0" encoding="UTF-8"?>`,
-    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
-    `  <url><loc>${app.url}</loc><lastmod>${lastmod}</lastmod></url>`,
-    ...pages.map((page) => `  <url><loc>${app.url}${page.path}</loc><lastmod>${page.lastmod}</lastmod></url>`),
-    `</urlset>`,
-    "",
-  ].join("\n");
-}
-
 /**
  * Returns the per-app robots.txt — documentation only: crawlers read robots.txt at the host root
  * (the hub repo), never below it (seo-geo §6). Policy: all bots allowed (Moni 2026-11-05).
@@ -167,7 +125,6 @@ export function robotsTxt(app: AppConfig): string {
     "",
   ].join("\n");
 }
-
 
 /**
  * Returns llms.txt in the llmstxt.org format (seo-geo §8): H1 → `>` summary → plain paragraphs

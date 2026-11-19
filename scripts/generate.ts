@@ -13,7 +13,8 @@ import { copyFileSync, mkdirSync, readFileSync, readdirSync, writeFileSync } fro
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { app, l10n, type AppConfig } from "../app.config.ts";
-import { llmsTxt, pageLastmod, robotsTxt, sitemapXml } from "./seo.ts";
+import { llmsTxt, robotsTxt } from "./seo.ts";
+import { appSitemapXml } from "./sitemap.ts";
 import { notFoundHtml } from "./static-page.ts";
 import { configProblems } from "./config-check.ts";
 import { themeInitScript } from "./theme-init.ts";
@@ -86,8 +87,7 @@ if (problems.length > 0) {
 
 writeTokens();
 const legal = readLegalDocuments(config, join(root, "content", "legal"));
-const policyPages = legal.map((doc) => ({ path: `${doc.id}/`, lastmod: doc.updated }));
-writePublic("sitemap.xml", sitemapXml(config, pageLastmod(config, readText("CHANGELOG.md")), policyPages));
+writePublic("sitemap.xml", appSitemapXml(config, readText("CHANGELOG.md"), legal));
 writePublic("llms.txt", llmsTxt(config));
 writePublic("robots.txt", robotsTxt(config));
 writePublic("404.html", notFoundHtml(config));
