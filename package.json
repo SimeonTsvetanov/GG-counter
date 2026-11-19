@@ -9,14 +9,16 @@
   },
   "license": "MIT",
   "scripts": {
-    "dev": "pnpm -F gg-counter-app dev",
-    "build": "tsc -b && pnpm -r build",
+    "generate": "node scripts/generate.ts",
+    "og-image": "node scripts/og-image.ts",
+    "dev": "pnpm generate && pnpm -F gg-counter-app dev",
+    "build": "pnpm generate && tsc -b && pnpm -r build",
     "preview": "pnpm -F gg-counter-app preview",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc -b",
     "test": "vitest run --coverage",
     "e2e": "playwright test",
-    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm e2e"
+    "verify": "pnpm generate && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm e2e"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

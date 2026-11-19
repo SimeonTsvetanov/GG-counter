@@ -1,7 +1,8 @@
 import type { Config } from "tailwindcss";
 
 export default {
-  content: ["./index.html", "./src/**/*.{ts,tsx}"],
+  // scripts/static-page.ts writes the static page text of index.html (PLAN T-06).
+  content: ["./index.html", "./src/**/*.{ts,tsx}", "../scripts/static-page.ts"],
   darkMode: ["class"],
   theme: {
     container: {

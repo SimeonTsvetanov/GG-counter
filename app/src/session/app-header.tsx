@@ -1,5 +1,6 @@
 // The sticky header of the main screen. While the leaderboard card is in view it shows the title
-// next to ghost actions; once the card scrolls away it turns into a compact row of outline buttons.
+// (the page's h1) next to ghost actions; once the card scrolls away it turns into a compact row of
+// outline buttons and the h1 stays for screen readers only.
 import { LayoutList } from "lucide-react";
 import meepleIconUrl from "../../meeple-plus.svg?url";
 import { Button } from "../components/ui/button";
@@ -30,9 +31,9 @@ export function AppHeader({ isLeaderboardInView, leaderboard, actions }: AppHead
                   <LayoutList className="h-5 w-5" aria-hidden />
                 </div>
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                  <h1 className="truncate text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                     GG Counter
-                  </p>
+                  </h1>
                   <p className="text-xs text-muted-foreground">
                     Boardgames score tracker
                   </p>
@@ -46,23 +47,27 @@ export function AppHeader({ isLeaderboardInView, leaderboard, actions }: AppHead
               />
             </>
           ) : (
-            <ActionBar
-              variant="outline"
-              className="flex w-full items-center justify-between gap-2"
-              buttonClassName="shrink-0"
-              leaderboard={leaderboard}
-              actions={actions}
-            >
-              <Button
+            <>
+              {/* The page keeps its one h1 while the compact header shows only the logo. */}
+              <h1 className="sr-only">GG Counter</h1>
+              <ActionBar
                 variant="outline"
-                size="icon"
-                onClick={scrollToTop}
-                className="shrink-0"
-                aria-label="Scroll to top"
+                className="flex w-full items-center justify-between gap-2"
+                buttonClassName="shrink-0"
+                leaderboard={leaderboard}
+                actions={actions}
               >
-                <img src={meepleIconUrl} alt="GG Counter" className="h-5 w-5" />
-              </Button>
-            </ActionBar>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={scrollToTop}
+                  className="shrink-0"
+                  aria-label="Scroll to top"
+                >
+                  <img src={meepleIconUrl} alt="GG Counter" className="h-5 w-5" />
+                </Button>
+              </ActionBar>
+            </>
           )}
         </div>
       </div>

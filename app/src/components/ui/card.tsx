@@ -31,8 +31,9 @@ export function CardTitle({
   className,
   ...props
 }: React.HTMLAttributes<HTMLHeadingElement>): React.JSX.Element {
+  // h2: card titles sit directly under the page's h1 in the header (no skipped level).
   return (
-    <h3
+    <h2
       className={cn(
         "text-xl font-semibold leading-none tracking-tight",
         className

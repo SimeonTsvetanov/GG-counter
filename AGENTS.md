@@ -6,6 +6,7 @@ Offline score tracker for board-game nights — a free micro-app by Simeon "Moni
 ## Read first
 1. `STATUS.md` (current state, next step). 2. `docs/SPEC.md` + `docs/PLAN.md`. 3. `docs/DECISIONS.md`.
 4. `docs/migration/baseline-2026-11-19.md` — the pre-forge numbers every later step is compared with.
+5. `app.config.ts` — the single source for name, texts, FAQ, SEO, manifest values and the base path.
 
 ## Rules
 - Talk to Moni in **Bulgarian**; every file, commit and issue in **English**.
@@ -22,6 +23,10 @@ Offline score tracker for board-game nights — a free micro-app by Simeon "Moni
   copies — never rename or reshape them outside PLAN T-07.
 - Moni corrects/dislikes something → apply it and add an entry to `LEARNINGS.md`.
 - Decisions → `docs/DECISIONS.md` (date · decision · reason) the same day. Update `STATUS.md` (≤ 30 lines).
+- Never hand-edit generated files: `app/public/{sitemap.xml,llms.txt,robots.txt,404.html,not-found.css}`
+  (git-ignored, `pnpm generate`) and the head/page text of `app/index.html` (filled at build from the
+  `<!--app-*-->` markers). Edit `app.config.ts` or `scripts/seo.ts` / `scripts/static-page.ts` instead.
+  `app/public/og-image.png` is committed: `pnpm og-image` after a name, tagline, accent or logo change.
 
 ## Where things are (workspace since PLAN T-04, features since T-05)
 ```
@@ -32,13 +37,15 @@ app/            gg-counter-app — the React PWA (Vite): src/app.tsx (compositio
                 src/components/ (theme toggle, status banner), src/hooks/ (use-game-state wraps core),
                 src/lib/ (storage I/O, layout classes), src/providers/; src/components/ui/ = vendored shadcn/Radix.
                 Imports core by name (`gg-counter-core`).
-app/public/     icons, favicon             tests/e2e     Playwright (desktop + phone, Chromium)
+app/public/     icons, favicon, og-image   tests/e2e     Playwright (desktop + phone, Chromium)
 docs/           SPEC, PLAN, DECISIONS, migration baseline
-app/vite.config.ts  base `/GG-counter/` in production, PWA manifest (id `gg-counter-pwa-v1`)
+app.config.ts   single source (PLAN T-06)  scripts/      generate.ts, seo.ts, static-page.ts, config-check.ts (+ tests), og-image.ts
+app/vite.config.ts  base from app.config (`/GG-counter/` in production), head/page text, PWA manifest (id `gg-counter-pwa-v1`)
 ```
 
 ## Commands
-`pnpm i` · `pnpm dev` · `pnpm verify` (lint + typecheck + test + build + e2e) · `pnpm lint` ·
-`pnpm typecheck` (`tsc -b`: core, app, Vite config, tests, tool configs) · `pnpm test` (Vitest, core ≥ 90 % lines) ·
+`pnpm i` · `pnpm dev` · `pnpm generate` (also before dev/build/verify) · `pnpm og-image` ·
+`pnpm verify` (generate + lint + typecheck + test + build + e2e) · `pnpm lint` ·
+`pnpm typecheck` (`tsc -b`: core, app, Vite config, scripts, tests, tool configs) · `pnpm test` (Vitest: core ≥ 90 % lines + generator) ·
 `pnpm build` (→ `app/dist`) · `node …/structure-check.mjs --repo .` (layers in `structure.config.json`) ·
 `pnpm e2e` (needs `pnpm build`; serves `app/dist` with `vite preview`)

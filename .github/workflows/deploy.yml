@@ -1,5 +1,5 @@
 # Deploy to GitHub Pages via OIDC (no tokens). Repo Settings → Pages → Source: GitHub Actions.
-# Publishes https://simeontsvetanov.github.io/GG-counter/ (base path set in app/vite.config.ts).
+# Publishes https://simeontsvetanov.github.io/GG-counter/ (basePath in app.config.ts).
 name: Deploy
 # Deploys only after CI (lint, typecheck, build, audit, licences, e2e) passed on main.
 on:
@@ -34,11 +34,9 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # build runs pnpm generate first: 404.html (Pages serves it with status 404 for unknown paths),
+      # sitemap.xml, llms.txt and robots.txt come from app.config.ts (PLAN T-06).
       - run: pnpm build
-      # Pages serves 404.html for unknown paths; the app shell handles them (pre-forge behaviour,
-      # replaced by the generated 404 page in PLAN T-06).
-      - name: Create 404 fallback
-        run: cp app/dist/index.html app/dist/404.html
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:

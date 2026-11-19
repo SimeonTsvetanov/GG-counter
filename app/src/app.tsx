@@ -4,8 +4,9 @@ import { useRef, useState } from "react";
 import { StatusBanner } from "./components/status-banner";
 import { useGameState } from "./hooks/use-game-state";
 import { useInView } from "./hooks/use-in-view";
+import { usePageInfo } from "./hooks/use-page-info";
 import { LeaderboardCard } from "./leaderboard/leaderboard-card";
-import { CONTAINER_CLASS } from "./lib/layout";
+import { CARD_WIDTH_CLASS, CONTAINER_CLASS } from "./lib/layout";
 import { PlayersSection } from "./players/players-section";
 import type { SessionActions } from "./session/action-bar";
 import { AppHeader } from "./session/app-header";
@@ -16,7 +17,7 @@ import { shareLeaderboard } from "./share/share-leaderboard";
 /** Share of the leaderboard card that must be on screen for the full header layout. */
 const LEADERBOARD_IN_VIEW_THRESHOLD = 0.15;
 
-/** The whole GG Counter screen: players, scores, leaderboard, share and install banner. */
+/** The whole GG Counter screen: players, scores, leaderboard, share, install banner, how it works and FAQ. */
 export function App(): React.JSX.Element {
   const game = useGameState();
   const [isLeaderboardDialogOpen, setIsLeaderboardDialogOpen] = useState(false);
@@ -27,6 +28,8 @@ export function App(): React.JSX.Element {
   const addCardRef = useRef<HTMLDivElement>(null);
   const leaderboardCardRef = useRef<HTMLDivElement>(null);
   const isLeaderboardInView = useInView(leaderboardCardRef, LEADERBOARD_IN_VIEW_THRESHOLD);
+  const pageInfoSlotRef = useRef<HTMLDivElement>(null);
+  usePageInfo(pageInfoSlotRef);
 
   const handleShare = () => {
     void shareLeaderboard(game.state.players, () => { setIsLeaderboardDialogOpen(false); });
@@ -76,6 +79,8 @@ export function App(): React.JSX.Element {
               onRequestReset={actions.onRequestReset}
               onClear={game.resetGame}
             />
+            {/* How it works + FAQ from index.html, below the tool (filled by usePageInfo). */}
+            <div ref={pageInfoSlotRef} className={CARD_WIDTH_CLASS} />
           </div>
         </main>
 

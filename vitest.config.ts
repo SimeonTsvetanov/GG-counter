@@ -1,4 +1,5 @@
-// Vitest — unit and property tests of packages/core (engineering → testing §1, §3). Playwright runs tests/e2e.
+// Vitest — unit and property tests of packages/core and the generator in scripts/ (engineering →
+// testing §1, §3). Playwright runs tests/e2e.
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
@@ -7,7 +8,7 @@ export default defineConfig({
     restoreMocks: true,
     unstubGlobals: true,
     unstubEnvs: true,
-    include: ["packages/*/test/**/*.test.ts"],
+    include: ["packages/*/test/**/*.test.ts", "scripts/**/*.test.ts"],
     coverage: {
       provider: "v8",
       include: ["packages/core/src/**"],

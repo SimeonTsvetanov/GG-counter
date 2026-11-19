@@ -14,12 +14,16 @@
 - T-05 split by feature: `app.tsx` is a composition root; `players/`, `leaderboard/`, `session/`, `share/`;
   temporary size-rule block deleted; fixtures in `packages/core/test/fixtures/`; screenshots identical.
   structure-check 0 FAIL 0 WARN; first-load JS 110.6 KB gzip (was 109.5).
+- T-06 single source: `app.config.ts` → head/OG/JSON-LD, page text (h1, answer, steps, FAQ in raw HTML,
+  shown below the leaderboard after load), manifest values, sitemap, llms.txt, robots.txt, 404 page;
+  og-image committed (`pnpm og-image`). geo-check 0 FAIL; 22 e2e; first-load JS 110.7 KB gzip.
 
 ## Next
-- T-06: `app.config.ts` + generator (single source of truth for head/meta, manifest, sitemap, llms.txt).
+- T-07: storage namespace `gg-counter:v1:*` with a one-time copy of the old keys.
 
 ## Blockers / open
-- Group a (T-01–T-03) deployed 2026-11-19; T-04 and T-05 not deployed yet (CI deploys `app/dist` now).
+- Group a (T-01–T-03) deployed 2026-11-19; T-04–T-06 not deployed yet (CI deploys `app/dist` now).
+- `structure.config.json` stays until `design/tokens.css` exists (T-12): forge layout check needs it.
 - Limit errors from core are not shown in the UI yet (a rejected name stays in the field; a rejected
   score change is ignored) — messages come with the shell/i18n tasks (T-08/T-09).
 - `.github/instructions/*.md` (old Copilot rules) contradict the forge rules — waiting for Moni: keep or remove.

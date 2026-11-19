@@ -69,7 +69,7 @@
 - Reading list: growth → seo-geo §2–6, geo §3–4, geo-content §1–3; app-shell → app-shell §0.
 - Acceptance: `geo-check --render` 0 FAIL and `seo-check` 0 FAIL on the preview; manifest `id`, `scope`, `start_url` unchanged; an installed old copy updates and still opens its saved game.
 - Depends on: T-05
-- [ ] done
+- [x] done — `app.config.ts` + `scripts/generate.ts` (sitemap, llms.txt, robots.txt, 404) and the Vite head/page-text plugin; raw HTML carries h1, answer, 5 steps, 7-question FAQ, moved below the leaderboard on load (one h1, now in the header); manifest id/scope/start_url unchanged; geo-check 0 FAIL, 22 e2e green (2026-11-19).
 
 ### T-07 · Storage namespace with migration
 - Goal: `gg-counter:v1:state` and `gg-counter:v1:theme`; first load copies the old `gg-counter/state` and `gg-counter-theme`, keeps the old values until the new ones are verified; Settings → export/import/clear.

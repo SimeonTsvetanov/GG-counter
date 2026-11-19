@@ -6,7 +6,9 @@
     "noEmit": false,
     "emitDeclarationOnly": true,
     "outDir": "../.tsbuild/app-node",
-    "types": ["node"]
+    "rootDir": "..",
+    "types": ["node"],
+    "allowImportingTsExtensions": true
   },
-  "include": ["vite.config.ts", "tailwind.config.ts"]
+  "include": ["vite.config.ts", "tailwind.config.ts", "../app.config.ts", "../scripts/seo.ts", "../scripts/static-page.ts"]
 }

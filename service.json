@@ -9,7 +9,7 @@
   "app": "https://simeontsvetanov.github.io/GG-counter/",
   "api": null,
   "mcp": null,
-  "llms": null,
+  "llms": "https://simeontsvetanov.github.io/GG-counter/llms.txt",
   "status": "migrating",
   "version": "0.1.0"
 }
