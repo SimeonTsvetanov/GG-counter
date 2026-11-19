@@ -14,5 +14,6 @@
 - T-04: workspace layout — `packages/core` (score logic, tests first) and the app moved to `app/`.
 
 ## Blockers / open
-- First deploy through the new CI → Deploy chain: confirm the live URL still serves the app and
-  the 16 e2e flows pass against it.
+- None. Group a (T-01–T-03) deployed 2026-11-19 through the new CI → Deploy; the 16 e2e tests pass
+  against the live URL (`E2E_BASE_URL=https://simeontsvetanov.github.io/GG-counter/ pnpm e2e`).
+- `.github/instructions/*.md` (old Copilot rules) contradict the forge rules — waiting for Moni: keep or remove.
