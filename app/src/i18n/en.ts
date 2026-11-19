@@ -193,7 +193,8 @@ export const en = {
       removeConfirm: "Remove",
     },
     score: {
-      adjust: "Adjust score for {{name}}",
+      // The visible score is part of the name (WCAG 2.5.3 label in name, PLAN T-12).
+      adjust: "Adjust score for {{name}}: {{score}}",
       title: "Adjust score",
       description: "Add or subtract points for {{name}}. Use negative values to subtract.",
       amount: "Custom score adjustment",

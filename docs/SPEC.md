@@ -49,11 +49,15 @@
 
 ## 6. UI
 - **Level 2 — React stays** (Moni 2026-11-19; existing app, see DECISIONS). Languages: English + Bulgarian (T-09; app/src/i18n).
-- Accent today `#1F4ED8`; logo `public/favicon.svg` (meeple). Screens: one main screen, dialogs.
+- Look (T-12): the forge tokens (`design/tokens.css`) through Tailwind 4, the same look as the sibling apps; light / dark /
+  system. Accent `#1F4ED8` (app.config.ts → generated accent tokens, WCAG-checked at build); browser bar and manifest colours =
+  the page background; links accent + semibold, no underline. Logo `public/favicon.svg` (meeple). Screens: one main screen,
+  dialogs (bottom sheets on phones), the standalone policy and 404 pages on the same tokens.
 
 ## 7. Limits and performance
 - Limits (Moni 2026-11-19): 50 players, 40-character names, scores −999,999…999,999 — for new input; older saved games load unchanged.
-- Targets: LCP ≤ 2.5 s, INP ≤ 200 ms, CLS ≤ 0.1; critical path ≤ 170 KB compressed; first-load JS budget for Level 2 TO CONFIRM after the first clean build.
+- Targets: LCP ≤ 2.5 s, INP ≤ 200 ms, CLS ≤ 0.1; critical path ≤ 170 KB compressed; first-load JS budget for Level 2:
+  **125 KB gzip proposed** (T-12 measured 118.2 KB; DECISIONS 2026-11-19) — TO CONFIRM by Moni.
 
 ## 8. Legal and AI layers
 - Terms, Privacy, AI notice (Variant A: built with AI tools; no AI feature, so no EU AI Act Art. 50 duties), Legal notice,

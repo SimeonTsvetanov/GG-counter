@@ -30,19 +30,22 @@ export function WhatsNewDialog({ onClose, opener }: WhatsNewDialogProps): React.
   const changelogLang = getLanguage() === "en" ? undefined : "en";
   return (
     <ShellDialog title={t("shell.whatsNew.title")} onClose={onClose} opener={opener}>
-      <div className="space-y-4 text-sm">
-        {__CHANGELOG__.length === 0 && <p className="text-muted-foreground">{t("shell.whatsNew.empty")}</p>}
+      <div className="prose">
+        {__CHANGELOG__.length === 0 && <p className="text-text-secondary">{t("shell.whatsNew.empty")}</p>}
         {__CHANGELOG__.map((entry) => (
-          <section key={entry.version} className="space-y-2">
-            <h3 className="font-semibold">{versionHeading(entry.version, entry.date)}</h3>
-            <ul lang={changelogLang} className="list-disc space-y-1 pl-5 text-muted-foreground">
+          <section key={entry.version} className="flex flex-col gap-2">
+            <h3>{versionHeading(entry.version, entry.date)}</h3>
+            <ul lang={changelogLang} className="text-text-secondary">
               {entry.items.map((item) => <li key={item}>{item}</li>)}
             </ul>
           </section>
         ))}
-        <a className="inline-flex min-h-11 items-center text-primary underline-offset-4 hover:underline" href={`${app.repo}/blob/main/CHANGELOG.md`} target="_blank" rel="noopener noreferrer">
-          {t("shell.whatsNew.fullChangelog")}
-        </a>
+        {/* Its own paragraph: the link text is in the UI language, the list above is English (lang parts). */}
+        <p>
+          <a className="text-button" href={`${app.repo}/blob/main/CHANGELOG.md`} target="_blank" rel="noopener noreferrer">
+            {t("shell.whatsNew.fullChangelog")}
+          </a>
+        </p>
       </div>
     </ShellDialog>
   );

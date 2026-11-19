@@ -1,11 +1,14 @@
 // The app menu (app-shell §3): a button in the header that opens the groups of app.config.ts
 // `shell.menu`. Radix DropdownMenu gives arrow keys, typeahead, Escape, outside click and focus return.
-import { useRef } from "react";
+// Loaded after the first paint (header-menus.tsx, PLAN T-12); a stand-in button takes its place until then.
+import { useLayoutEffect, useRef, useState } from "react";
 import { Menu } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../components/ui/dropdown-menu";
 import { app, type ShellItemId } from "../config";
 import { t } from "../i18n";
+import type { LazyMenuProps } from "./lazy-menu";
+import { useMenuHandover } from "./menu-handover";
 import { SHELL_ITEMS, shellItemLabel, type RunShellItem } from "./shell-items";
 
 /** Props of {@link AppMenu}. */
@@ -18,16 +21,13 @@ export interface AppMenuProps {
   readonly variant: "ghost" | "outline";
 }
 
-/** Items ≥ 44 px on touch screens, a little tighter with a mouse (ui-patterns §5). */
-const ITEM_CLASS = "min-h-11 cursor-pointer px-3 text-base [@media(pointer:fine)]:min-h-9 [@media(pointer:fine)]:text-sm focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring";
-
 /** One menu entry: a link for external pages, otherwise an item that runs the entry. */
 function MenuEntry({ id, runItem, isInstalled, opensDialog, trigger, onOpensDialog }: { id: ShellItemId; runItem: RunShellItem; isInstalled: boolean; opensDialog: boolean; trigger: React.RefObject<HTMLButtonElement | null>; onOpensDialog: () => void }): React.JSX.Element {
   const target = SHELL_ITEMS[id];
   const label = shellItemLabel(id, isInstalled);
   if (target.kind === "link") {
     return (
-      <DropdownMenuItem asChild className={ITEM_CLASS}>
+      <DropdownMenuItem asChild>
         <a href={target.href} target="_blank" rel="noopener noreferrer">{label}</a>
       </DropdownMenuItem>
     );
@@ -35,7 +35,6 @@ function MenuEntry({ id, runItem, isInstalled, opensDialog, trigger, onOpensDial
   const isDone = id === "install" && isInstalled;
   return (
     <DropdownMenuItem
-      className={ITEM_CLASS}
       disabled={isDone}
       data-action={id}
       onSelect={() => {
@@ -75,24 +74,36 @@ function activateFocusedItemOnEnter(event: React.KeyboardEvent<HTMLDivElement>):
 }
 
 /** Renders the menu button and its grouped entries. */
-export function AppMenu({ runItem, isInstalled, canInstall, variant }: AppMenuProps): React.JSX.Element {
+export function AppMenu({ runItem, isInstalled, canInstall, variant, initialIntent }: AppMenuProps & LazyMenuProps): React.JSX.Element {
   const trigger = useRef<HTMLButtonElement>(null);
+  const { open, setOpen, onContentFocus } = useMenuHandover(initialIntent, trigger);
+  // A menu opened from the stand-in is open on mount: make the page inert then too (no onOpenChange).
+  const [isOpenOnMount] = useState(open);
+  useLayoutEffect(() => {
+    if (isOpenOnMount) makePageInert(true);
+  }, [isOpenOnMount]);
   // True while an entry opens a dialog: the menu must not move focus back to its button then, because
   // focus leaving the new dialog would close it at once; the dialog returns focus there when it closes.
   const isOpeningDialog = useRef(false);
   return (
-    <DropdownMenu onOpenChange={makePageInert}>
+    <DropdownMenu
+      open={open}
+      onOpenChange={(isOpen) => {
+        makePageInert(isOpen);
+        setOpen(isOpen);
+      }}
+    >
       <DropdownMenuTrigger asChild>
-        <Button ref={trigger} variant={variant} size="icon" aria-label={t("shell.menu.open")} data-menu-open="" className="shrink-0">
-          <Menu className="h-5 w-5" aria-hidden />
+        <Button ref={trigger} variant={variant} size="icon" aria-label={t("shell.menu.open")} data-menu-open="">
+          <Menu aria-hidden />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
         sideOffset={8}
         collisionPadding={16}
-        className="max-h-[calc(100dvh-5rem)] w-64 overflow-y-auto"
         onKeyDownCapture={activateFocusedItemOnEnter}
+        onFocus={onContentFocus}
         onCloseAutoFocus={(event) => {
           if (isOpeningDialog.current) event.preventDefault();
           isOpeningDialog.current = false;
@@ -101,7 +112,7 @@ export function AppMenu({ runItem, isInstalled, canInstall, variant }: AppMenuPr
         {app.shell.menu.map((group, index) => (
           <DropdownMenuGroup key={group.id} aria-labelledby={`menu-group-${group.id}`}>
             {index > 0 && <DropdownMenuSeparator />}
-            <DropdownMenuLabel id={`menu-group-${group.id}`} className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            <DropdownMenuLabel id={`menu-group-${group.id}`}>
               {t(`shell.menu.${group.id}`)}
             </DropdownMenuLabel>
             {group.items.map((id) => (

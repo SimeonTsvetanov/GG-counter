@@ -10,13 +10,10 @@ const THEMES: readonly Theme[] = ["system", "light", "dark"];
 export function ThemeChoice(): React.JSX.Element {
   const { theme, setTheme } = useTheme();
   return (
-    <fieldset className="grid grid-cols-3 gap-1 rounded-lg bg-muted p-1">
+    <fieldset className="segmented">
       <legend className="sr-only">{t("shell.theme.label")}</legend>
       {THEMES.map((value) => (
-        <label
-          key={value}
-          className="flex min-h-11 cursor-pointer items-center justify-center rounded-md text-sm font-medium text-foreground has-[:checked]:bg-background has-[:checked]:shadow-sm has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ring"
-        >
+        <label key={value}>
           <input
             type="radio"
             name="theme"

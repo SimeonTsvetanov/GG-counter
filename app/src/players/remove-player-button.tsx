@@ -30,9 +30,9 @@ export function RemovePlayerButton({ playerName, onConfirm }: RemovePlayerButton
           variant="ghost"
           size="icon"
           aria-label={t("app.players.remove", { name: playerName })}
-          className="text-destructive hover:text-destructive"
+          className="text-text-secondary"
         >
-          <Trash2 className="h-5 w-5" />
+          <Trash2 aria-hidden />
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
@@ -44,10 +44,7 @@ export function RemovePlayerButton({ playerName, onConfirm }: RemovePlayerButton
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>{t("shell.cancel")}</AlertDialogCancel>
-          <AlertDialogAction
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            onClick={onConfirm}
-          >
+          <AlertDialogAction onClick={onConfirm}>
             {t("app.players.removeConfirm")}
           </AlertDialogAction>
         </AlertDialogFooter>

@@ -64,22 +64,20 @@ function useTopDialogSlot(): HTMLElement | null {
 function ToastView({ toast, inDialog, onDismiss, onHold }: { toast: Toast; inDialog: boolean; onDismiss: () => void; onHold: (held: boolean) => void }): React.JSX.Element {
   return (
     <div
-      className={cn(
-        "flex items-center gap-3 rounded-lg bg-foreground px-4 py-3 text-sm text-background shadow-lg",
-        inDialog ? "mb-2" : "pointer-events-auto mx-auto w-full max-w-md"
-      )}
+      className={cn("toast", inDialog && "toast--in-dialog")}
       onMouseEnter={() => { onHold(true); }}
       onMouseLeave={() => { onHold(false); }}
       onFocus={() => { onHold(true); }}
       onBlur={() => { onHold(false); }}
     >
-      <p className="flex-1">{toast.message}</p>
+      <p>{toast.message}</p>
+      {/* Filled accent, not accent text: inside a dialog the toast sits on the fill colour (design-system §2). */}
       {toast.action && (
-        <Button size="sm" variant="secondary" onClick={() => { toast.action?.run(); onDismiss(); }}>
+        <Button onClick={() => { toast.action?.run(); onDismiss(); }}>
           {toast.action.label}
         </Button>
       )}
-      <Button size="sm" variant="ghost" className="text-background hover:bg-background/15 hover:text-background" onClick={onDismiss}>
+      <Button variant="ghost" onClick={onDismiss}>
         {t("shell.dismiss")}
       </Button>
     </div>
@@ -119,7 +117,7 @@ export function ToastProvider({ children }: { children: ReactNode }): React.JSX.
     <ToastContext.Provider value={value}>
       {children}
       {/* The region is always there, so screen readers announce what appears in it. */}
-      <div role="status" aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-0 z-[60] px-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+      <div role="status" aria-live="polite" className="toast-region">
         {dialog === null && view}
       </div>
       {dialog !== null && view && createPortal(<div role="status" aria-live="polite">{view}</div>, dialog)}

@@ -10,5 +10,5 @@
     "types": ["node"],
     "allowImportingTsExtensions": true
   },
-  "include": ["vite.config.ts", "tailwind.config.ts", "../app.config.ts", "../scripts/seo.ts", "../scripts/static-page.ts", "src/i18n/en.ts", "../scripts/changelog.ts", "../scripts/credits.ts", "../scripts/sw-handover.ts", "../scripts/legal.ts", "src/ui/legal-document.ts"]
+  "include": ["vite.config.ts", "../scripts/tokens.ts", "../app.config.ts", "../scripts/seo.ts", "../scripts/static-page.ts", "src/i18n/en.ts", "../scripts/changelog.ts", "../scripts/credits.ts", "../scripts/sw-handover.ts", "../scripts/legal.ts", "src/ui/legal-document.ts"]
 }

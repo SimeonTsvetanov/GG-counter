@@ -36,17 +36,13 @@ export function AddPlayerCard({
   const errorId = useId();
   return (
     <div ref={ref} className={CARD_WIDTH_CLASS}>
-      <Card className="border-0 shadow-md">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-base font-semibold">
-            {t("app.players.addTitle")}
-          </CardTitle>
-          <span className="text-xs text-muted-foreground">
-            {t("app.players.count", { count: playerCount })}
-          </span>
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("app.players.addTitle")}</CardTitle>
+          <span className="card-meta">{t("app.players.count", { count: playerCount })}</span>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <CardContent>
+          <div className="flex flex-col gap-2 sm:flex-row">
             <Input
               ref={inputRef}
               value={name}
@@ -56,25 +52,20 @@ export function AddPlayerCard({
                   onAdd();
                 }
               }}
+              autoComplete="off"
+              autoCapitalize="words"
+              enterKeyHint="done"
               placeholder={t("app.players.namePlaceholder")}
               aria-label={t("app.players.nameLabel")}
               aria-invalid={error !== null}
               aria-describedby={errorId}
-              className="flex-1 min-w-0"
             />
-            <Button onClick={onAdd} className="w-full sm:w-auto">
+            <Button onClick={onAdd} className="sm:min-w-28">
               {t("app.players.add")}
             </Button>
           </div>
-          {/* The error replaces the helper text while there is one (ui-patterns §2); the alert
-              element is always there, so screen readers announce what appears in it. */}
-          <div>
-            {error === null && <p className="text-xs text-muted-foreground">{t("app.players.nameLabel")}</p>}
-            <p id={errorId} role="alert" className="text-sm font-medium text-destructive">{error}</p>
-          </div>
-          <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-            {t("app.players.count", { count: playerCount })}
-          </p>
+          {/* Always in the page, so screen readers announce what appears in it (ui-patterns §2). */}
+          <p id={errorId} role="alert" className="field-error">{error}</p>
         </CardContent>
       </Card>
     </div>

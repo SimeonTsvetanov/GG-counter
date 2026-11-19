@@ -32,44 +32,31 @@ export function StatusBanner({ install }: { install: PwaInstall }): React.JSX.El
   }
 
   return (
-    <div className={`${CONTAINER_CLASS} mt-3`}>
-      <div className="rounded-lg bg-card p-4 text-card-foreground shadow-md">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-2 text-sm">
-            {!isOnline && (
-              <p className="font-medium text-destructive">
-                {t("shell.status.offline")}
-              </p>
-            )}
-            {showInstallBanner && (
-              <p className="font-medium">
-                {t("shell.status.installOffer", { name: app.name })}
-              </p>
-            )}
-          </div>
-          <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:flex-nowrap">
-            {showInstallBanner && (
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={handleInstallRequest}
-                className="w-full sm:w-auto"
-              >
-                <Download className="mr-2 h-4 w-4" /> {t("shell.status.install")}
-              </Button>
-            )}
-            {showInstallBanner && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => { setInstallDismissed(true); }}
-                className="w-full sm:w-auto"
-              >
-                {t("shell.dismiss")}
-              </Button>
-            )}
-          </div>
+    <div className={`${CONTAINER_CLASS} pt-3`}>
+      <div className="card narrow-column flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-2 text-md">
+          {/* Not colour alone: the words say "offline" (WCAG 1.4.1); warning text passes on a card. */}
+          {!isOnline && (
+            <p className="font-semibold text-warning-text">
+              {t("shell.status.offline")}
+            </p>
+          )}
+          {showInstallBanner && (
+            <p className="font-semibold">
+              {t("shell.status.installOffer", { name: app.name })}
+            </p>
+          )}
         </div>
+        {showInstallBanner && (
+          <div className="button-stack sm:shrink-0">
+            <Button variant="secondary" onClick={handleInstallRequest}>
+              <Download aria-hidden /> {t("shell.status.install")}
+            </Button>
+            <Button variant="ghost" onClick={() => { setInstallDismissed(true); }}>
+              {t("shell.dismiss")}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

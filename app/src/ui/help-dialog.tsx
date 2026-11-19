@@ -19,18 +19,15 @@ export interface HelpDialogProps {
   readonly openDialog: (id: ShellDialogId) => void;
 }
 
-/** Buttons that read as links, 44 px tall (target size, accessibility §1). */
-const TEXT_BUTTON_CLASS = "min-h-11 text-primary underline-offset-4 hover:underline";
-
 /** Wide screens show every section open (help-docs §3: tabs on desktop, accordion on phones). */
 const WIDE_QUERY = "(min-width: 900px)";
 
 /** One Help category. */
 function Section({ id, title, isOpen, children }: { id: string; title: string; isOpen: boolean; children: ReactNode }): React.JSX.Element {
   return (
-    <details id={`help-${id}`} open={isOpen} className="group rounded-lg bg-muted/50 px-3 py-2">
-      <summary className="min-h-11 cursor-pointer content-center font-medium">{title}</summary>
-      <div className="space-y-2 pb-2 pt-1 text-sm text-muted-foreground">{children}</div>
+    <details id={`help-${id}`} open={isOpen}>
+      <summary>{title}</summary>
+      <div className="prose">{children}</div>
     </details>
   );
 }
@@ -48,18 +45,18 @@ export function HelpDialog({ onClose, opener, section, openDialog }: HelpDialogP
 
   return (
     <ShellDialog title={t("shell.help.title")} onClose={onClose} opener={opener}>
-      <div ref={body} className="space-y-2">
+      <div ref={body} className="disclosures">
         <Section id="about" title={t("shell.help.whatItDoes")} isOpen={isOpen("about", true)}>
           <p>{text.answer}</p>
         </Section>
         <Section id="start" title={t("shell.help.quickStart")} isOpen={isOpen("start")}>
-          <ol className="list-decimal space-y-1 pl-5">{text.steps.map((step) => <li key={step}>{step}</li>)}</ol>
+          <ol>{text.steps.map((step) => <li key={step}>{step}</li>)}</ol>
         </Section>
         <Section id="features" title={t("shell.help.features")} isOpen={isOpen("features")}>
-          <ul className="list-disc space-y-1 pl-5">{text.features.map((feature) => <li key={feature}>{feature}</li>)}</ul>
+          <ul>{text.features.map((feature) => <li key={feature}>{feature}</li>)}</ul>
         </Section>
         <Section id="install" title={t("shell.help.install")} isOpen={isOpen("install")}>
-          <ul className="list-disc space-y-1 pl-5">
+          <ul>
             <li>{t("shell.help.installAndroid")}</li>
             <li>{t("shell.help.installIOS")}</li>
             <li>{t("shell.help.installDesktop")}</li>
@@ -68,10 +65,10 @@ export function HelpDialog({ onClose, opener, section, openDialog }: HelpDialogP
         <Section id="privacy" title={t("shell.help.privacy")} isOpen={isOpen("privacy")}>
           <p>{t("shell.help.privacyText", { name: app.name })}</p>
           <p>{t("shell.help.privacyData")}</p>
-          <button type="button" className={TEXT_BUTTON_CLASS} onClick={() => { openDialog("privacy"); }}>{t("shell.help.privacyLink")}</button>
+          <button type="button" className="text-button" onClick={() => { openDialog("privacy"); }}>{t("shell.help.privacyLink")}</button>
         </Section>
         <Section id="limits" title={t("shell.help.limits")} isOpen={isOpen("limits")}>
-          <ul className="list-disc space-y-1 pl-5">
+          <ul>
             <li>{t("shell.help.limitPlayers", { max: MAX_PLAYERS })}</li>
             <li>{t("shell.help.limitName", { max: MAX_NAME_LENGTH })}</li>
             <li>{t("shell.help.limitScore", { min: formatNumber(MIN_SCORE), max: formatNumber(MAX_SCORE) })}</li>
@@ -82,20 +79,20 @@ export function HelpDialog({ onClose, opener, section, openDialog }: HelpDialogP
         <Section id="faq" title={t("shell.help.faq")} isOpen={isOpen("faq")}>
           {text.faq.map((item) => (
             <div key={item.q}>
-              <p className="font-medium text-foreground">{item.q}</p>
+              <p><strong>{item.q}</strong></p>
               <p>{item.a}</p>
             </div>
           ))}
         </Section>
         <Section id="contact" title={t("shell.help.contact")} isOpen={isOpen("contact")}>
-          <p className="flex flex-wrap gap-x-4 gap-y-2">
-            <button type="button" className={TEXT_BUTTON_CLASS} onClick={() => { openDialog("report"); }}>
+          <p className="link-row">
+            <button type="button" className="text-button" onClick={() => { openDialog("report"); }}>
               {t("shell.menu.items.report")}
             </button>
-            <button type="button" className={TEXT_BUTTON_CLASS} onClick={() => { openDialog("support"); }}>
+            <button type="button" className="text-button" onClick={() => { openDialog("support"); }}>
               {t("shell.help.contactLink")}
             </button>
-            <a className="inline-flex min-h-11 items-center text-primary underline-offset-4 hover:underline" href={app.shell.buyMeACoffee} target="_blank" rel="noopener noreferrer">
+            <a className="text-button" href={app.shell.buyMeACoffee} target="_blank" rel="noopener noreferrer">
               {t("shell.menu.items.support")}
             </a>
           </p>

@@ -1,0 +1,110 @@
+/* The frosted header (design-system §8): sticky, translucent and blurred, a shadow only once the page has
+   scrolled (data-scrolled, IntersectionObserver on .scroll-sentinel — no scroll listeners). Two layouts
+   (app/src/session/app-header.tsx): brand + actions while the leaderboard card is on screen, a compact
+   row of actions after it scrolled away. The title never clips: it wraps to its own row first. */
+@layer components {
+  /* || Components: header */
+  .app-header {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-header);
+    padding-top: var(--safe-top);
+    background: var(--header-bg);
+    -webkit-backdrop-filter: var(--header-blur);
+    backdrop-filter: var(--header-blur);
+    transition: box-shadow var(--duration-base) var(--ease-standard);
+    -webkit-user-select: none;
+    user-select: none;
+
+    &[data-scrolled] {
+      box-shadow: var(--shadow-2);
+    }
+
+    @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+      background: var(--color-bg);
+    }
+  }
+
+  .app-header-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: var(--space-2);
+    min-height: var(--header-height);
+    padding-block: var(--space-1);
+  }
+
+  /* || Components: brand */
+  /* basis 0 + min-content: the brand takes a row of its own only when its longest word cannot fit. */
+  .brand {
+    display: flex;
+    flex: 1 1 0;
+    align-items: center;
+    gap: var(--space-2);
+    min-width: min-content;
+
+    /* Phones: name + five 44 px buttons fill a 390 px row, so the logo shows from 600 px. */
+    & img {
+      display: none;
+      flex-shrink: 0;
+      width: calc(var(--tap-target) - 2 * var(--space-2));
+      height: calc(var(--tap-target) - 2 * var(--space-2));
+      border-radius: var(--radius-sm);
+
+      @media (width > 600px) {
+        display: block;
+      }
+    }
+  }
+
+  .brand-name {
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  /* Phones keep the header to one row: the tagline shows from 600 px. */
+  .brand-tagline {
+    display: none;
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+    line-height: var(--leading-tight);
+
+    @media (width > 600px) {
+      display: block;
+    }
+  }
+
+  /* || Components: header actions */
+  .header-actions {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+  }
+
+  /* Compact layout: the actions spread over the whole row, the logo button first. */
+  .header-actions--compact {
+    flex: 1;
+    justify-content: space-between;
+
+    @media (width > 600px) {
+      justify-content: flex-end;
+      gap: var(--space-1);
+
+      & > :first-child {
+        margin-inline-end: auto;
+      }
+    }
+  }
+
+  /* The theme button lives in Settings on phones (DECISIONS 2026-11-19, app-shell §2). */
+  .header-theme {
+    display: none;
+
+    @media (width > 600px) {
+      display: inline-flex;
+    }
+  }
+}

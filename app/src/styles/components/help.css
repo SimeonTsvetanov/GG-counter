@@ -1,0 +1,49 @@
+/* Reading text inside dialogs (Help, policy pages, About, What's new): body colour, lists with their
+   markers. Links follow base.css: accent + semibold — the weight tells them apart from the text, because
+   the accent is only 2.52:1 (light) / 2.70:1 (dark) against it (WCAG 1.4.1 via G182, PLAN T-12). */
+@layer components {
+  /* || Components: prose */
+  .prose {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    color: var(--color-text);
+    font-size: var(--text-md);
+    /* Long URLs and email addresses never overflow the sheet (Moni 2026-11-08). */
+    overflow-wrap: anywhere;
+
+    & h3 {
+      margin-top: var(--space-2);
+      font-size: var(--text-base);
+      font-weight: var(--weight-semibold);
+      line-height: var(--leading-tight);
+    }
+
+    & strong {
+      font-weight: var(--weight-semibold);
+    }
+
+    & ul,
+    & ol {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      padding-inline-start: var(--space-5);
+    }
+
+    & ul {
+      list-style: disc;
+    }
+
+    & ol {
+      list-style: decimal;
+    }
+  }
+
+  /* A row of text buttons and links (Help → Contact, About → Source / What's new). */
+  .link-row {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: var(--space-5);
+  }
+}

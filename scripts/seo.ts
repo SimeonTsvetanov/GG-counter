@@ -3,6 +3,7 @@
  * scripts/generate.ts (sitemap.xml, robots.txt, llms.txt) and app/vite.config.ts (the static head).
  */
 import type { AppConfig } from "../app.config.ts";
+import { themeColorMetas } from "./tokens.ts";
 
 /** The committed social image (seo-geo §3: 1200×630 PNG; made by `pnpm og-image`). */
 export const OG_IMAGE = { file: "og-image.png", width: 1200, height: 630, type: "image/png" } as const;
@@ -87,7 +88,7 @@ export function headTags(app: AppConfig): string {
     `<meta name="description" content="${description}" />`,
     `<link rel="canonical" href="${app.url}" />`,
     `<meta name="referrer" content="strict-origin-when-cross-origin" />`,
-    `<meta name="theme-color" content="${app.manifest.themeColor}" />`,
+    ...themeColorMetas(),
     `<link rel="describedby" type="text/plain" href="${app.url}llms.txt" title="Docs for AI agents (llms.txt)" />`,
     ...(verification ? [`<meta name="google-site-verification" content="${escapeHtml(verification)}" />`] : []),
     `<meta property="og:type" content="website" />`,

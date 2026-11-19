@@ -1,0 +1,43 @@
+/* Overrides: output modes that must beat every component — forced colours and print. The last layer, so
+   plain declarations win; no !important needed (css-architecture §2). */
+@layer overrides {
+  /* || Overrides: forced colours */
+  /* Shadows disappear in forced-colours mode; a system-colour border keeps surfaces and controls visible
+     (design-system §6 — the one place a border is right). */
+  @media (forced-colors: active) {
+    .card,
+    .page-info,
+    .button,
+    .field,
+    .score,
+    .segmented,
+    .menu,
+    .sheet,
+    .alert,
+    .toast,
+    .error-details {
+      border: 1px solid CanvasText;
+    }
+  }
+
+  /* || Overrides: print — the game only */
+  @media print {
+    .app-header,
+    .app-footer,
+    .toast-region,
+    .score-steps,
+    .player-card-head button,
+    .card-footer {
+      display: none;
+    }
+
+    :root {
+      color-scheme: light;
+    }
+
+    .card,
+    .page-info {
+      box-shadow: none;
+    }
+  }
+}

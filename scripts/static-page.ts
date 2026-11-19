@@ -3,8 +3,8 @@
  * block that app/index.html carries before JavaScript runs, and the standalone 404 page.
  * Used by app/vite.config.ts (index.html) and scripts/generate.ts (404.html).
  *
- * The block's Tailwind classes are written out here in full because app/tailwind.config.ts scans
- * this file. The app's `usePageInfo` hook moves the `<section>` below the leaderboard on mount, drops
+ * The block uses the component classes of app/src/styles/components/page-info.css and disclosure.css
+ * (PLAN T-12). The app's `usePageInfo` hook moves the `<section>` below the leaderboard on mount, drops
  * `[data-static-only]` (the h1: the React header has its own) and translates the parts marked
  * `data-i18n` (en.ts keys) and `data-text` (app.config texts) — keep the markers in sync. The static
  * HTML is English only: one English URL for crawlers (seo-geo §2, PLAN T-09).
@@ -12,6 +12,7 @@
 import type { AppConfig } from "../app.config.ts";
 import { en } from "../app/src/i18n/en.ts";
 import { escapeHtml } from "./seo.ts";
+import { TOKENS_CSS, themeColorMetas } from "./tokens.ts";
 
 /** The English texts of the block's headings and label, from the app's dictionary (one source). */
 const PAGE = en.app.page;
@@ -26,9 +27,7 @@ function faqItems(app: AppConfig): string {
   return app.faq
     .map(
       (item) =>
-        `<details class="rounded-md bg-muted/40 px-3 py-2 shadow-sm">` +
-        `<summary class="cursor-pointer py-1 font-medium">${escapeHtml(item.q)}</summary>` +
-        `<p class="pb-1 pt-2 text-muted-foreground">${escapeHtml(item.a)}</p></details>`,
+        `<details><summary>${escapeHtml(item.q)}</summary><p>${escapeHtml(item.a)}</p></details>`,
     )
     .join("\n          ");
 }
@@ -38,16 +37,16 @@ function faqItems(app: AppConfig): string {
  * one screen tall before React mounts, so the block starts below the fold — no flash of text.
  */
 export function pageInfoHtml(app: AppConfig): string {
-  return `<div data-page-info class="safe-area">
-      <section aria-label="${escapeHtml(PAGE.label.replace("{{name}}", app.name))}" data-i18n-aria-label="app.page.label" class="mx-auto w-full max-w-lg space-y-4 rounded-lg bg-card p-6 text-sm text-card-foreground shadow-md">
-        <h1 data-static-only class="text-base font-semibold">${escapeHtml(app.name)}</h1>
-        <p data-text="answer" class="text-muted-foreground">${escapeHtml(app.answer)}</p>
-        <h2 data-i18n="app.page.howItWorks" class="text-base font-semibold">${escapeHtml(PAGE.howItWorks)}</h2>
-        <ol data-text="steps" class="list-decimal space-y-1 pl-5 text-muted-foreground">
+  return `<div data-page-info class="page-info-static">
+      <section aria-label="${escapeHtml(PAGE.label.replace("{{name}}", app.name))}" data-i18n-aria-label="app.page.label" class="page-info">
+        <h1 data-static-only>${escapeHtml(app.name)}</h1>
+        <p data-text="answer">${escapeHtml(app.answer)}</p>
+        <h2 data-i18n="app.page.howItWorks">${escapeHtml(PAGE.howItWorks)}</h2>
+        <ol data-text="steps">
           ${stepItems(app)}
         </ol>
-        <h2 data-i18n="app.page.faq" class="text-base font-semibold">${escapeHtml(PAGE.faq)}</h2>
-        <div data-text="faq" class="space-y-2">
+        <h2 data-i18n="app.page.faq">${escapeHtml(PAGE.faq)}</h2>
+        <div data-text="faq" class="disclosures">
           ${faqItems(app)}
         </div>
       </section>
@@ -56,7 +55,7 @@ export function pageInfoHtml(app: AppConfig): string {
 
 /** Returns the `<noscript>` line shown inside `#root` when JavaScript is off. */
 export function noscriptHtml(app: AppConfig): string {
-  return `<noscript><p class="p-6 text-center text-sm">${escapeHtml(app.name)} needs JavaScript to keep score. How it works and the answers to common questions are below.</p></noscript>`;
+  return `<noscript><p class="noscript">${escapeHtml(app.name)} needs JavaScript to keep score. How it works and the answers to common questions are below.</p></noscript>`;
 }
 
 /**
@@ -73,9 +72,10 @@ export function notFoundHtml(app: AppConfig): string {
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="robots" content="noindex" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
-    <meta name="theme-color" content="${app.manifest.themeColor}" />
+    ${themeColorMetas().join("\n    ")}
     <title>Page not found · ${name}</title>
     <link rel="icon" href="${base}favicon.svg" />
+    <link rel="stylesheet" href="${base}${TOKENS_CSS}" />
     <link rel="stylesheet" href="${base}not-found.css" />
   </head>
   <body>
@@ -83,7 +83,7 @@ export function notFoundHtml(app: AppConfig): string {
       <img src="${base}favicon.svg" alt="" width="64" height="64" />
       <h1>Page not found</h1>
       <p>This address is not part of ${name}; it may be an old or mistyped link.</p>
-      <a class="not-found__button" href="${base}">Open ${name}</a>
+      <a class="not-found-button" href="${base}">Open ${name}</a>
     </main>
   </body>
 </html>

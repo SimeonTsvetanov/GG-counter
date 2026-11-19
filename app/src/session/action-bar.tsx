@@ -1,14 +1,14 @@
 // The header's actions (Leaderboard, Add player, Share, Clear session, Theme, Menu). One component for
 // both header layouts; they differ only in the button style and an optional leading button. The theme
-// button is shown from the `sm` breakpoint up; on phones the theme is in Menu → Settings (app-shell §2,
+// button is shown from 600 px up (header.css); on phones the theme is in Menu → Settings (app-shell §2,
 // DECISIONS 2026-11-19), so the phone header keeps the same number of buttons as before.
 import type { Player } from "gg-counter-core";
 import { Plus, RefreshCw, Share2, Trophy } from "lucide-react";
-import { ThemeToggle } from "../components/theme-toggle";
 import { Button } from "../components/ui/button";
 import { t } from "../i18n";
 import { LeaderboardDialog } from "../leaderboard/leaderboard-dialog";
-import { AppMenu, type AppMenuProps } from "../ui/app-menu";
+import type { AppMenuProps } from "../ui/app-menu";
+import { HeaderAppMenu, HeaderThemeMenu } from "../ui/header-menus";
 
 /** What the session actions do; the main screen owns the state behind them. */
 export interface SessionActions {
@@ -23,12 +23,10 @@ export interface SessionActions {
 
 /** Props of {@link ActionBar}. */
 export interface ActionBarProps {
-  /** Button style: ghost next to the title, outline in the compact layout. */
+  /** Button style: plain next to the title, on the fill colour in the compact layout. */
   variant: "ghost" | "outline";
   /** Layout classes of the bar itself. */
   className: string;
-  /** Extra classes for the Add player, Share and Clear session buttons. */
-  buttonClassName?: string;
   /** State of the Leaderboard dialog, shared by both header layouts. */
   leaderboard: { open: boolean; onOpenChange: (open: boolean) => void; players: readonly Player[] };
   actions: SessionActions;
@@ -42,7 +40,6 @@ export interface ActionBarProps {
 export function ActionBar({
   variant,
   className,
-  buttonClassName,
   leaderboard,
   actions,
   menu,
@@ -58,7 +55,7 @@ export function ActionBar({
         onRequestReset={actions.onRequestReset}
       >
         <Button variant={variant} size="icon" aria-label={t("app.header.leaderboard")}>
-          <Trophy className="h-4 w-4" />
+          <Trophy aria-hidden />
         </Button>
       </LeaderboardDialog>
 
@@ -67,9 +64,8 @@ export function ActionBar({
         size="icon"
         onClick={actions.onQuickAdd}
         aria-label={t("app.header.addPlayer")}
-        className={buttonClassName}
       >
-        <Plus className="h-4 w-4" />
+        <Plus aria-hidden />
       </Button>
 
       <Button
@@ -77,9 +73,8 @@ export function ActionBar({
         size="icon"
         onClick={actions.onShare}
         aria-label={t("app.header.share")}
-        className={buttonClassName}
       >
-        <Share2 className="h-4 w-4" />
+        <Share2 aria-hidden />
       </Button>
 
       <Button
@@ -87,13 +82,12 @@ export function ActionBar({
         size="icon"
         onClick={actions.onRequestClear}
         aria-label={t("app.header.clear")}
-        className={buttonClassName}
       >
-        <RefreshCw className="h-4 w-4" />
+        <RefreshCw aria-hidden />
       </Button>
 
-      <ThemeToggle className="hidden sm:inline-flex" />
-      <AppMenu {...menu} variant={variant} />
+      <HeaderThemeMenu className="header-theme" />
+      <HeaderAppMenu {...menu} variant={variant} />
     </div>
   );
 }

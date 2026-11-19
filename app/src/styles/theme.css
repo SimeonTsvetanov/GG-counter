@@ -1,0 +1,75 @@
+/* Tailwind 4 theme = the forge tokens (design → design-system §1, engineering → react §1).
+   `inline reference`: utilities read the tokens of design/tokens.css directly and Tailwind emits no
+   variables of its own — a plain or `inline` @theme writes `:root { --color-bg: var(--color-bg) }`,
+   a cycle that would void every token (checked with Tailwind 4.3.5, PLAN T-12).
+   `--*: initial` drops Tailwind's default theme, so only token values exist as utilities
+   (`p-4` = 4 × --space-1, `text-md`, `rounded-lg`, `shadow-1`, `bg-surface` …). */
+@theme inline reference {
+  --*: initial;
+
+  /* 4 px grid: p-1 = --space-1 … p-16 = --space-16. */
+  --spacing: var(--space-1);
+  --spacing-tap: var(--tap-target);
+
+  /* `sm:` = 600 px, the phone/wider breakpoint of design → responsive-layout (component CSS uses its
+     media queries directly: 600 / 900). */
+  --breakpoint-sm: 37.5rem;
+
+  --container-content: var(--content-max);
+  --container-narrow: var(--content-narrow);
+  --container-measure: var(--measure);
+
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-surface-raised: var(--color-surface-raised);
+  --color-fill: var(--color-fill);
+  --color-fill-hover: var(--color-fill-hover);
+  --color-thumb: var(--color-thumb);
+  --color-separator: var(--color-separator);
+  --color-text: var(--color-text);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-tertiary: var(--color-text-tertiary);
+  --color-accent: var(--color-accent);
+  --color-accent-pressed: var(--color-accent-pressed);
+  --color-accent-text: var(--color-accent-text);
+  --color-accent-tint: var(--color-accent-tint);
+  --color-on-accent: var(--color-on-accent);
+  --color-danger: var(--color-danger);
+  --color-on-danger: var(--color-on-danger);
+  --color-danger-text: var(--color-danger-text);
+  --color-success-text: var(--color-success-text);
+  --color-warning-text: var(--color-warning-text);
+  --color-focus: var(--color-focus);
+
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --text-xs: var(--text-xs);
+  --text-sm: var(--text-sm);
+  --text-md: var(--text-md);
+  --text-base: var(--text-base);
+  --text-lg: var(--text-lg);
+  --text-xl: var(--text-xl);
+  --text-2xl: var(--text-2xl);
+  --text-3xl: var(--text-3xl);
+  --font-weight-regular: var(--weight-regular);
+  --font-weight-medium: var(--weight-medium);
+  --font-weight-semibold: var(--weight-semibold);
+  --font-weight-bold: var(--weight-bold);
+  --leading-tight: var(--leading-tight);
+  --leading-normal: var(--leading-normal);
+  --tracking-tight: var(--tracking-tight);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-full: var(--radius-full);
+
+  --shadow-1: var(--shadow-1);
+  --shadow-2: var(--shadow-2);
+  --shadow-3: var(--shadow-3);
+}
+
+/* The saved theme's class on <html> (theme-init.js, ThemeProvider) — kept for the e2e characterization
+   tests; the colours themselves follow color-scheme through light-dark() in the tokens. */
+@custom-variant dark (&:where(.dark, .dark *));

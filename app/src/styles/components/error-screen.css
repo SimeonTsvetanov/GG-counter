@@ -1,0 +1,93 @@
+/* The in-app error screen (app/src/ui/error-screen.tsx, app-shell → error-pages §2): centred, calm, the
+   real error in a chip and in the details; the same look as the standalone 404 page. */
+@layer components {
+  /* || Components: error screen */
+  .error-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    min-height: 100dvh;
+    max-width: var(--content-narrow);
+    margin-inline: auto;
+    padding: calc(var(--space-12) + var(--safe-top)) calc(var(--space-5) + var(--safe-right)) calc(var(--space-12) + var(--safe-bottom)) calc(var(--space-5) + var(--safe-left));
+    text-align: center;
+  }
+
+  .error-icon {
+    display: grid;
+    place-items: center;
+    width: calc(var(--tap-target) + var(--space-3));
+    height: calc(var(--tap-target) + var(--space-3));
+    border-radius: var(--radius-full);
+    background: color-mix(in oklch, var(--color-danger-text) 14%, transparent);
+    color: var(--color-danger-text);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+  }
+
+  .error-title {
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+    text-wrap: balance;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .error-text {
+    color: var(--color-text-secondary);
+    text-wrap: pretty;
+  }
+
+  /* On --color-bg, not on fill: secondary text on fill is under 4.5:1 (design-system §2). */
+  .error-chip {
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-1);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  .error-actions {
+    align-self: stretch;
+  }
+
+  .error-note {
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+  }
+
+  .error-details {
+    align-self: stretch;
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-1);
+    text-align: start;
+
+    & summary {
+      display: flex;
+      align-items: center;
+      min-height: var(--tap-target);
+      padding: 0 var(--space-4);
+      font-weight: var(--weight-medium);
+      cursor: pointer;
+    }
+
+    & pre {
+      max-height: 40dvh;
+      overflow: auto;
+      padding: 0 var(--space-4) var(--space-4);
+      color: var(--color-text-secondary);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+  }
+}

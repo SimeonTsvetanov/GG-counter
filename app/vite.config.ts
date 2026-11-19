@@ -6,6 +6,7 @@ import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
 import { VitePWA, type ManifestOptions } from "vite-plugin-pwa";
 import { app as config, l10n, type AppConfig } from "../app.config.ts";
 import { OG_IMAGE, headTags } from "../scripts/seo.ts";
@@ -14,6 +15,7 @@ import { whatsNew } from "../scripts/changelog.ts";
 import { appCredits } from "../scripts/credits.ts";
 import { readLegalDocuments } from "../scripts/legal.ts";
 import { SW_HANDOVER_FILE } from "../scripts/sw-handover.ts";
+import { THEME_BACKGROUND } from "../scripts/tokens.ts";
 
 const app: AppConfig = config;
 
@@ -91,8 +93,9 @@ function previewNextDeploy(base: string): Plugin {
 }
 
 /**
- * Returns the web app manifest. id, start_url, scope, name, short_name, colours and icons are a
- * contract with installed copies (SPEC §4): same values as the pre-forge manifest.
+ * Returns the web app manifest. id, start_url, scope, name, short_name and icons are a contract with
+ * installed copies (SPEC §4): same values as the pre-forge manifest. The colours are the light page
+ * background of design/tokens.css since PLAN T-12 (forge template; theme-color metas cover dark).
  */
 function pwaManifest(base: string): Partial<ManifestOptions> {
   return {
@@ -104,8 +107,8 @@ function pwaManifest(base: string): Partial<ManifestOptions> {
     scope: base,
     display: app.manifest.display,
     orientation: app.manifest.orientation,
-    background_color: app.manifest.backgroundColor,
-    theme_color: app.manifest.themeColor,
+    background_color: THEME_BACKGROUND.light,
+    theme_color: THEME_BACKGROUND.light,
     icons: [
       { src: "icons/icon-192x192.svg", sizes: "192x192", type: "image/svg+xml", purpose: "any" },
       { src: "icons/icon-512x512.svg", sizes: "512x512", type: "image/svg+xml", purpose: "any" },
@@ -136,6 +139,8 @@ export default defineConfig(({ mode }) => {
       pagesNotFound(base),
       previewNextDeploy(base),
       react(),
+      // Tailwind 4 (PLAN T-12): app/src/styles/app.css maps its theme to design/tokens.css.
+      tailwindcss(),
       VitePWA({
         // pwa §5: a new version waits for the user's Reload (update toast in app/src/ui/), never reloads
         // by itself; registration happens in app/src/ui/pwa.ts, so no injected registerSW.js.
@@ -145,7 +150,8 @@ export default defineConfig(({ mode }) => {
         workbox: {
           // Same cache id, file name (sw.js) and scope as the pre-forge worker: installed copies update in place.
           cacheId: app.id,
-          globPatterns: ["**/*.{js,css,html,svg,png,webp,ico}"],
+          // woff2: the self-hosted Inter subsets (PLAN T-12), so the app looks the same offline.
+          globPatterns: ["**/*.{js,css,html,svg,png,webp,ico,woff2}"],
           // The social image is for link previews only, never needed offline (pwa §3).
           globIgnores: [OG_IMAGE.file],
           cleanupOutdatedCaches: true,

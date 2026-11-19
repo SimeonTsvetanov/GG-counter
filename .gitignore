@@ -27,3 +27,6 @@ app/public/support/
 app/public/policy-page.css
 app/public/year.js
 app/public/third-party-licenses.txt
+# Design tokens (PLAN T-12): the accent from app.config.ts, and tokens.css + accent for the standalone pages
+app/src/generated/
+app/public/tokens.css

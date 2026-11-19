@@ -3,9 +3,8 @@
 // first focus goes to the title, as for every long sheet, so reading starts at the top.
 import { useRef, type ReactNode } from "react";
 import { Button } from "../components/ui/button";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../components/ui/dialog";
+import { Dialog, DialogBody, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../components/ui/dialog";
 import { t } from "../i18n";
-import { cn } from "../lib/utils";
 
 /** Props of {@link ShellDialog}. */
 export interface ShellDialogProps {
@@ -35,7 +34,7 @@ export function ShellDialog({ title, description, onClose, opener, children, act
   return (
     <Dialog open onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
       <DialogContent
-        className={cn("max-h-[90dvh] max-w-lg overflow-y-auto", className)}
+        className={className}
         onOpenAutoFocus={(event) => {
           event.preventDefault();
           heading.current?.focus();
@@ -48,11 +47,11 @@ export function ShellDialog({ title, description, onClose, opener, children, act
       >
         <DialogHeader>
           {/* Focused by script only (tabIndex -1, never a tab stop), so it needs no focus ring. */}
-          <DialogTitle ref={heading} tabIndex={-1} className="focus-visible:outline-none">{title}</DialogTitle>
+          <DialogTitle ref={heading} tabIndex={-1}>{title}</DialogTitle>
           {description !== undefined && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
-        {children}
-        <DialogFooter className="gap-2">
+        <DialogBody>{children}</DialogBody>
+        <DialogFooter>
           {actions}
           <DialogClose asChild>
             <Button variant="secondary">{t("shell.close")}</Button>

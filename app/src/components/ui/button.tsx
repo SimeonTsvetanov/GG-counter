@@ -1,3 +1,6 @@
+// Vendored shadcn/ui Button, restyled to the forge tokens (PLAN T-12): the look lives in
+// app/src/styles/components/button.css (.button + variants); cva only maps the props to those classes,
+// and utilities passed in `className` place the button (width, order).
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../../lib/utils";
@@ -5,49 +8,50 @@ import { forwardRef } from "react";
 
 type ButtonVariants = VariantProps<typeof buttonVariants>;
 
-const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50",
-  {
-    variants: {
-      variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        link: "text-primary underline-offset-4 hover:underline",
-      },
-      size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
-        icon: "h-10 w-10",
-      },
+const buttonVariants = cva("button", {
+  variants: {
+    variant: {
+      // Primary: the one main action of a view (ui-patterns §1).
+      default: "button--primary",
+      secondary: "",
+      // The compact header's toolbar buttons: on the fill colour, like secondary.
+      outline: "",
+      ghost: "button--plain",
+      // Filled red: the confirm button of a delete/clear alert only.
+      danger: "button--danger",
+      // Quiet red text (iOS Settings style) on card surfaces.
+      destructive: "button--destructive",
     },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
+    size: {
+      default: "",
+      icon: "button--icon",
     },
-  }
-);
+  },
+  defaultVariants: {
+    variant: "default",
+    size: "default",
+  },
+});
 
+/** Props of {@link Button}: every native `<button>` attribute plus the variant, size and `asChild`. */
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     ButtonVariants {
+  /** Renders the single child (e.g. an `<a>`) with the button's look instead of a `<button>`. */
   asChild?: boolean;
 }
 
+/** A button with the forge look (44 px, token colours, soft lift on hover, press scale). */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, type, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
 
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
+        // A real <button> never submits by accident; asChild keeps the child's own semantics.
+        {...(asChild ? {} : { type: type ?? "button" })}
         {...props}
       />
     );

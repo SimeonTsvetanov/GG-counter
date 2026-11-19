@@ -32,8 +32,6 @@ export interface ManifestConfig {
   readonly shortName: string;
   readonly display: "standalone";
   readonly orientation: "portrait-primary";
-  readonly backgroundColor: string;
-  readonly themeColor: string;
 }
 
 /**
@@ -98,7 +96,11 @@ export interface AppConfig {
   readonly version: string;
   /** UI languages, English first; the static page, head, sitemap and llms.txt are English only (seo-geo §2). */
   readonly languages: readonly LanguageCode[];
-  /** Accent / theme colour (hex). */
+  /**
+   * The one accent (hex, design-system §3): scripts/accent.ts derives the accent tokens (fill, text,
+   * focus ring) for both themes and fails the build below WCAG AA. The browser bar and manifest colours
+   * are the page background from design/tokens.css (scripts/tokens.ts), not this value.
+   */
   readonly accent: string;
   /** Legal notice, Privacy and Support (legal-pages §2, §6); taken from TeamSync's app.config.ts (forge DECISIONS 2026-11-06: LinkedIn in every app). */
   readonly author: { readonly name: string; readonly country: string; readonly github: string; readonly linkedin: string };
@@ -149,8 +151,6 @@ export const app = {
     shortName: "GG Counter",
     display: "standalone",
     orientation: "portrait-primary",
-    backgroundColor: "#1F4ED8",
-    themeColor: "#1F4ED8",
   },
   steps: [
     "Type a player's name and tap Add. Repeat for everyone at the table, up to 50 players.",

@@ -1,3 +1,7 @@
+// Vendored shadcn/ui AlertDialog, restyled to the forge tokens (PLAN T-12): a small centred alert over the
+// blurred page (app/src/styles/components/alert.css). Every confirmation in GG Counter deletes or resets
+// something, so the action is the filled red button and Cancel the plain one (ui-patterns §4); Radix
+// focuses Cancel first (accessibility §4).
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import { cn } from "../../lib/utils";
 import { forwardRef } from "react";
@@ -11,10 +15,7 @@ const AlertDialogOverlay = forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Overlay
     ref={ref}
-    className={cn(
-      "fixed inset-0 z-50 bg-black/55 backdrop-blur-sm transition-opacity dark:bg-black/70 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-      className
-    )}
+    className={cn("modal-backdrop", className)}
     {...props}
   />
 ));
@@ -28,10 +29,7 @@ const AlertDialogContent = forwardRef<
     <AlertDialogOverlay />
     <AlertDialogPrimitive.Content
       ref={ref}
-      className={cn(
-        "fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-        className
-      )}
+      className={cn("alert", className)}
       {...props}
     />
   </AlertDialogPortal>
@@ -42,13 +40,7 @@ const AlertDialogHeader = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>): React.JSX.Element => (
-  <div
-    className={cn(
-      "flex flex-col space-y-2 text-center sm:text-left",
-      className
-    )}
-    {...props}
-  />
+  <div className={className} {...props} />
 );
 AlertDialogHeader.displayName = "AlertDialogHeader";
 
@@ -56,13 +48,7 @@ const AlertDialogFooter = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>): React.JSX.Element => (
-  <div
-    className={cn(
-      "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
-      className
-    )}
-    {...props}
-  />
+  <div className={cn("alert-actions", className)} {...props} />
 );
 AlertDialogFooter.displayName = "AlertDialogFooter";
 
@@ -72,7 +58,7 @@ const AlertDialogTitle = forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Title
     ref={ref}
-    className={cn("text-lg font-semibold", className)}
+    className={cn("alert-title", className)}
     {...props}
   />
 ));
@@ -84,7 +70,7 @@ const AlertDialogDescription = forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Description
     ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
+    className={cn("alert-text", className)}
     {...props}
   />
 ));
@@ -97,10 +83,7 @@ const AlertDialogAction = forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Action
     ref={ref}
-    className={cn(
-      "inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-      className
-    )}
+    className={cn("button button--danger", className)}
     {...props}
   />
 ));
@@ -112,10 +95,7 @@ const AlertDialogCancel = forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Cancel
     ref={ref}
-    className={cn(
-      "inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-semibold transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-      className
-    )}
+    className={cn("button", className)}
     {...props}
   />
 ));

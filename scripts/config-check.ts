@@ -67,7 +67,7 @@ export function configProblems(app: AppConfig, context: ConfigContext): string[]
     ...(app.answer.includes(app.name) ? [] : ["answer does not name the app"]),
     ...countProblem("steps", app.steps.length, [3, 5]),
     ...countProblem("faq", app.faq.length, [5, 7]),
-    ...[app.accent, app.manifest.themeColor, app.manifest.backgroundColor].filter((c) => !HEX_COLOUR.test(c)).map((c) => `colour "${c}" is not #RRGGBB`),
+    ...(HEX_COLOUR.test(app.accent) ? [] : [`colour "${app.accent}" is not #RRGGBB`]),
     ...(ISO_DATE.test(app.seo.contentUpdated) ? [] : [`seo.contentUpdated "${app.seo.contentUpdated}" is not YYYY-MM-DD`]),
     ...languageProblems(app, context.l10n),
   ];

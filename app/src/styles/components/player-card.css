@@ -1,0 +1,78 @@
+/* Player cards (app/src/players/): two columns on phones, three from 900 px. Each card: the name field and
+   Remove, the score (a button that opens "Adjust score"), then − and + as two equal buttons. The score
+   has its own row, so a 6- or 7-character score fits a 390 px phone (PLAN T-12). */
+@layer components {
+  /* || Components: player grid */
+  .player-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+
+    @media (width > 900px) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-4);
+    }
+  }
+
+  /* || Components: player card */
+  .player-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-3);
+
+    @media (width > 600px) {
+      padding: var(--space-4);
+    }
+
+    /* The leader: an accent tint over the card (the leaderboard says it in words). */
+    &[data-leader] {
+      background-image: linear-gradient(var(--color-accent-tint), var(--color-accent-tint));
+      box-shadow: var(--shadow-2);
+    }
+  }
+
+  .player-card-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  /* || Components: score */
+  .score {
+    display: block;
+    width: 100%;
+    min-height: var(--tap-target);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-md);
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+    font-variant-numeric: tabular-nums;
+    transition: background-color var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-out);
+
+    @media (hover: hover) {
+      &:hover {
+        background: var(--color-fill);
+      }
+    }
+
+    &:active {
+      background: var(--color-fill);
+      transform: scale(0.97);
+    }
+
+    /* Saved games from before the limits may hold longer numbers: smaller, and wrapping as a last resort. */
+    &[data-long] {
+      font-size: var(--text-xl);
+      overflow-wrap: anywhere;
+    }
+  }
+
+  .score-steps {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+}

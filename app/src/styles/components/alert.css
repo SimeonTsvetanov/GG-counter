@@ -1,0 +1,64 @@
+/* Alert (Radix AlertDialog): confirm before deleting, replacing or resetting (ui-patterns §4) — a small
+   centred card over the blurred page (modal.css), Cancel focused first. Pops in from 1.08 with a spring;
+   no close animation (see modal.css). */
+@layer components {
+  /* || Components: alert */
+  /* Confirm before deleting or replacing: a small centred card on every screen size. */
+  .alert {
+    --alert-max-width: 380px;
+
+    position: fixed;
+    inset: 50% auto auto 50%;
+    z-index: var(--z-modal);
+    width: min(100% - 2 * var(--space-6), var(--alert-max-width));
+    padding: var(--space-5);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface-raised);
+    color: var(--color-text);
+    box-shadow: var(--shadow-3);
+    text-align: center;
+    translate: -50% -50%;
+
+    &[data-state="open"] {
+      animation: alert-in var(--duration-alert) var(--ease-spring), modal-fade-in var(--duration-alert) var(--ease-out);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      &[data-state="open"] {
+        animation: modal-fade-in var(--duration-fade) var(--ease-out);
+      }
+    }
+  }
+
+  .alert-title {
+    margin-bottom: var(--space-2);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-tight);
+    text-wrap: balance;
+  }
+
+  .alert-text {
+    margin-bottom: var(--space-5);
+    color: var(--color-text-secondary);
+    font-size: var(--text-md);
+  }
+
+  /* Side by side like iOS, equal width; both go full width when a label does not fit one line. */
+  .alert-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+
+    & > * {
+      flex: 1 1 7rem;
+    }
+  }
+
+  @keyframes alert-in {
+    from {
+      transform: scale(1.08);
+    }
+  }
+
+}

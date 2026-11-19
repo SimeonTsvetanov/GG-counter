@@ -7,6 +7,7 @@ import type { AppConfig, ShellItemId } from "../app.config.ts";
 import { en } from "../app/src/i18n/en.ts";
 import { isPolicyPage, type LegalBlock, type LegalDocument, type LegalInline } from "../app/src/ui/legal-document.ts";
 import { escapeHtml } from "./seo.ts";
+import { TOKENS_CSS, themeColorMetas } from "./tokens.ts";
 
 /** The pages' stylesheet in app/public/ (copied from scripts/page-assets/ by generate.ts). */
 export const POLICY_PAGE_CSS = "policy-page.css";
@@ -113,11 +114,12 @@ function headHtml(app: AppConfig, doc: LegalDocument): string {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
-    <meta name="theme-color" content="${app.manifest.themeColor}" />
+    ${themeColorMetas().join("\n    ")}
     <title>${escapeHtml(doc.title)} · ${escapeHtml(app.name)}</title>
     <meta name="description" content="${escapeHtml(`${doc.title} of ${app.name}, the ${app.tagline.toLowerCase()}.`)}" />
     <link rel="canonical" href="${app.url}${doc.id}/" />
     <link rel="icon" href="${base}favicon.svg" />
+    <link rel="stylesheet" href="${base}${TOKENS_CSS}" />
     <link rel="stylesheet" href="${base}${POLICY_PAGE_CSS}" />
     <script src="${base}theme-init.js"></script>
     <script src="${base}${POLICY_PAGE_SCRIPT}" defer></script>`;

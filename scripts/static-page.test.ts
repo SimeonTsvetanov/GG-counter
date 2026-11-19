@@ -25,7 +25,7 @@ describe("pageInfoHtml", () => {
     expect(html.match(/<section\b/g)).toHaveLength(1);
     // PLAN T-09: the hook translates these parts; the static text itself stays English.
     expect(html).toContain('<section aria-label="About GG Counter" data-i18n-aria-label="app.page.label"');
-    for (const marker of ['data-text="answer"', 'data-text="steps"', 'data-text="faq"', 'data-i18n="app.page.howItWorks" class="text-base font-semibold">How it works<', 'data-i18n="app.page.faq" class="text-base font-semibold">Frequently asked questions<']) {
+    for (const marker of ['data-text="answer"', 'data-text="steps"', 'data-text="faq"', 'data-i18n="app.page.howItWorks">How it works<', 'data-i18n="app.page.faq">Frequently asked questions<']) {
       expect(html).toContain(marker);
     }
   });
@@ -34,7 +34,7 @@ describe("pageInfoHtml", () => {
     const tricky: AppConfig = { ...app, answer: "GG Counter <script>x</script>", faq: [{ q: "A & B?", a: "<b>Yes</b>" }] };
     const escaped = pageInfoHtml(tricky);
     expect(escaped).toContain("GG Counter &lt;script&gt;x&lt;/script&gt;");
-    expect(escaped).toContain("<summary class=\"cursor-pointer py-1 font-medium\">A &amp; B?</summary>");
+    expect(escaped).toContain("<summary>A &amp; B?</summary>");
     expect(escaped).not.toContain("<b>Yes</b>");
   });
 });
@@ -51,7 +51,7 @@ describe("notFoundHtml", () => {
   it("is noindex, titled, and links back to the app with absolute asset URLs", () => {
     expect(html).toContain(`<meta name="robots" content="noindex" />`);
     expect(html).toContain("<title>Page not found · GG Counter</title>");
-    expect(html).toContain(`<a class="not-found__button" href="/GG-counter/">Open GG Counter</a>`);
+    expect(html).toContain(`<a class="not-found-button" href="/GG-counter/">Open GG Counter</a>`);
     for (const [, url] of html.matchAll(/(?:href|src)="([^"]+)"/g)) expect(url).toMatch(/^\/GG-counter\//);
   });
 

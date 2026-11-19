@@ -23,46 +23,35 @@ Offline score tracker for board-game nights — a free micro-app by Simeon "Moni
   the pre-forge `gg-counter/state` and `gg-counter-theme` are copied once and never written — removal per PLAN T-14.
 - Moni corrects/dislikes something → apply it and add an entry to `LEARNINGS.md`.
 - Decisions → `docs/DECISIONS.md` (date · decision · reason) the same day. Update `STATUS.md` (≤ 30 lines).
-- Never hand-edit generated files: `app/public/{sitemap.xml,llms.txt,robots.txt,404.html,not-found.css,theme-init.js,sw-handover.js}`,
-  the policy pages `app/public/{terms,privacy,ai-notice,legal-notice,support}/`, `policy-page.css`, `year.js`,
-  `third-party-licenses.txt` (git-ignored, `pnpm generate`), the repo `LICENSE` (committed, generated) and the head/page
-  text of `app/index.html` (filled at build from the `<!--app-*-->` markers). Edit `app.config.ts`, `content/legal/*.md`
-  or `scripts/seo.ts` / `static-page.ts` / `theme-init.ts` / `legal*.ts` / `licenses.ts` instead.
+- Never hand-edit generated files (git-ignored, `pnpm generate`): `app/public/{sitemap.xml,llms.txt,robots.txt,404.html,
+  not-found.css,theme-init.js,sw-handover.js,tokens.css,policy-page.css,year.js,third-party-licenses.txt}`, the policy pages
+  `app/public/<page>/`, `app/src/generated/accent.css`; nor the repo `LICENSE` (committed) and the `<!--app-*-->` text of
+  `app/index.html`. Edit `app.config.ts`, `content/legal/*.md`, `design/tokens.css` or the `scripts/*.ts` builders instead.
   `app/public/og-image.png` is committed: `pnpm og-image` after a name, tagline, accent or logo change.
+- Look (PLAN T-12): every value from `design/tokens.css` (forge) + the accent of `app.config.ts`; CSS in
+  `app/src/styles/` (`app.css` layer order, `theme.css` = Tailwind 4 `@theme inline reference`, one file per component);
+  shadcn components in `src/components/ui/` map props to those classes; utilities in JSX only place things.
 - Legal texts (PLAN T-10) must match the code: a change to storage, sharing, reporting, hosting or a new third party
   updates `content/legal/privacy.md` (+ its "Last updated") in the same commit; run the forge `compliance-check.mjs`.
 
 ## Where things are (workspace since PLAN T-04, features since T-05)
 ```
-packages/core   gg-counter-core (private) — pure score logic + Vitest/fast-check tests; no DOM/storage/network;
-                test/fixtures/ = saved-state fixtures (also imported by tests/e2e)
-app/            gg-counter-app — the React PWA (Vite): src/app.tsx (composition root), feature folders
-                src/players/, src/leaderboard/, src/session/ (header, action bar, confirmations), src/share/;
-                src/ui/ = app shell (PLAN T-08): menu, shell dialogs (lazy), Settings data panel, footer, toasts,
-                pwa.ts (service worker + update toast), error boundary/screen; src/i18n/ (PLAN T-09) = i18next:
-                en.ts (every UI text, the source), bg.ts (lazy chunk, typed against en.ts), index.ts (t, setLanguage),
-                detect.ts (start language), use-language.ts (re-render hook); no JSX string literals (ESLint rule,
-                scripts/ui-text-rule.ts); Bulgarian app.config texts = `l10n.bg` in app.config.ts;
-                src/config.ts = the one import of app.config.ts;
-                src/components/ (theme toggle, status banner), src/hooks/ (use-game-state wraps core),
-                src/storage/ (localStorage: game, theme, prefs, migration, export/import/clear; sessionStorage guard;
-                tests in app/test/storage/, UI logic tests in app/test/ui/),
-                src/lib/ (layout classes), src/providers/; src/components/ui/ = vendored shadcn/Radix.
-                Imports core by name (`gg-counter-core`; fixtures for tests: `gg-counter-core/test-fixtures`).
-content/legal/  policy sources (Terms, Privacy, AI notice, Legal notice, Support; English; PLAN T-10) → scripts/legal.ts →
-                in-app dialogs (src/ui/legal-dialog.tsx, lazy, `__LEGAL__`) + standalone pages (scripts/legal-page.ts)
-app/public/     icons, favicon, og-image   tests/e2e     Playwright (desktop + phone, Chromium; locale en-US, i18n.spec bg-BG)
-docs/           SPEC, PLAN, DECISIONS, migration baseline
-app.config.ts   single source (PLAN T-06; `shell` = menu/footer, T-08)  scripts/  generate.ts, seo.ts, static-page.ts,
-                config-check.ts, changelog.ts (What's new), credits.ts (About), sw-handover.ts, legal.ts + legal-page.ts
-                (policy pages), licenses.ts (third-party-licenses.txt, LICENSE) (+ tests), og-image.ts;
-                page-assets/ (not-found.css, policy-page.css, LICENSE.mit, licenses/ = upstream texts for packages without one)
-app/vite.config.ts  base from app.config (`/GG-counter/` in production), head/page text, PWA manifest (id `gg-counter-pwa-v1`)
+packages/core   gg-counter-core (private): pure score logic + Vitest/fast-check; test/fixtures/ (also used by tests/e2e)
+app/src/        app.tsx (composition root); players/, leaderboard/, session/ (header, actions, confirmations), share/;
+                ui/ = app shell (menu + lazy header menus, shell dialogs, Settings, footer, toasts, pwa.ts, error screen);
+                i18n/ (en.ts = every UI text, bg.ts lazy, no JSX string literals); storage/ (the only storage access);
+                styles/ (CSS layers), components/ui/ (vendored shadcn/Radix), hooks/, lib/, providers/ (theme), config.ts
+app/test/       storage/ + ui/ unit tests           tests/e2e  Playwright (desktop + phone; en-US, i18n.spec bg-BG)
+design/         tokens.css (forge)                  tests/a11y screens.json for the forge a11y-check (--screens)
+content/legal/  policy sources → scripts/legal.ts → lazy dialogs + standalone pages (scripts/legal-page.ts)
+scripts/        generate.ts, seo, static-page, config-check, changelog, credits, sw-handover, legal(-page), licenses,
+                accent.ts (forge copy), tokens.ts (hex of tokens), og-image.ts; page-assets/ (404 + policy CSS, licences)
+app.config.ts   single source (T-06; `shell` T-08; `l10n.bg` T-09)   app/vite.config.ts  base, head text, manifest, Tailwind
 ```
 
 ## Commands
 `pnpm i` · `pnpm dev` · `pnpm generate` (also before dev/build/verify) · `pnpm og-image` ·
 `pnpm verify` (generate + lint + typecheck + test + build + e2e) · `pnpm lint` ·
 `pnpm typecheck` (`tsc -b`: core, app, Vite config, scripts, tests, tool configs) · `pnpm test` (Vitest: core + app storage ≥ 90 % lines + generator) ·
-`pnpm build` (→ `app/dist`) · `node …/structure-check.mjs --repo .` (layers in `structure.config.json`) ·
+`pnpm build` (→ `app/dist`) · `node …/structure-check.mjs --repo .` (forge defaults) · `node …/a11y-check.mjs <url> --screens tests/a11y/screens.json` ·
 `pnpm e2e` (needs `pnpm build`; serves `app/dist` with `vite preview`)

@@ -4,6 +4,7 @@ import { RefreshCw, Share2 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import {
   Dialog,
+  DialogBody,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -37,62 +38,30 @@ export function LeaderboardDialog({
   onRequestReset,
   children,
 }: LeaderboardDialogProps): React.JSX.Element {
-  const remaining = players.slice(3);
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-w-md">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{t("app.leaderboard.title")}</DialogTitle>
-          <DialogDescription>
-            {t("app.leaderboard.highlights")}
-          </DialogDescription>
+          <DialogDescription>{t("app.leaderboard.highlights")}</DialogDescription>
         </DialogHeader>
-        <div className="space-y-4">
+        <DialogBody>
           <PodiumList
-            players={players.slice(0, 3)}
-            empty={
-              <p className="text-sm text-muted-foreground">
-                {t("app.leaderboard.emptyDialog")}
-              </p>
-            }
+            players={players}
+            restRow="app.leaderboard.rankRowDialog"
+            empty={<p className="text-text-secondary">{t("app.leaderboard.emptyDialog")}</p>}
           />
-          {remaining.length > 0 && (
-            <div className="space-y-1">
-              {remaining.map((player, index) => (
-                <div
-                  key={player.id}
-                  className="flex items-center justify-between rounded-md bg-muted/40 px-3 py-1.5 text-xs shadow-sm"
-                >
-                  <span className="flex items-center gap-2">
-                    {t("app.leaderboard.rankRowDialog", { rank: index + 4, name: player.name })}
-                  </span>
-                  <span className="text-muted-foreground">
-                    {player.score}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-        <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-between">
-          <Button
-            onClick={onShare}
-            variant="secondary"
-            className="w-full sm:w-auto"
-          >
-            <Share2 className="mr-2 h-4 w-4" /> {t("app.leaderboard.share")}
+        </DialogBody>
+        <DialogFooter>
+          <Button onClick={onShare} variant="secondary">
+            <Share2 aria-hidden /> {t("app.leaderboard.share")}
           </Button>
-          <Button
-            variant="outline"
-            className="w-full sm:w-auto"
-            onClick={onRequestReset}
-          >
-            <RefreshCw className="mr-2 h-4 w-4" /> {t("app.leaderboard.reset")}
+          <Button variant="secondary" onClick={onRequestReset}>
+            <RefreshCw aria-hidden /> {t("app.leaderboard.reset")}
           </Button>
           <DialogClose asChild>
-            <Button className="w-full sm:w-auto">{t("app.leaderboard.ok")}</Button>
+            <Button>{t("app.leaderboard.ok")}</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

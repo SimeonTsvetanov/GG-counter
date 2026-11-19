@@ -1,5 +1,7 @@
-// The theme choice (light / dark / system) for the whole app: the class on <html> and the saved
-// choice (app/src/storage/theme.ts). public/theme-init.js sets the same class before the first paint.
+// The theme choice (light / dark / system) for the whole app: the class on <html> (the resolved theme),
+// `data-theme` for a forced choice (design/tokens.css → color-scheme; System removes it), the browser bar
+// colour, and the saved choice (app/src/storage/theme.ts). public/theme-init.js does the same before the
+// first paint.
 import {
   createContext,
   type Dispatch,
@@ -41,6 +43,30 @@ function resolveTheme(theme: Theme): Theme {
   return theme;
 }
 
+/** The two `theme-color` metas (light / dark, scripts/tokens.ts) and the colours they were written with. */
+const themeColorMetas = (): HTMLMetaElement[] => [...document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')];
+const originalThemeColors = new WeakMap<HTMLMetaElement, string>();
+
+/**
+ * Puts `theme` on `<html>`: the resolved class, `data-theme` when forced, and the browser bar colour —
+ * a forced theme paints both metas with the page background the browser now resolves; System restores
+ * the per-scheme values of the HTML (design-system §4).
+ */
+function applyTheme(theme: Theme): Theme {
+  const element = document.documentElement;
+  const next = resolveTheme(theme);
+  element.classList.remove("light", "dark");
+  element.classList.add(next);
+  if (theme === "system") element.removeAttribute("data-theme");
+  else element.setAttribute("data-theme", theme);
+  const background = getComputedStyle(element).backgroundColor;
+  for (const meta of themeColorMetas()) {
+    if (!originalThemeColors.has(meta)) originalThemeColors.set(meta, meta.content);
+    meta.content = theme === "system" ? (originalThemeColors.get(meta) ?? meta.content) : background;
+  }
+  return next;
+}
+
 /** Applies the chosen theme to `<html>`, saves it in this browser and shares it via {@link useTheme}. */
 export function ThemeProvider({
   children,
@@ -56,12 +82,7 @@ export function ThemeProvider({
       return;
     }
 
-    const element = window.document.documentElement;
-    const next = resolveTheme(theme);
-
-    element.classList.remove("light", "dark");
-    element.classList.add(next);
-    setResolvedTheme(next);
+    setResolvedTheme(applyTheme(theme));
 
     // "system" removes the saved value (writeTheme), as before; a refused save keeps the theme for this session.
     writeTheme(theme);
@@ -75,13 +96,7 @@ export function ThemeProvider({
     const mediaQuery = window.matchMedia(prefersDarkQuery);
 
     const handler = () => {
-      setResolvedTheme(resolveTheme(theme));
-      if (theme === "system") {
-        const element = window.document.documentElement;
-        const next = resolveTheme("system");
-        element.classList.remove("light", "dark");
-        element.classList.add(next);
-      }
+      setResolvedTheme(theme === "system" ? applyTheme(theme) : resolveTheme(theme));
     };
 
     mediaQuery.addEventListener("change", handler);

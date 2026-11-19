@@ -6,9 +6,13 @@ import { LEGACY_THEME_KEY, themeInitScript } from "./theme-init.ts";
 
 const script = themeInitScript(app);
 
+/** The attributes theme-init.js set on <html> in the last {@link run}. */
+let attributes: Record<string, string> = {};
+
 /** Runs theme-init.js against `stored` (null = storage blocked) and returns the classes it set on <html>. */
 function run(stored: Record<string, string> | null, { systemDark = false } = {}): string[] {
   const classes: string[] = [];
+  attributes = {};
   const localStorage = {
     getItem: (key: string) => {
       if (stored === null) throw new Error("SecurityError");
@@ -18,7 +22,7 @@ function run(stored: Record<string, string> | null, { systemDark = false } = {})
   runInNewContext(script, {
     localStorage,
     window: { matchMedia: () => ({ matches: systemDark }) },
-    document: { documentElement: { classList: { add: (name: string) => classes.push(name) } } },
+    document: { documentElement: { classList: { add: (name: string) => classes.push(name) }, setAttribute: (name: string, value: string) => { attributes[name] = value; } } },
   });
   return classes;
 }
@@ -48,5 +52,16 @@ describe("themeInitScript", () => {
     expect(run({ [STORAGE_KEYS.theme]: "{broken" }, { systemDark: true })).toEqual(["dark"]);
     expect(run({ [LEGACY_KEYS.theme]: "blue" })).toEqual(["light"]);
     expect(run(null, { systemDark: true })).toEqual(["dark"]);
+  });
+
+  it("a saved choice sets data-theme (tokens.css color-scheme); the system theme leaves it unset", () => {
+    run({ [STORAGE_KEYS.theme]: "\"dark\"" });
+    expect(attributes).toEqual({ "data-theme": "dark" });
+    run({ [LEGACY_KEYS.theme]: "light" }, { systemDark: true });
+    expect(attributes).toEqual({ "data-theme": "light" });
+    run({}, { systemDark: true });
+    expect(attributes).toEqual({});
+    run({ [STORAGE_KEYS.theme]: "\"blue\"" });
+    expect(attributes).toEqual({});
   });
 });

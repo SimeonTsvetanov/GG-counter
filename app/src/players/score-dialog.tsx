@@ -5,6 +5,7 @@ import type { Player } from "gg-counter-core";
 import { Button } from "../components/ui/button";
 import {
   Dialog,
+  DialogBody,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -16,6 +17,7 @@ import {
 import { Input } from "../components/ui/input";
 import { t } from "../i18n";
 import { limitMessage, type LimitCode } from "./limit-message";
+import { isLongScore } from "./score-size";
 
 /** Props of {@link ScoreDialog}. */
 interface ScoreDialogProps {
@@ -60,8 +62,9 @@ export function ScoreDialog({ player, onApply }: ScoreDialogProps): React.JSX.El
       <DialogTrigger asChild>
         <button
           type="button"
-          className="flex min-w-[min(4rem,30vw)] justify-center rounded-md bg-card px-3 py-2 text-4xl font-bold shadow-inner focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-          aria-label={t("app.score.adjust", { name: player.name })}
+          className="score"
+          data-long={isLongScore(player.score) ? "" : undefined}
+          aria-label={t("app.score.adjust", { name: player.name, score: player.score })}
         >
           {player.score}
         </button>
@@ -73,7 +76,7 @@ export function ScoreDialog({ player, onApply }: ScoreDialogProps): React.JSX.El
             {t("app.score.description", { name: player.name })}
           </DialogDescription>
         </DialogHeader>
-        <div>
+        <DialogBody>
           <Input
             type="number"
             inputMode="numeric"
@@ -89,15 +92,17 @@ export function ScoreDialog({ player, onApply }: ScoreDialogProps): React.JSX.El
                 handleApplyCustom();
               }
             }}
+            autoComplete="off"
+            enterKeyHint="done"
             aria-label={t("app.score.amount")}
             aria-invalid={error !== null}
             aria-describedby={errorId}
           />
-          <p id={errorId} role="alert" className="mt-2 text-sm font-medium text-destructive empty:mt-0">{error && limitMessage(error)}</p>
-        </div>
+          <p id={errorId} role="alert" className="field-error">{error && limitMessage(error)}</p>
+        </DialogBody>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="ghost">{t("shell.cancel")}</Button>
+            <Button variant="secondary">{t("shell.cancel")}</Button>
           </DialogClose>
           <Button onClick={handleApplyCustom}>{t("app.score.apply")}</Button>
         </DialogFooter>

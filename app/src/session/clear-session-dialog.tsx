@@ -44,7 +44,6 @@ export function ClearSessionDialog({
         <AlertDialogFooter>
           <AlertDialogCancel>{t("shell.cancel")}</AlertDialogCancel>
           <AlertDialogAction
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             onClick={onConfirm}
           >
             {t("app.session.clearConfirm")}

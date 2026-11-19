@@ -23,7 +23,7 @@ const NO_DEFAULT_EXPORT = { selector: "ExportDefaultDeclaration", message: "Use 
 const TEST_FILES = ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "tests/**"];
 
 export default tseslint.config(
-  { ignores: ["**/*.d.ts", "**/dist/**", "app/postcss.config.cjs", "**/.tsbuild/**", "app/public/**", "coverage/**", "playwright-report/**", "test-results/**"] },
+  { ignores: ["**/*.d.ts", "**/dist/**", "**/.tsbuild/**", "app/public/**", "coverage/**", "playwright-report/**", "test-results/**"] },
   js.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,

@@ -69,22 +69,19 @@ export function PlayersSection({
 
   return (
     <>
-      <div className="mx-auto w-full max-w-lg sm:max-w-none">
-        <section className="grid grid-cols-2 justify-items-center gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-          {players.map((player) => (
-            <PlayerCard
-              key={player.id}
-              player={player}
-              isLeader={leaderId === player.id}
-              onRename={onRename}
-              onRemove={onRemove}
-              onAdjust={onAdjust}
-              className="w-full"
-            />
-          ))}
-        </section>
-      </div>
-      <div className="mt-2 w-full">{addPlayerCard}</div>
+      <section className="player-grid">
+        {players.map((player) => (
+          <PlayerCard
+            key={player.id}
+            player={player}
+            isLeader={leaderId === player.id}
+            onRename={onRename}
+            onRemove={onRemove}
+            onAdjust={onAdjust}
+          />
+        ))}
+      </section>
+      {addPlayerCard}
     </>
   );
 }

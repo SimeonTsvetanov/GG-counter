@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./app";
 import { initI18n } from "./i18n";
-import "./styles/global.css";
+import "./styles/app.css";
 import { ThemeProvider } from "./providers/theme-provider";
 import { migrateLegacyStorage } from "./storage/migrate";
 import { ErrorBoundary } from "./ui/error-boundary";

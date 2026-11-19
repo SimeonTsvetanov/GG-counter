@@ -1,0 +1,53 @@
+/* Disclosure lists (<details>): the FAQ under the leaderboard and the Help sections. Rows separated by
+   hairlines (ui-patterns §7); the whole summary row is the 44 px target; a chevron turns when open. */
+@layer components {
+  /* || Components: disclosures */
+  .disclosures {
+    display: flex;
+    flex-direction: column;
+
+    & details + details {
+      box-shadow: inset 0 1px 0 var(--color-separator);
+    }
+
+    & summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      min-height: var(--tap-target);
+      padding-block: var(--space-2);
+      color: var(--color-text);
+      font-weight: var(--weight-medium);
+      cursor: pointer;
+      list-style: none;
+
+      &::-webkit-details-marker {
+        display: none;
+      }
+
+      /* A chevron (two 2 px strokes of a rotated square — an icon, not a box border) that turns when the
+         answer is open; decorative, <details> says open/closed itself. */
+      &::after {
+        content: "" / "";
+        flex-shrink: 0;
+        width: var(--space-2);
+        height: var(--space-2);
+        border-right: var(--focus-ring-width) solid var(--color-text-tertiary);
+        border-bottom: var(--focus-ring-width) solid var(--color-text-tertiary);
+        transform: rotate(45deg);
+        transition: transform var(--duration-fast) var(--ease-standard);
+      }
+    }
+
+    & details[open] summary::after {
+      transform: rotate(-135deg);
+    }
+
+    /* The answer under its question. */
+    & details > :not(summary) {
+      padding-bottom: var(--space-3);
+      color: var(--color-text-secondary);
+    }
+  }
+}

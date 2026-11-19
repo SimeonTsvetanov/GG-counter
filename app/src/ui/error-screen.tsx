@@ -39,12 +39,12 @@ export function ErrorScreen({ error }: { error: Error }): React.JSX.Element {
   };
 
   return (
-    <main role="alert" aria-labelledby="error-title" className="mx-auto flex min-h-dvh max-w-lg flex-col justify-center gap-4 p-6 text-foreground">
-      <div aria-hidden className="flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10 text-2xl font-bold text-destructive">!</div>
-      <h1 id="error-title" ref={title} tabIndex={-1} className="text-2xl font-semibold focus-visible:outline-none">{t("shell.error.title")}</h1>
-      <p className="text-muted-foreground">{t("shell.error.text", { name: app.name })}</p>
-      <p className="w-fit rounded-full bg-muted px-3 py-1 text-xs font-medium">{error.name === "Error" ? t("shell.error.unexpected") : error.name}</p>
-      <div className="grid gap-2 sm:grid-cols-2">
+    <main role="alert" aria-labelledby="error-title" className="error-screen">
+      <div aria-hidden className="error-icon">!</div>
+      <h1 id="error-title" ref={title} tabIndex={-1} className="error-title">{t("shell.error.title")}</h1>
+      <p className="error-text">{t("shell.error.text", { name: app.name })}</p>
+      <p className="error-chip">{error.name === "Error" ? t("shell.error.unexpected") : error.name}</p>
+      <div className="button-stack error-actions">
         <Button onClick={() => { location.reload(); }}>{t("shell.error.reload")}</Button>
         <Button variant="secondary" onClick={exportData}>{t("shell.error.export")}</Button>
         <Button asChild variant="secondary">
@@ -52,14 +52,14 @@ export function ErrorScreen({ error }: { error: Error }): React.JSX.Element {
         </Button>
         <Button variant="secondary" onClick={copy}>{t("shell.copy")}</Button>
       </div>
-      <p className="text-sm">
-        <a className="text-primary underline-offset-4 hover:underline" href={mailtoUrl(report)}>{t("shell.report.email")}</a>
+      <p>
+        <a className="text-button" href={mailtoUrl(report)}>{t("shell.report.email")}</a>
       </p>
-      <p className="text-xs text-muted-foreground">{t("shell.report.public")}</p>
-      <p role="status" className="min-h-5 text-sm text-muted-foreground">{status}</p>
-      <details className="rounded-lg bg-muted/50 p-3 text-xs">
-        <summary className="cursor-pointer font-medium">{t("shell.error.details")}</summary>
-        <pre className="mt-2 overflow-x-auto whitespace-pre-wrap break-words font-mono">{details}</pre>
+      <p className="error-note">{t("shell.report.public")}</p>
+      <p role="status" className="error-note">{status}</p>
+      <details className="error-details">
+        <summary>{t("shell.error.details")}</summary>
+        <pre>{details}</pre>
       </details>
     </main>
   );

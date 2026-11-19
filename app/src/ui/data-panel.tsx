@@ -93,9 +93,9 @@ export function DataPanel({ onImported, onCleared }: DataPanelProps): React.JSX.
 
   return (
     <>
-      <section aria-labelledby="settings-data" className="space-y-2">
-        <h3 id="settings-data" className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{t("shell.settings.data")}</h3>
-        <div className="grid gap-2 rounded-lg bg-muted/50 p-3 sm:grid-cols-2">
+      <section aria-labelledby="settings-data" className="group">
+        <h3 id="settings-data" className="group-title">{t("shell.settings.data")}</h3>
+        <div className="button-stack">
           <Button variant="secondary" onClick={() => { showToast({ message: t("shell.settings.exported", { file: downloadExport() }) }); }}>
             {t("shell.settings.export")}
           </Button>
@@ -114,12 +114,13 @@ export function DataPanel({ onImported, onCleared }: DataPanelProps): React.JSX.
             }}
           />
         </div>
-        <p role="alert" className="text-sm text-destructive">{error && importErrorText(error)}</p>
-        <p className="text-xs text-muted-foreground">{t("shell.settings.dataNote")}</p>
+        <p role="alert" className="field-error">{error && importErrorText(error)}</p>
+        <p className="group-note">{t("shell.settings.dataNote")}</p>
       </section>
-      <section aria-labelledby="settings-danger" className="space-y-2">
-        <h3 id="settings-danger" className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{t("shell.settings.danger")}</h3>
-        <Button variant="destructive" className="w-full" onClick={askToClear}>{t("shell.settings.clear")}</Button>
+      {/* Its own last section, full-width red (ui-patterns §12): red text would be 4.09:1 on the dark sheet. */}
+      <section aria-labelledby="settings-danger" className="group">
+        <h3 id="settings-danger" className="group-title">{t("shell.settings.danger")}</h3>
+        <Button variant="danger" onClick={askToClear}>{t("shell.settings.clear")}</Button>
       </section>
       <ConfirmDialog confirmation={confirmation} onDone={() => { setConfirmation(null); }} />
     </>

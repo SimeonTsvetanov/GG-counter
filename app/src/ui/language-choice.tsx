@@ -13,14 +13,10 @@ export function LanguageChoice(): React.JSX.Element {
   const [picked, setPicked] = useState<LanguageCode | null>(null);
   const checked = picked ?? active;
   return (
-    <fieldset className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1">
+    <fieldset className="segmented">
       <legend className="sr-only">{t("shell.language.label")}</legend>
       {app.languages.map((lang) => (
-        <label
-          key={lang}
-          lang={lang}
-          className="flex min-h-11 cursor-pointer items-center justify-center rounded-md text-sm font-medium text-foreground has-[:checked]:bg-background has-[:checked]:shadow-sm has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ring"
-        >
+        <label key={lang} lang={lang}>
           <input
             type="radio"
             name="lang"

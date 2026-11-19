@@ -123,7 +123,12 @@
 - Reading list: design → design-system, css-architecture; engineering → react §1.
 - Acceptance: `a11y-check` 0 FAIL; screenshot matrix approved by Moni.
 - Depends on: T-08
-- [ ] done
+- [x] done — `design/tokens.css` (forge 0.26.0 + `--z-modal`), accent `#1F4ED8` generated and checked (36/36 PASS);
+  Tailwind 4.3.5 (`@theme inline reference`), component CSS in layers, shadcn components restyled; frosted header,
+  player cards (score row + equal −/+), sheets/alerts/menu/toasts, Settings, Help, legal, error screen, policy + 404
+  pages on the same tokens; links without underline; Inter (Latin + Cyrillic); `theme-color` light/dark; og-image;
+  header menus lazy (first-load JS 136.8 → 118.2 KB); `structure.config.json` removed (2026-11-19). Screenshot matrix
+  waits for Moni's approval.
 
 ### T-13 · Radix → Base UI (optional, Moni decides after T-12)
 - Goal: follow the Level 2 component choice. Skipped unless approved — no user-visible gain by itself.

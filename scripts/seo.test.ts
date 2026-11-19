@@ -20,7 +20,9 @@ describe("headTags", () => {
     expect(head).toContain(`<link rel="canonical" href="https://simeontsvetanov.github.io/GG-counter/" />`);
     expect(head).toContain(`<link rel="describedby" type="text/plain" href="${app.url}llms.txt"`);
     expect(head).toContain(`<meta name="referrer" content="strict-origin-when-cross-origin" />`);
-    expect(head).toContain(`<meta name="theme-color" content="#1F4ED8" />`);
+    // PLAN T-12: one theme-color per colour scheme, = --color-bg of design/tokens.css (design-system §4).
+    expect(head).toContain(`<meta name="theme-color" media="(prefers-color-scheme: light)" content="#F5F5F7" />`);
+    expect(head).toContain(`<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" />`);
   });
 
   it("has the complete Open Graph and X card tags with absolute URLs", () => {

@@ -24,7 +24,6 @@ export function ConfirmDialog({ confirmation, onDone }: { confirmation: Confirma
         <AlertDialogFooter>
           <AlertDialogCancel>{t("shell.cancel")}</AlertDialogCancel>
           <AlertDialogAction
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             onClick={() => { confirmation?.onConfirm(); }}
           >
             {confirmation?.confirm}

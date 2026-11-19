@@ -1,0 +1,282 @@
+[
+  {
+    "name": "players",
+    "actions": [
+      {
+        "fill": ".card-content input.field",
+        "text": "Ana"
+      },
+      {
+        "click": ".card-content .button--primary"
+      },
+      {
+        "fill": ".card-content input.field",
+        "text": "Boris"
+      },
+      {
+        "click": ".card-content .button--primary"
+      },
+      {
+        "fill": ".card-content input.field",
+        "text": "Maximilian Alexander-Konstantinov"
+      },
+      {
+        "click": ".card-content .button--primary"
+      },
+      {
+        "fill": ".card-content input.field",
+        "text": "Dana"
+      },
+      {
+        "click": ".card-content .button--primary"
+      }
+    ]
+  },
+  {
+    "name": "menu",
+    "actions": [
+      {
+        "fill": ".card-content input.field",
+        "text": "Ana"
+      },
+      {
+        "click": ".card-content .button--primary"
+      },
+      {
+        "click": "[data-menu-open]"
+      },
+      {
+        "wait": 400
+      }
+    ]
+  },
+  {
+    "name": "settings",
+    "actions": [
+      {
+        "click": "[data-menu-open]"
+      },
+      {
+        "wait": 300
+      },
+      {
+        "click": "[role=\"menu\"] [data-action=\"settings\"]"
+      },
+      {
+        "wait": 400
+      }
+    ]
+  },
+  {
+    "name": "help",
+    "actions": [
+      {
+        "click": "[data-menu-open]"
+      },
+      {
+        "wait": 300
+      },
+      {
+        "click": "[role=\"menu\"] [data-action=\"help\"]"
+      },
+      {
+        "wait": 400
+      }
+    ]
+  },
+  {
+    "name": "whats-new",
+    "actions": [
+      {
+        "click": "[data-menu-open]"
+      },
+      {
+        "wait": 300
+      },
+      {
+        "click": "[role=\"menu\"] [data-action=\"whats-new\"]"
+      },
+      {
+        "wait": 400
+      }
+    ]
+  },
+  {
+    "name": "about",
+    "actions": [
+      {
+        "click": "[data-menu-open]"
+      },
+      {
+        "wait": 300
+      },
+      {
+        "click": "[role=\"menu\"] [data-action=\"about\"]"
+      },
+      {
+        "wait": 400
+      }
+    ]
+  },
+  {
+    "name": "report",
+    "actions": [
+      {
+        "click": "[data-menu-open]"
+      },
+      {
+        "wait": 300
+      },
+      {
+        "click": "[role=\"menu\"] [data-action=\"report\"]"
+      },
+      {
+        "wait": 400
+      }
+    ]
+  },
+  {
+    "name": "privacy",
+    "actions": [
+      {
+        "click": "[data-menu-open]"
+      },
+      {
+        "wait": 300
+      },
+      {
+        "click": "[role=\"menu\"] [data-action=\"privacy\"]"
+      },
+      {
+        "wait": 400
+      }
+    ]
+  },
+  {
+    "name": "terms",
+    "actions": [
+      {
+        "click": "[data-menu-open]"
+      },
+      {
+        "wait": 300
+      },
+      {
+        "click": "[role=\"menu\"] [data-action=\"terms\"]"
+      },
+      {
+        "wait": 400
+      }
+    ]
+  },
+  {
+    "name": "clear-data-alert",
+    "actions": [
+      {
+        "click": "[data-menu-open]"
+      },
+      {
+        "wait": 300
+      },
+      {
+        "click": "[role=\"menu\"] [data-action=\"settings\"]"
+      },
+      {
+        "wait": 400
+      },
+      {
+        "click": "[role=\"dialog\"] .button--danger"
+      },
+      {
+        "wait": 400
+      }
+    ]
+  },
+  {
+    "name": "remove-alert",
+    "actions": [
+      {
+        "fill": ".card-content input.field",
+        "text": "Ana"
+      },
+      {
+        "click": ".card-content .button--primary"
+      },
+      {
+        "click": ".player-card-head .button"
+      },
+      {
+        "wait": 400
+      }
+    ]
+  },
+  {
+    "name": "score-dialog",
+    "actions": [
+      {
+        "fill": ".card-content input.field",
+        "text": "Ana"
+      },
+      {
+        "click": ".card-content .button--primary"
+      },
+      {
+        "click": ".player-card .score"
+      },
+      {
+        "wait": 400
+      }
+    ]
+  },
+  {
+    "name": "leaderboard-dialog",
+    "actions": [
+      {
+        "fill": ".card-content input.field",
+        "text": "Ana"
+      },
+      {
+        "click": ".card-content .button--primary"
+      },
+      {
+        "fill": ".card-content input.field",
+        "text": "Boris"
+      },
+      {
+        "click": ".card-content .button--primary"
+      },
+      {
+        "fill": ".card-content input.field",
+        "text": "Maximilian Alexander-Konstantinov"
+      },
+      {
+        "click": ".card-content .button--primary"
+      },
+      {
+        "fill": ".card-content input.field",
+        "text": "Dana"
+      },
+      {
+        "click": ".card-content .button--primary"
+      },
+      {
+        "click": ".header-actions .button"
+      },
+      {
+        "wait": 400
+      }
+    ]
+  },
+  {
+    "name": "limit-message",
+    "actions": [
+      {
+        "fill": ".card-content input.field",
+        "text": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      },
+      {
+        "click": ".card-content .button--primary"
+      }
+    ]
+  }
+]

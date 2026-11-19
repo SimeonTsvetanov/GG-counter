@@ -24,6 +24,8 @@ import { useAppShell } from "./ui/use-app-shell";
 
 /** Share of the leaderboard card that must be on screen for the full header layout. */
 const LEADERBOARD_IN_VIEW_THRESHOLD = 0.15;
+/** Any part of the 1 px top marker on screen = the page is at the top (no header shadow). */
+const AT_TOP_THRESHOLD = 0;
 
 /** The whole GG Counter screen: players, scores, leaderboard, share, install banner, how it works and FAQ. */
 export function App(): React.JSX.Element {
@@ -40,6 +42,8 @@ export function App(): React.JSX.Element {
   const addCardRef = useRef<HTMLDivElement>(null);
   const leaderboardCardRef = useRef<HTMLDivElement>(null);
   const isLeaderboardInView = useInView(leaderboardCardRef, LEADERBOARD_IN_VIEW_THRESHOLD);
+  const topSentinelRef = useRef<HTMLSpanElement>(null);
+  const isAtTop = useInView(topSentinelRef, AT_TOP_THRESHOLD);
   const pageInfoSlotRef = useRef<HTMLDivElement>(null);
   usePageInfo(pageInfoSlotRef, lang);
 
@@ -58,10 +62,12 @@ export function App(): React.JSX.Element {
   };
 
   return (
-    <div className="min-h-dvh bg-background text-foreground">
-      <div className="safe-area flex w-full min-h-dvh flex-col">
+    <>
+      <div className="app">
+        <span ref={topSentinelRef} className="scroll-sentinel" aria-hidden />
         <AppHeader
           isLeaderboardInView={isLeaderboardInView}
+          isScrolled={!isAtTop}
           leaderboard={{
             open: isLeaderboardDialogOpen,
             onOpenChange: setIsLeaderboardDialogOpen,
@@ -73,28 +79,26 @@ export function App(): React.JSX.Element {
 
         <StatusBanner install={shell.install} />
 
-        <main className="flex-1">
-          <div className={`${CONTAINER_CLASS} flex flex-col gap-6 py-6`}>
-            <PlayersSection
-              players={game.state.players}
-              leaderId={game.ranking.leader?.id ?? null}
-              onAddPlayer={game.addPlayer}
-              onRename={game.renamePlayer}
-              onRemove={game.removePlayer}
-              onAdjust={game.adjustScore}
-              addCardRef={addCardRef}
-              addInputRef={addInputRef}
-            />
-            <LeaderboardCard
-              ref={leaderboardCardRef}
-              ranking={game.ranking}
-              onShare={handleShare}
-              onRequestReset={actions.onRequestReset}
-              onClear={game.resetGame}
-            />
-            {/* How it works + FAQ from index.html, below the tool (filled by usePageInfo). */}
-            <div ref={pageInfoSlotRef} className={CARD_WIDTH_CLASS} />
-          </div>
+        <main className={`${CONTAINER_CLASS} app-main`}>
+          <PlayersSection
+            players={game.state.players}
+            leaderId={game.ranking.leader?.id ?? null}
+            onAddPlayer={game.addPlayer}
+            onRename={game.renamePlayer}
+            onRemove={game.removePlayer}
+            onAdjust={game.adjustScore}
+            addCardRef={addCardRef}
+            addInputRef={addInputRef}
+          />
+          <LeaderboardCard
+            ref={leaderboardCardRef}
+            ranking={game.ranking}
+            onShare={handleShare}
+            onRequestReset={actions.onRequestReset}
+            onClear={game.resetGame}
+          />
+          {/* How it works + FAQ from index.html, below the tool (filled by usePageInfo). */}
+          <div ref={pageInfoSlotRef} className={CARD_WIDTH_CLASS} />
         </main>
 
         <AppFooter runItem={shell.runItem} />
@@ -133,6 +137,6 @@ export function App(): React.JSX.Element {
         }}
       />
       <CrashTestHook />
-    </div>
+    </>
   );
 }

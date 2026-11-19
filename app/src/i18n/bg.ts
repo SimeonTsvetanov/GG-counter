@@ -196,7 +196,7 @@ export const bg: Messages = {
       removeConfirm: "Премахни",
     },
     score: {
-      adjust: "Промени точките на {{name}}",
+      adjust: "Промени точките на {{name}}: {{score}}",
       title: "Промени точките",
       description: "Добавете или извадете точки на {{name}}. За изваждане въведете число с минус.",
       amount: "Промяна на точките",

@@ -16,17 +16,15 @@ export interface SettingsDialogProps extends DataPanelProps {
 export function SettingsDialog({ onClose, opener, onImported, onCleared }: SettingsDialogProps): React.JSX.Element {
   return (
     <ShellDialog title={t("shell.settings.title")} onClose={onClose} opener={opener}>
-      <div className="space-y-6">
-        <section aria-labelledby="settings-theme" className="space-y-2">
-          <h3 id="settings-theme" className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{t("shell.theme.label")}</h3>
-          <ThemeChoice />
-        </section>
-        <section aria-labelledby="settings-language" className="space-y-2">
-          <h3 id="settings-language" className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{t("shell.language.label")}</h3>
-          <LanguageChoice />
-        </section>
-        <DataPanel onImported={onImported} onCleared={onCleared} />
-      </div>
+      <section aria-labelledby="settings-theme" className="group">
+        <h3 id="settings-theme" className="group-title">{t("shell.theme.label")}</h3>
+        <ThemeChoice />
+      </section>
+      <section aria-labelledby="settings-language" className="group">
+        <h3 id="settings-language" className="group-title">{t("shell.language.label")}</h3>
+        <LanguageChoice />
+      </section>
+      <DataPanel onImported={onImported} onCleared={onCleared} />
     </ShellDialog>
   );
 }

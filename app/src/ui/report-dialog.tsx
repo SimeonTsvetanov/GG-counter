@@ -40,8 +40,8 @@ export function ReportDialog({ onClose, opener }: ReportDialogProps): React.JSX.
 
   return (
     <ShellDialog title={t("shell.report.title")} description={t("shell.report.intro")} onClose={onClose} opener={opener}>
-      <div className="space-y-3 text-sm">
-        <label htmlFor={ids.text} className="block font-medium">{t("shell.report.label")}</label>
+      <div className="flex flex-col gap-3">
+        <label htmlFor={ids.text} className="font-semibold">{t("shell.report.label")}</label>
         <textarea
           id={ids.text}
           value={text}
@@ -51,15 +51,15 @@ export function ReportDialog({ onClose, opener }: ReportDialogProps): React.JSX.
           aria-invalid={isMissing && isEmpty}
           aria-describedby={`${ids.error} ${ids.hint}`}
           onChange={(event) => { setText(event.target.value); setIsMissing(false); }}
-          className="w-full rounded-md bg-muted px-3 py-2 text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          className="field"
         />
-        <p id={ids.error} role="alert" className="text-destructive">{isMissing && isEmpty ? t("shell.report.empty") : ""}</p>
-        <label className="flex min-h-11 items-center gap-3">
-          <input type="checkbox" checked={withDetails} onChange={(event) => { setWithDetails(event.target.checked); }} className="h-5 w-5 accent-primary" />
+        <p id={ids.error} role="alert" className="field-error">{isMissing && isEmpty ? t("shell.report.empty") : ""}</p>
+        <label className="flex min-h-tap items-center gap-3">
+          <input type="checkbox" checked={withDetails} onChange={(event) => { setWithDetails(event.target.checked); }} className="size-5" />
           {t("shell.report.details")}
         </label>
-        <p id={ids.hint} className="text-xs text-muted-foreground">{t("shell.report.public")}</p>
-        <div className="grid gap-2 sm:grid-cols-2">
+        <p id={ids.hint} className="field-hint">{t("shell.report.public")}</p>
+        <div className="button-stack">
           <Button asChild>
             <a href={mailtoUrl(report)} onClick={guard}>{t("shell.report.email")}</a>
           </Button>

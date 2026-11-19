@@ -1,65 +1,69 @@
-/* policy-page.css — style of the standalone policy pages (scripts/legal-page.ts, PLAN T-10).
-   The pages cannot load the app's hashed CSS bundle, so the tokens below repeat the app's colours
-   from app/src/styles/global.css, like not-found.css; both move to design/tokens.css in PLAN T-12.
-   theme-init.js puts the saved theme's class on <html>; without JavaScript the system theme applies. */
+/* policy-page.css — style of the standalone policy pages (scripts/legal-page.ts, PLAN T-10). The pages
+   cannot load the app's hashed CSS bundle, so they load tokens.css (design/tokens.css + the generated
+   accent, written by generate.ts) first — one token source for the app and its pages (PLAN T-12).
+   theme-init.js sets the saved theme (data-theme) before the first paint; without JavaScript the system
+   theme applies. The look follows the forge template's page.css: frosted header, one text card. */
 @layer tokens, base, layout, components, overrides;
 
-@layer tokens {
-  /* light-dark() picks by color-scheme: the saved choice (class) wins, else the system theme. */
-  :root {
-    color-scheme: light dark;
-    --page-bg: light-dark(oklch(0.967 0.003 264.542), oklch(0.13 0.028 261.692));
-    --surface: light-dark(oklch(1 0 0), oklch(0.21 0.034 264.665));
-    --text: light-dark(oklch(0.13 0.028 261.692), oklch(0.985 0.002 247.839));
-    --text-secondary: light-dark(oklch(0.551 0.027 264.364), oklch(0.707 0.022 261.325));
-    /* The accent as text and focus ring: light 6.7:1 on the surface; dark 6.7:1 on the surface (accessibility §2). */
-    --accent-text: light-dark(#1f4ed8, #7c9cf5);
-    --shadow: light-dark(oklch(0 0 0 / 0.08), oklch(0 0 0 / 0.4)) 0 1px 3px, light-dark(oklch(0 0 0 / 0.06), transparent) 0 4px 16px;
-    --radius: 0.625rem;
-    --space-2: 0.5rem;
-    --space-4: 1rem;
-    --space-6: 1.5rem;
-    --space-8: 2rem;
-    --measure: 42rem;
-
-    &.light {
-      color-scheme: light;
-    }
-
-    &.dark {
-      color-scheme: dark;
-    }
-  }
-}
-
 @layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
     margin: 0;
     min-height: 100dvh;
-    background: var(--page-bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-    line-height: 1.6;
+    line-height: var(--leading-normal);
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Links without underline, accent + semibold (forge DECISIONS 2026-11-06, Moni). */
+  /* Links without underline: accent + semibold, the weight is the non-colour cue (WCAG 1.4.1, G182);
+     Moni 2026-11-06, DECISIONS 2026-11-19 (PLAN T-12). */
   a {
-    color: var(--accent-text);
-    font-weight: 600;
+    color: var(--color-accent-text);
+    font-weight: var(--weight-semibold);
     text-decoration: none;
+  }
 
-    &:focus-visible {
-      outline: 2px solid var(--accent-text);
-      outline-offset: 2px;
-      border-radius: 2px;
+  :focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  /* Smooth navigation to and from the app (the app opts in too). */
+  @view-transition {
+    navigation: auto;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    @view-transition {
+      navigation: none;
     }
   }
 }
 
 @layer layout {
   .policy-header {
-    padding: max(var(--space-4), env(safe-area-inset-top)) var(--space-4) 0;
+    position: sticky;
+    top: 0;
+    /* The brand lines up with the text card below (same width as .policy). */
+    padding: var(--safe-top) max(calc(var(--space-4) + var(--safe-right)), calc((100% - var(--measure)) / 2)) 0 max(calc(var(--space-4) + var(--safe-left)), calc((100% - var(--measure)) / 2));
+    background: var(--header-bg);
+    -webkit-backdrop-filter: var(--header-blur);
+    backdrop-filter: var(--header-blur);
+
+    @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+      background: var(--color-bg);
+    }
   }
 
   .policy {
@@ -70,11 +74,14 @@
   .policy-footer {
     width: min(100% - 2 * var(--space-4), var(--measure));
     margin: 0 auto;
-    padding-bottom: max(var(--space-8), env(safe-area-inset-bottom));
-    /* Full text colour: the secondary grey is under 4.5:1 on the tinted page (axe, PLAN T-10). */
-    color: var(--text);
-    font-size: 0.875rem;
+    padding-bottom: calc(var(--space-8) + var(--safe-bottom));
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
     text-align: center;
+
+    & p {
+      margin: 0;
+    }
   }
 }
 
@@ -84,30 +91,38 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    min-height: 2.75rem;
-    color: var(--text);
-    font-size: 1.0625rem;
+    min-height: var(--header-height);
+    color: var(--color-text);
+    font-size: var(--text-base);
+
+    & img {
+      border-radius: var(--radius-sm);
+    }
   }
 
   /* || Components: policy text card */
   .policy-body {
-    padding: clamp(var(--space-4), 4vw, var(--space-8));
-    border-radius: var(--radius);
-    background: var(--surface);
-    box-shadow: var(--shadow);
+    padding: clamp(var(--space-5), 4vw, var(--space-10));
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-1);
+    font-size: var(--text-base);
     /* Long URLs and emails never overflow the card (Moni 2026-11-08). */
     overflow-wrap: anywhere;
 
     & h1 {
       margin: 0;
-      font-size: 1.75rem;
-      line-height: 1.2;
+      font-size: var(--text-2xl);
+      line-height: var(--leading-tight);
+      letter-spacing: var(--tracking-tight);
       text-wrap: balance;
     }
 
     & h2 {
       margin: var(--space-8) 0 0;
-      font-size: 1.25rem;
+      font-size: var(--text-lg);
+      line-height: var(--leading-tight);
+      letter-spacing: var(--tracking-tight);
       text-wrap: balance;
     }
 
@@ -115,24 +130,26 @@
       margin-top: var(--space-2);
     }
 
-    /* Links inside sentences are underlined: the dark accent is 2.5:1 against the body text, so
-       colour alone is not enough (WCAG 1.4.1); the footer links stand alone and stay plain. */
-    & a {
-      text-decoration: underline;
-      text-underline-offset: 0.2em;
+    & code {
+      padding: 0 var(--space-1);
+      border-radius: var(--radius-sm);
+      background: var(--color-fill);
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
     }
   }
 
   .policy-updated {
     margin-top: var(--space-2);
-    color: var(--text-secondary);
-    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
   }
 
-  /* || Components: footer links (same order as the app footer) */
+  /* || Components: footer links (same order as the app footer, WCAG 3.2.6) */
   .policy-nav {
     margin-bottom: var(--space-2);
-    line-height: 2.75;
+    /* Inline links (2.5.8 inline exception); the line height spaces the rows for touch. */
+    line-height: var(--tap-target);
   }
 }
 

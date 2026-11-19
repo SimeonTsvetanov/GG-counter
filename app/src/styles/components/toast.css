@@ -1,0 +1,47 @@
+/* Toast (app/src/ui/toast.tsx): a short raised pill with an optional action that rises from the bottom
+   edge (ui-patterns §6). Inside an open dialog it sits at the top of the dialog instead (accessibility §5). */
+@layer components {
+  /* || Components: toast */
+  .toast {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    width: 100%;
+    max-width: var(--content-narrow);
+    padding: var(--space-1) var(--space-1) var(--space-1) var(--space-4);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface-raised);
+    color: var(--color-text);
+    box-shadow: var(--shadow-3);
+    font-size: var(--text-md);
+    pointer-events: auto;
+    animation: toast-in var(--duration-alert) var(--ease-spring);
+
+    & p {
+      flex: 1;
+      padding-block: var(--space-2);
+    }
+
+    /* Reduced motion: a short fade instead of the rise (accessibility §8). */
+    @media (prefers-reduced-motion: reduce) {
+      animation: modal-fade-in var(--duration-fade) var(--ease-out);
+    }
+  }
+
+  /* Inside a dialog: on the fill colour, so it stands apart from the raised dialog surface. The dialog sets
+     --toast-margin for its own padding (a sheet has none of its own, an alert has). */
+  .toast--in-dialog {
+    margin: var(--toast-margin, 0 0 var(--space-3));
+    width: auto;
+    text-align: start;
+    background: var(--color-fill);
+    box-shadow: none;
+  }
+
+  /* No opacity: the text keeps full contrast in every frame. */
+  @keyframes toast-in {
+    from {
+      transform: translateY(var(--space-4)) scale(0.98);
+    }
+  }
+}

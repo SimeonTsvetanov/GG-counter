@@ -1,3 +1,6 @@
+// The header's theme button (from 600 px up): a menu of Light / Dark / System. The icon shows the theme
+// in use (sun in light, moon in dark). Loaded after the first paint like the app menu (ui/header-menus.tsx).
+import { useRef } from "react";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -9,12 +12,15 @@ import {
 } from "./ui/dropdown-menu";
 import { Moon, Sun } from "lucide-react";
 import { t } from "../i18n";
-import { cn } from "../lib/utils";
 import { useTheme } from "../providers/theme-provider";
+import type { LazyMenuProps } from "../ui/lazy-menu";
+import { useMenuHandover } from "../ui/menu-handover";
 
 /** Menu button that switches between light, dark and system theme. */
-export function ThemeToggle({ className }: { className?: string }): React.JSX.Element {
+export function ThemeToggle({ className, initialIntent }: { className?: string } & LazyMenuProps): React.JSX.Element {
   const { theme, setTheme } = useTheme();
+  const trigger = useRef<HTMLButtonElement>(null);
+  const { open, setOpen, onContentFocus } = useMenuHandover(initialIntent, trigger);
 
   const handleChange = (value: string) => {
     if (value === "light" || value === "dark" || value === "system") {
@@ -23,24 +29,24 @@ export function ThemeToggle({ className }: { className?: string }): React.JSX.El
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="outline"
+          ref={trigger}
           size="icon"
           aria-label={t("shell.theme.toggle")}
-          className={cn("relative", className)}
+          variant="ghost"
+          className={className}
         >
-          <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <span className="sr-only">{t("shell.theme.toggle")}</span>
+          <Sun className="dark:hidden" aria-hidden />
+          <Moon className="hidden dark:block" aria-hidden />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
         sideOffset={8}
         collisionPadding={16}
-        className="w-40"
+        onFocus={onContentFocus}
       >
         <DropdownMenuLabel>{t("shell.theme.label")}</DropdownMenuLabel>
         <DropdownMenuRadioGroup

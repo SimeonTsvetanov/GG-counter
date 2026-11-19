@@ -44,6 +44,19 @@ copies keep working.
   screens. The header title is no longer cut off on small phones.
 - A clearer focus outline for keyboard users, larger text in input fields, and readable text on
   red buttons in the dark theme.
+- A new look, the same as the other free tools by the same author: a calm light grey or black page,
+  white or dark cards with soft shadows instead of lines, a see-through header that gets a shadow
+  when you scroll, the Inter font where the system font is not available, and GG Counter's blue for
+  the main button. Light, dark and system themes as before; the browser bar follows the theme.
+- Player cards: the score has its own row, so six-digit scores fit on a phone; − and + are two
+  equal buttons under it. The trash buttons are grey, not red.
+- Buttons, fields and menu entries are at least 44 px tall; dialogs open as sheets from the bottom on
+  phones; the leaderboard is one list with medals for the top three.
+- Links are shown in blue and bold, without underlines, also in the policy pages; the policy pages
+  and the "Page not found" page use the same colours as the app.
+- The preview image for shared links has the new look.
+- The app starts a little faster: the menus load right after the first screen (first download
+  about 14 % smaller).
 
 ### Changed (repository only)
 - Tests that lock today's behaviour, pnpm, the licence file, lint rules and CI that deploys only
@@ -52,6 +65,8 @@ copies keep working.
 - The repo `LICENSE` and `third-party-licenses.txt` are generated (current year, full licence texts).
 - All app texts in one English dictionary, ready for a second language; the menu and footer come
   from `app.config.ts`; the service worker and its tests follow the forge PWA rules.
+- Design tokens (`design/tokens.css`) from the forge and Tailwind CSS 4 mapped to them; the accent
+  colours are generated from `app.config.ts` and checked for contrast at every build.
 
 ### Fixed
 - The offline banner no longer says changes "will sync" — nothing is synced; your game stays on this device.
