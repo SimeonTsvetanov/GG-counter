@@ -37,6 +37,8 @@ test("online: a file the service worker did not save comes from the network, not
 });
 
 test("a new version waits for the user: the toast offers Reload and only that applies it", async ({ page, context }) => {
+  // Needs the `vite preview` seam that serves a changed sw.js; the live site cannot produce a new version on demand.
+  test.skip(Boolean(process.env.E2E_BASE_URL), "runs only against the local preview server");
   await openControlled(page);
   const before = await page.evaluate(async () => (await navigator.serviceWorker.ready).active?.scriptURL);
   // A changed sw.js = a new deploy (the preview server adds a comment for this cookie, app/vite.config.ts).
