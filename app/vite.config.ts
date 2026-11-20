@@ -99,8 +99,10 @@ function previewNextDeploy(base: string): Plugin {
 
 /**
  * Returns the web app manifest. id, start_url, scope, name, short_name and icons are a contract with
- * installed copies (SPEC §4): same values as the pre-forge manifest. The colours are the light page
- * background of design/tokens.css since PLAN T-12 (forge template; theme-color metas cover dark).
+ * installed copies (SPEC §4): same values as the pre-forge manifest. The colours are the dark page
+ * background of design/tokens.css (1.2.2, DECISIONS 2026-11-20): Android paints the navigation bar of the
+ * installed app from the manifest only, with no dark variant, and a light bar under the dark theme looked
+ * wrong on Moni's phone. The theme-color metas still follow the theme for the status bar.
  */
 function pwaManifest(base: string): Partial<ManifestOptions> {
   return {
@@ -112,8 +114,8 @@ function pwaManifest(base: string): Partial<ManifestOptions> {
     scope: base,
     display: app.manifest.display,
     orientation: app.manifest.orientation,
-    background_color: THEME_BACKGROUND.light,
-    theme_color: THEME_BACKGROUND.light,
+    background_color: THEME_BACKGROUND.dark,
+    theme_color: THEME_BACKGROUND.dark,
     icons: [
       { src: "icons/icon-192x192.svg", sizes: "192x192", type: "image/svg+xml", purpose: "any" },
       { src: "icons/icon-512x512.svg", sizes: "512x512", type: "image/svg+xml", purpose: "any" },

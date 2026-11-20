@@ -4,6 +4,12 @@ All notable user-facing changes. Format: Keep a Changelog · SemVer.
 
 ## [Unreleased]
 
+## [1.2.2] - 2026-11-20
+
+### Changed
+- On Android the bar with the back and home buttons under the installed app is black, so it matches the
+  dark theme. Reinstall GG Counter (or wait for Chrome to update it) to see the change.
+
 ## [1.2.1] - 2026-11-20
 
 ### Removed
