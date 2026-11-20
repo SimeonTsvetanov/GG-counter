@@ -136,7 +136,7 @@ export const app = {
     "GG Counter is a free score tracker for board-game nights: add up to 50 players, change scores with +1, −1 or any amount, and share the ranked leaderboard as text. GG Counter needs no account, works offline after the first visit and saves the game on your device only.",
   url: "https://simeontsvetanov.github.io/GG-counter/",
   repo: "https://github.com/SimeonTsvetanov/GG-counter",
-  version: "1.2.2",
+  version: "1.2.3",
   languages: ["en", "bg"],
   accent: "#1F4ED8",
   author: {

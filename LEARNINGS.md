@@ -31,3 +31,6 @@ Corrections captured for `/learn` (format: forge:flow → learn §1). Newest las
 - 2026-11-20 · Moni: the Android navigation bar of the installed app was blue — the installed WebAPK still had the pre-forge
   manifest colours (#1F4ED8); Chrome updates them on its own schedule. Open: which colour the bar gets in dark theme with the
   new manifest (#F5F5F7) — needs his screenshot after the update. Scope guess: general (pwa: manifest colours vs dark theme).
+- 2026-11-20 · Moni's phone (1.2.1, installed, Android): the Add field was again half under the keyboard — his page was
+  pinch-zoomed by about 5 % (cards cut at the screen edge in three screenshots) and `visibleSpan` returned null for any zoom.
+  A helper must not switch itself off for a small zoom; test the zoomed case. Fixed in 1.2.3. Scope guess: general.

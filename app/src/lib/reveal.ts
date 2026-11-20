@@ -14,17 +14,16 @@ export interface Span {
 
 /** Room kept between the field and the edge of the visible area. */
 export const REVEAL_MARGIN = 12;
-/** A visual viewport scaled by more than this is pinch-zoomed: the user is looking around, leave it alone. */
-const ZOOM_TOLERANCE = 0.01;
 
 /**
  * Returns the part of the layout viewport the user sees: from the bottom of the sticky header (`coveredTop`) or
  * the visual viewport's top, whichever is lower, to the visual viewport's bottom (the top of the keyboard).
- * Null while the page is pinch-zoomed. Without `VisualViewport` the whole layout viewport counts.
+ * A pinch-zoomed page counts too (1.2.3: on Moni's phone a slight zoom of about 1.05 switched the reveal off
+ * and the field stayed under the keyboard): `offsetTop` and `height` are layout pixels at every scale.
+ * Without `VisualViewport` the whole layout viewport counts.
  */
-export function visibleSpan(viewport: ViewportBox | null, layoutHeight: number, coveredTop: number): Span | null {
+export function visibleSpan(viewport: ViewportBox | null, layoutHeight: number, coveredTop: number): Span {
   if (viewport === null) return { top: Math.max(0, coveredTop), bottom: layoutHeight };
-  if (Math.abs(viewport.scale - 1) > ZOOM_TOLERANCE) return null;
   return { top: Math.max(viewport.offsetTop, coveredTop), bottom: viewport.offsetTop + viewport.height };
 }
 

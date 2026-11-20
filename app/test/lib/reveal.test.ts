@@ -10,8 +10,9 @@ describe("visibleSpan", () => {
   it("iOS scrolled the visual viewport down: its own top wins over the header", () => {
     expect(visibleSpan({ height: 400, offsetTop: 120, scale: 1 }, 844, 52)).toEqual({ top: 120, bottom: 520 });
   });
-  it("pinch-zoomed → null (leave the page alone)", () => {
-    expect(visibleSpan({ height: 300, offsetTop: 0, scale: 2 }, 844, 52)).toBeNull();
+  it("pinch-zoomed → still the part the user sees (a slight zoom must not switch the reveal off)", () => {
+    expect(visibleSpan({ height: 480, offsetTop: 30, scale: 1.05 }, 844, 52)).toEqual({ top: 52, bottom: 510 });
+    expect(visibleSpan({ height: 300, offsetTop: 100, scale: 2 }, 844, 52)).toEqual({ top: 100, bottom: 400 });
   });
   it("no VisualViewport → the layout viewport below the header", () => {
     expect(visibleSpan(null, 800, 52)).toEqual({ top: 52, bottom: 800 });

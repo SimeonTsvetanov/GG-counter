@@ -10,7 +10,6 @@ import { REVEAL_MARGIN, revealOffset, visibleSpan } from "../lib/reveal";
 function reveal(area: HTMLElement): void {
   const header = document.querySelector(".app-header")?.getBoundingClientRect().bottom ?? 0;
   const visible = visibleSpan(window.visualViewport ?? null, window.innerHeight, header);
-  if (visible === null) return;
   const box = area.getBoundingClientRect();
   const offset = revealOffset({ top: box.top, bottom: box.bottom }, visible, parsePixels(readToken("--space-3"), REVEAL_MARGIN));
   if (offset === 0) return;

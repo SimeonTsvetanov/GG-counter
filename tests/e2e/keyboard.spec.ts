@@ -117,3 +117,19 @@ test("a player's name field focused under the keyboard moves above it", async ({
   }, visible + 20);
   await expectOnScreen(page, [rename], visible);
 });
+
+// 1.2.3: on Moni's phone the page was pinch-zoomed by about 5 % and the reveal switched itself off.
+test("a slightly zoomed page: the Add field still moves above the keyboard", async ({ page }) => {
+  await fakeViewport(page);
+  await page.goto("./");
+  const field = page.getByRole("textbox", { name: "Player name", exact: true });
+  const add = page.getByRole("button", { name: "Add", exact: true });
+  for (const name of ["Ana", "Boris", "Chen", "Dana"]) {
+    await field.fill(name);
+    await field.press("Enter");
+  }
+  await page.evaluate(() => { (window.visualViewport as unknown as { scale: number }).scale = 1.05; });
+  await field.focus();
+  const visible = await openKeyboard(page, KEYBOARD);
+  await expectOnScreen(page, [field, add], visible);
+});

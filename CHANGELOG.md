@@ -4,6 +4,12 @@ All notable user-facing changes. Format: Keep a Changelog · SemVer.
 
 ## [Unreleased]
 
+## [1.2.3] - 2026-11-20
+
+### Fixed
+- The Add Player field and its Add button stay above the on-screen keyboard also when the page is
+  slightly zoomed in.
+
 ## [1.2.2] - 2026-11-20
 
 ### Changed
