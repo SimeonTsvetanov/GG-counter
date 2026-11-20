@@ -11,3 +11,4 @@ Corrections captured for `/learn` (format: forge:flow → learn §1). Newest las
 - Evidence: commit / file / screenshot path
 - Scope guess: general (plugin) | this project only
 -->
+- 2026-11-20 · Moni: secondary information on a card (the last-changes line) must stay in the background, the newest value included — no filled accent shapes for it. Applied in history.css.

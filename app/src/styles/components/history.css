@@ -1,6 +1,6 @@
 /* Score history (app/src/players/history-*.tsx, SPEC 1.1 F16): the "last changes" line on each player card
    and the history sheet behind it. The line reads like a calculator's tape above its result: small, dimmed,
-   oldest → newest from left to right, the newest at the right end in the text colour. */
+   oldest → newest from left to right, the newest at the right end, a little heavier. */
 @layer components {
   /* || Components: last changes line */
   /* Always there, empty or not, so cards stay equal and nothing jumps at the first change. */
@@ -31,9 +31,10 @@
       transform: scale(0.97);
     }
 
-    /* The secondary grey on the tinted card is 4.34:1 (light), under AA for small text: full text colour there. */
+    /* The secondary grey on the tinted card is 4.34:1 (light), under AA for small text: a slightly darker
+       grey there (≈ 5:1), still in the background like the rest (Moni 2026-11-20). */
     .player-card[data-last-scored] & {
-      color: var(--color-text);
+      color: color-mix(in oklab, var(--color-text-secondary) 75%, var(--color-text));
     }
   }
 
@@ -63,19 +64,18 @@
       margin-inline-start: auto;
     }
 
+    /* Quiet on purpose (Moni 2026-11-20: "noticeable, but not quite", like a calculator's tape): the newest
+       change keeps the line's grey and is only a little heavier. */
     &[data-newest] {
-      color: var(--color-text);
       font-weight: var(--weight-semibold);
     }
 
-    /* The last-scored card: its newest change is a pill — the mark is a shape too, not colour alone. The
-       accent-text colour keeps the pill ≥ 4.6:1 against the tinted card in both themes (accent fill: 2:1 dark),
-       and the card's surface colour reads on it (6.7:1 light, 6.0:1 dark; DECISIONS 2026-11-20). */
+    /* The last-scored card: its newest change sits in a thin outlined pill — the mark is a shape too, not
+       colour alone — in the same grey as the line. */
     .player-card[data-last-scored] &[data-newest] {
       padding-inline: var(--space-2);
+      border: 1px solid currentcolor;
       border-radius: var(--radius-full);
-      background: var(--color-accent-text);
-      color: var(--color-surface);
     }
   }
 
