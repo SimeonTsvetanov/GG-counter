@@ -21,7 +21,7 @@ The trophy button (**Open leaderboard**) in the header opens the same list in a 
 
 If you close the share sheet without choosing an app, nothing is shared or copied.
 
-**Share** is also in the window of the trophy button, and the share button (**Share session**) in the header does the same.
+**Share** is also in the window of the trophy button.
 
 **Share** in the **Leaderboard** card is turned off while the game has no players.
 

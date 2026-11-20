@@ -178,7 +178,6 @@ export const bg: Messages = {
     header: {
       leaderboard: "Отвори класирането",
       addPlayer: "Добави играч",
-      share: "Сподели сесията",
       clear: "Изчисти сесията",
     },
     players: {

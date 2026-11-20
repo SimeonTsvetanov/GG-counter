@@ -85,7 +85,7 @@ test("AC4: the leaderboard is sorted by score with medals and totals", async ({ 
 });
 
 // 1.2 (SPEC F21, DECISIONS 2026-11-20): Moni asked for a nicer text with the app link, so the pre-forge format
-// of AC5 changed on purpose. Every leaderboard Share (header, card, dialog) hands the same text to Web Share,
+// of AC5 changed on purpose. Every leaderboard Share (card, dialog) hands the same text to Web Share,
 // without `url` — the link is the text's last line, and apps that append `url` would print it twice.
 const APP_URL = "https://simeontsvetanov.github.io/GG-counter/";
 
@@ -108,7 +108,6 @@ test("AC5: every leaderboard Share sends the 1.2 text with the app link once, wi
   await recordShares(page);
   await openWith(page, V1_STATE);
   const openers = [
-    () => page.getByRole("button", { name: "Share session" }).first().click(),
     () => page.locator("[data-flip='main:leaderboard']").getByRole("button", { name: "Share", exact: true }).click(),
     async () => {
       await page.getByRole("button", { name: "Open leaderboard" }).first().click();
@@ -147,7 +146,7 @@ test("AC5: without Web Share the same text is copied and a toast says so; a canc
     Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: (text: string) => { copied.push(text); return Promise.resolve(); } } });
   });
   await openWith(page, V1_STATE);
-  await page.getByRole("button", { name: "Share session" }).first().click();
+  await page.locator("[data-flip='main:leaderboard']").getByRole("button", { name: "Share", exact: true }).click();
   await expect(page.getByText("Leaderboard copied ✓")).toBeVisible();
   const copied = await page.evaluate(() => (window as unknown as { copied: string[] }).copied);
   expect(copied).toHaveLength(1);
@@ -157,8 +156,17 @@ test("AC5: without Web Share the same text is copied and a toast says so; a canc
   await page.evaluate(() => {
     Object.defineProperty(navigator, "share", { configurable: true, value: () => Promise.reject(new DOMException("cancelled", "AbortError")) });
   });
-  await page.getByRole("button", { name: "Share session" }).first().click();
+  await page.locator("[data-flip='main:leaderboard']").getByRole("button", { name: "Share", exact: true }).click();
   await expect.poll(() => page.evaluate(() => (window as unknown as { copied: string[] }).copied.length)).toBe(1);
+});
+
+// 1.2.1: the header has no Share button (it gave a wrong "blocked" message with no players; Share stays in the
+// Leaderboard card — disabled while there are no players — the leaderboard window and the menu).
+test("the header has no share button and the card's Share is disabled without players", async ({ page }) => {
+  await page.goto("./");
+  await expect(page.getByRole("button", { name: "Open leaderboard" }).first()).toBeVisible();
+  await expect(page.locator("header").getByRole("button", { name: /share/i })).toHaveCount(0);
+  await expect(page.locator("[data-flip='main:leaderboard']").getByRole("button", { name: "Share", exact: true })).toBeDisabled();
 });
 
 // 1.1 (SPEC F13): the alert now has a choice; its default "Players and scores" (confirm = the last button)

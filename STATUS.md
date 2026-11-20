@@ -1,6 +1,6 @@
 # STATUS — GG Counter
 
-**Updated:** 2026-11-20 (T-17: version 1.2.0) · **Phase:** 1.1.0 live; 1.2.0 built, not yet released (SPEC §11; PLAN T-17 done)
+**Updated:** 2026-11-20 (version 1.2.1) · **Phase:** 1.2.0 live since 2026-11-20; 1.2.1 removes the header Share button (SPEC §11; PLAN T-17 done)
 
 ## Done
 - Migration (2026-11-19): T-01 characterization flows; T-02/T-03 pnpm 12, supply chain, `LICENSE`, forge ESLint, `pnpm verify`,

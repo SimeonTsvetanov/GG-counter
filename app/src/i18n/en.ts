@@ -175,7 +175,6 @@ export const en = {
     header: {
       leaderboard: "Open leaderboard",
       addPlayer: "Add player",
-      share: "Share session",
       clear: "Clear session",
     },
     players: {

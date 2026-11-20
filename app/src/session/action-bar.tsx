@@ -3,7 +3,7 @@
 // button is shown from 600 px up (header.css); on phones the theme is in Menu → Settings (app-shell §2,
 // DECISIONS 2026-11-19), so the phone header keeps the same number of buttons as before.
 import type { Player } from "gg-counter-core";
-import { Plus, RefreshCw, Share2, Trophy } from "lucide-react";
+import { Plus, RefreshCw, Trophy } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { t } from "../i18n";
 import { LeaderboardDialog } from "../leaderboard/leaderboard-dialog";
@@ -66,15 +66,6 @@ export function ActionBar({
         aria-label={t("app.header.addPlayer")}
       >
         <Plus aria-hidden />
-      </Button>
-
-      <Button
-        variant={variant}
-        size="icon"
-        onClick={actions.onShare}
-        aria-label={t("app.header.share")}
-      >
-        <Share2 aria-hidden />
       </Button>
 
       <Button

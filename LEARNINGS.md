@@ -25,3 +25,9 @@ Corrections captured for `/learn` (format: forge:flow → learn §1). Newest las
 - 2026-11-20 · Moni: shared results should be "even more beautiful and again have a link to the app" — share texts are
   marketing: readable in proportional chat fonts (emoji marks, figure-space padding), result line, attribution with the app URL.
   Applied in core `formatLeaderboard` (SPEC F21). Scope guess: general (app-shell §8 could show a model share text).
+- 2026-11-20 · Moni on the live 1.2.0 (Android, installed): the header Share button with 0 players showed "Sharing and copying
+  are blocked in this browser" — "nothing to share" was reported as a failure; an action that cannot work must be disabled or
+  say the real reason. He also wants no duplicate of a menu action in the header. Removed in 1.2.1. Scope guess: general.
+- 2026-11-20 · Moni: the Android navigation bar of the installed app was blue — the installed WebAPK still had the pre-forge
+  manifest colours (#1F4ED8); Chrome updates them on its own schedule. Open: which colour the bar gets in dark theme with the
+  new manifest (#F5F5F7) — needs his screenshot after the update. Scope guess: general (pwa: manifest colours vs dark theme).
