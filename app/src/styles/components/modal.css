@@ -33,11 +33,13 @@
 
     position: fixed;
     inset-inline: 0;
-    bottom: 0;
+    /* Above the on-screen keyboard: Android resizes the layout viewport (viewport meta
+       interactive-widget=resizes-content); iOS Safari does not, so lib/keyboard-inset.ts measures it. */
+    bottom: var(--keyboard-inset, 0px);
     z-index: var(--z-modal);
     display: flex;
     flex-direction: column;
-    max-height: calc(100dvh - var(--safe-top) - var(--space-6));
+    max-height: calc(var(--visual-height, 100dvh) - var(--safe-top) - var(--space-6));
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     background: var(--color-surface-raised);
     color: var(--color-text);
@@ -52,9 +54,9 @@
     @media (width > 600px) {
       --sheet-enter: translateY(var(--space-3)) scale(0.97);
 
-      inset: 50% auto auto 50%;
+      inset: calc((100% - var(--keyboard-inset, 0px)) / 2) auto auto 50%;
       width: min(100% - 2 * var(--space-4), var(--content-narrow));
-      max-height: 85dvh;
+      max-height: calc(var(--visual-height, 100dvh) * 0.85);
       border-radius: var(--radius-xl);
       translate: -50% -50%;
 

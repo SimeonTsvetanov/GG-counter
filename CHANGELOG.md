@@ -4,6 +4,9 @@ All notable user-facing changes. Format: Keep a Changelog · SemVer.
 
 ## [Unreleased]
 
+### Fixed
+- The on-screen keyboard no longer covers the buttons of a window with a text field (for example Apply in Adjust score): the window now sits above the keyboard on Android and on iPhone.
+
 ## [1.0.0] - 2026-11-19
 The first numbered release: GG Counter now follows the same standard as the other free tools by the
 same author. The address, your saved games and installed copies keep working.
