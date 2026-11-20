@@ -188,9 +188,16 @@ export const en = {
       decrease: "Decrease score for {{name}}",
       increase: "Increase score for {{name}}",
       remove: "Remove {{name}}",
-      removeTitle: "Remove player?",
-      removeMessage: "This removes {{name}} and their score.",
-      removeConfirm: "Remove",
+      // The delete alert with a choice (SPEC 1.1 F14): remove the player (default) or only reset the score.
+      removeTitle: "Remove player or score?",
+      removeMessage: "Choose what to remove for {{name}}. You cannot undo this action.",
+      removeLegend: "What to remove",
+      removePlayer: "Player and score",
+      removePlayerHint: "{{name}} leaves the game.",
+      removePlayerConfirm: "Remove",
+      removeScore: "Score only",
+      removeScoreHint: "{{name}} stays, with 0 points.",
+      removeScoreConfirm: "Reset",
     },
     score: {
       // The visible score is part of the name (WCAG 2.5.3 label in name, PLAN T-12).
@@ -215,13 +222,16 @@ export const en = {
       ok: "OK",
     },
     session: {
+      // One alert for Clear session and Reset scores (SPEC 1.1 F13): players and scores (default) or scores only.
       clearTitle: "Clear session?",
-      clearFromHeader: "This removes all players and scores. You cannot undo this action.",
-      clearFromCard: "This deletes all players and scores. You cannot undo this action.",
-      clearConfirm: "Clear",
-      resetTitle: "Reset all scores?",
-      resetMessage: "This will set every player's score to zero without removing players.",
-      resetConfirm: "Reset",
+      clearMessage: "Choose what to clear. You cannot undo this action.",
+      clearLegend: "What to clear",
+      clearAll: "Players and scores",
+      clearAllHint: "Removes every player, for a new group.",
+      clearAllConfirm: "Clear",
+      clearScores: "Scores only",
+      clearScoresHint: "Every player stays, with 0 points, for a new game.",
+      clearScoresConfirm: "Reset",
     },
     limits: {
       PLAYERS_TOO_MANY: "A game can have up to {{max}} players. Remove a player to add another.",

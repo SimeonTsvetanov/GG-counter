@@ -1,6 +1,6 @@
 # Change scores
 
-This guide shows you how to add or subtract points, by one or by any amount, and how to set every score back to zero. First [add the players](manage-players.md).
+This guide shows you how to add or subtract points, by one or by any amount, and how to set one score or every score back to zero. First [add the players](manage-players.md).
 
 ## Change a score by one point
 
@@ -27,14 +27,22 @@ To close the window without a change, select **Cancel**. If you enter `0` or lea
 
 A score stays between -999,999 and 999,999. When a change would go past a limit, GG Counter shows a message, for example "Scores go from -999,999 to 999,999. This change would go past the limit.", and keeps the score as it is. For **+** and **−** the message appears under the card. For a custom amount it appears under the field, and the window stays open so you can enter another amount.
 
+## Set one score to zero
+
+1. In the player's card, select the trash button (**Remove**, followed by the player's name).
+2. In the **Remove player or score?** window, select **Score only**.
+3. Select **Reset**.
+
+The player stays with a score of 0. The other scores don't change. You can't undo this.
+
 ## Set every score to zero
 
 To play again with the same players:
 
 1. In the **Leaderboard** card, select **Reset scores**.
-2. In the **Reset all scores?** window, select **Reset**.
+2. In the **Clear session?** window, **Scores only** is already selected. Select **Reset**.
 
-Every score is 0 and the players stay. You can't undo this. **Reset scores** is also in the window that the trophy button (**Open leaderboard**) in the header opens.
+Every score is 0 and the players stay. You can't undo this. **Reset scores** is also in the window that the trophy button (**Open leaderboard**) in the header opens. The **Clear session** button opens the same window with **Players and scores** selected, so select **Scores only** there to keep the players.
 
 ## Related
 

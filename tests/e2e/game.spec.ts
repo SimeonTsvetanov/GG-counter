@@ -52,7 +52,9 @@ test("AC2: rename and remove a player (remove asks first) and it stays gone afte
   await page.getByRole("textbox", { name: "Player name for Boris" }).press("Enter"); // a rename is saved on Enter or blur
   await expect.poll(() => scoreOf(page, "Bobby")).toBe(27);
   await page.getByRole("button", { name: "Remove Ana" }).click();
-  await expect(page.getByRole("alertdialog", { name: "Remove player?" })).toBeVisible();
+  // 1.1 (SPEC F14, DECISIONS 2026-11-20): the alert is named "Remove player or score?" (was "Remove player?") and
+  // has "Player and score" checked by default; its confirm "Remove" removes the player as before.
+  await expect(page.getByRole("alertdialog", { name: "Remove player or score?" })).toBeVisible();
   await page.getByRole("alertdialog").getByRole("button", { name: "Remove" }).click();
   await expect(page.getByRole("textbox", { name: "Player name for Ana" })).toHaveCount(0);
   await page.reload();
@@ -96,6 +98,8 @@ test("AC5: Share gives the leaderboard text in the known format", async ({ page 
   expect(lines[8]).toMatch(/^🕒 Snapshot: /);
 });
 
+// 1.1 (SPEC F13): the alert now has a choice; its default "Players and scores" (confirm = the last button)
+// is the clear-everything of AC6, so this test is unchanged.
 test("AC6: clear session removes everything after a confirmation", async ({ page }) => {
   await openWith(page, V1_STATE);
   await page.getByRole("button", { name: "Clear session" }).first().click();

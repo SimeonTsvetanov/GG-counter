@@ -15,9 +15,9 @@ export interface SessionActions {
   /** Scrolls to the Add player card and focuses its name field. */
   onQuickAdd: () => void;
   onShare: () => void;
-  /** Opens the "Reset all scores?" confirmation. */
+  /** Opens the "Clear session?" alert with "Scores only" checked (Reset scores buttons). */
   onRequestReset: () => void;
-  /** Opens the "Clear session?" confirmation. */
+  /** Opens the "Clear session?" alert with "Players and scores" checked. */
   onRequestClear: () => void;
 }
 
@@ -82,6 +82,7 @@ export function ActionBar({
         size="icon"
         onClick={actions.onRequestClear}
         aria-label={t("app.header.clear")}
+        data-action="clear-session"
       >
         <RefreshCw aria-hidden />
       </Button>

@@ -15,11 +15,11 @@
 | ID | Feature | Acceptance |
 |---|---|---|
 | F1 | Add a player by name (trimmed); an empty name adds nobody | AC1: "Ana", "  Boris  ", "   " → two players, score 0 |
-| F2 | Rename (saved on Enter or blur; max 40 characters since PLAN T-08, was 32) and remove a player (remove asks to confirm) | AC2: removed player is gone after reload |
+| F2 | Rename (saved on Enter or blur; max 40 characters since PLAN T-08, was 32) and remove a player (remove asks to confirm; 1.1: with a choice, F14) | AC2: removed player is gone after reload |
 | F3 | Change a score: +1 / −1 buttons, and a dialog for a custom amount | AC3: +1, −1 and a custom +12 give the exact sum |
 | F4 | Leaderboard sorted by score with 🥇🥈🥉, total score and player count | AC4: order and totals match the scores |
 | F5 | Share the leaderboard as text (Web Share, else clipboard) | AC5: text equals the format in §4 for a fixed game |
-| F6 | Reset all scores (confirm) and clear the session (confirm) | AC6: reset keeps players at 0; clear removes all |
+| F6 | Reset all scores (confirm) and clear the session (confirm) — 1.1: one alert with a choice (F13) | AC6: reset keeps players at 0; clear removes all |
 | F7 | Everything is saved on the device and restored after reload | AC7: state written by the **old** app loads unchanged in the new one |
 | F8 | Light / dark / system theme (Settings; the header theme button from 640 px up — phones use Settings since T-08) | AC8: choice survives reload |
 | F9 | Installable PWA, works offline; online/offline indicator; a new version waits for the user's Reload (T-08) | AC9: loads offline after first visit; installed copy keeps working after the update |
@@ -71,3 +71,23 @@
 ## 9. Acceptance and risks
 - Done when: AC1–AC9 pass on the live URL with data created by the old version; forge checks at 0 FAIL; baseline → after numbers recorded.
 - Risks: installed PWAs during the service-worker change; the storage-key migration; removing 2,189 tracked `node_modules` files from git history is **not** planned (only untracking).
+
+## 10. Version 1.1 (Moni 2026-11-20; PLAN T-15 = part A, T-16 = part B)
+> Approved by Moni's request of 2026-11-20 ("new features for 1.1"; decisions delegated). Behaviour changes
+> on purpose against the characterization tests are named in DECISIONS 2026-11-20.
+
+| ID | Feature | Acceptance |
+|---|---|---|
+| F13 | **Clear session with a choice** (A1): the header's Clear session button opens one alert "Clear session?" with a radio group — **Players and scores** (default) or **Scores only** (every player stays with 0) — and under it Cancel + a red confirm whose one-word label names the result ("Clear" / "Reset"). The Leaderboard card's Clear session and the Reset scores buttons (card and dialog) open the same alert; Reset scores opens it with Scores only checked. The separate "Reset all scores?" alert is gone | AC13: default clears everything (AC6 unchanged); Scores only → same players, all 0, empty histories; reopening shows the opener's default again; Cancel/Escape change nothing |
+| F14 | **A player's delete button with a choice** (A2): the same alert pattern, "Remove player or score?" — **Player and score** (default, removes the player) or **Score only** (score 0, history emptied, the player stays); confirm "Remove" / "Reset" | AC14: default removes the player (AC2 unchanged); Score only keeps the card at 0; other players unchanged |
+| F15 | **Score history** (A3, data): every score change (+1, −1, custom amount) is saved as an entry `{ id, delta, at }`; changes of the same player in the same direction ≤ 3 s apart (no other player in between) merge into one entry; up to 50 entries per player, older ones fold into the score; F13/F14 resets empty the history; saved with the game and in the export file | AC15: +1 ×3 quickly = one entry +3; a pause > 3 s starts a new one; score always = base + sum of the entries; a 1.0.0 game and a 1.0.0 export load/import with the same players and scores (empty histories); a damaged history in an import is refused with a reason |
+| F16 | **Last changes and history sheet** (B): each card shows a short "last changes" line (newest entries, e.g. "+3 · −1"); tapping it opens a sheet with the player's history (newest first, time + amount), each entry with an × that removes it at once and takes its points off the score | AC16: × on a +5 entry lowers the score by 5 and the entry is gone after reload; removal that would pass a limit says why and changes nothing |
+| F17 | **Last-scored highlight** (B): the card of the player with the newest history entry is marked (quietly, not like the leader) | AC17: scoring Boris after Ana moves the mark to Boris; removing Boris's newest entry moves it back |
+| F18 | **Rank badges and denser cards** (B): cards show the place 1/2/3 as a badge (ties share a place, "1224"); cards are denser so more fit on a phone screen | AC18: 34, 27, 27 → badges 1, 2, 2; the phone shows more cards per screen than 1.0.0 without targets < 44 px |
+
+- Interfaces for part B (core, `gg-counter-core`): `Player.history: readonly ScoreEntry[]`; `removeScoreEntry`,
+  `lastScoredPlayerId`, `rank(…).places` (ties share a place), `scoreBase`, `MAX_HISTORY_ENTRIES`, `MERGE_WINDOW_MS`; the
+  app hook `useGameState()` gives `removeScoreEntry(playerId, entryId)`, `lastScoredId` and `ranking.places`. No storage change.
+- Data (§5 update): the saved game is version 2 (each player has `history`); `score` stays the total, so an older cached
+  1.0.0 app still reads the scores (it drops the history). Key stays `gg-counter:v1:state`; export `schemaVersion` stays 1.
+- Not in 1.1: undo toast after a clear (the alert asks first); history of renames or of removed players.

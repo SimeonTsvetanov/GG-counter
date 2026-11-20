@@ -1,6 +1,6 @@
-<!-- From the forge template app-shell/templates/legal/privacy.md (legal-pages §2, 2026-11-07), filled for GG Counter and checked against the code on 2026-11-19 (PLAN T-10). Not legal advice. One bullet per layer the app really has. Placeholders are filled by scripts/legal.ts from app.config.ts. -->
+<!-- From the forge template app-shell/templates/legal/privacy.md (legal-pages §2, 2026-11-07), filled for GG Counter and checked against the code on 2026-11-19 (PLAN T-10) and on 2026-11-20 (score history, PLAN T-15). Not legal advice. One bullet per layer the app really has. Placeholders are filled by scripts/legal.ts from app.config.ts. -->
 
-**Privacy** — Last updated: 19 November 2026
+**Privacy** — Last updated: 20 November 2026
 
 - **Who is responsible:** {App} is made by Simeon Tsvetanov, {country} (contact: {email}). The
   players and scores you enter stay on your device and under your control only; where data
@@ -9,7 +9,8 @@
   not uploaded anywhere, and they are never put in the page address. The app loads nothing from
   other websites: no fonts, scripts, images or trackers from third parties.
 - **Stored on your device only:** your game (player names, scores and when they were last
-  changed), your settings (theme and language), the last version whose "What's new" you saw, and
+  changed, and for each player a history of their most recent score changes — the points of each
+  change and when it was made, up to 50 per player), your settings (theme and language), the last version whose "What's new" you saw, and
   a note that the data of the older version of {App} was copied over, are kept in your browser's
   local storage on this device. The older version's own copy of your game and theme stays there
   too, unchanged, until a later update removes it. When part of a new version cannot load and the
@@ -20,7 +21,7 @@
   export your game to a file, import it again, or delete everything with **Clear my data**; you
   can also clear this site's data in your browser.
 - **Export file:** **Export my data** saves a file (`gg-counter-data-YYYY-MM-DD.json`) with your
-  game, theme and language to your device. Where it goes from there is up to you. **Import data**
+  game (with each player's score history), theme and language to your device. Where it goes from there is up to you. **Import data**
   reads a file you choose on your device; it is not uploaded.
 - **Offline copy:** so {App} works without internet, your browser keeps an offline copy of the
   app's own files (not your game) in its Cache Storage, managed by a service worker. {App} does

@@ -5,8 +5,8 @@ import { MAX_NAME_LENGTH, MAX_PLAYERS, addPlayer, createEmptyGame, removePlayer,
 const NOW = "2026-11-19T10:00:00.000Z";
 const game: GameState = {
   players: [
-    { id: "a1", name: "Ana", score: 34, createdAt: "2025-12-01T19:00:00.000Z" },
-    { id: "b2", name: "Boris", score: 27, createdAt: "2025-12-01T19:00:05.000Z" },
+    { id: "a1", name: "Ana", score: 34, createdAt: "2025-12-01T19:00:00.000Z", history: [] },
+    { id: "b2", name: "Boris", score: 27, createdAt: "2025-12-01T19:00:05.000Z", history: [] },
   ],
   lastUpdated: "2025-12-01T21:30:00.000Z",
   version: 1,
@@ -14,14 +14,14 @@ const game: GameState = {
 
 /** A game with `count` players named P1…Pn. */
 function gameWith(count: number): GameState {
-  const players = Array.from({ length: count }, (_, i) => ({ id: `p${String(i)}`, name: `P${String(i + 1)}`, score: 0, createdAt: NOW }));
+  const players = Array.from({ length: count }, (_, i) => ({ id: `p${String(i)}`, name: `P${String(i + 1)}`, score: 0, createdAt: NOW, history: [] }));
   return { ...createEmptyGame(NOW), players };
 }
 
 describe("addPlayer", () => {
   it("appends a trimmed name with score 0, the given id and creation time", () => {
     const result = addPlayer(game, { name: "  Чен  ", id: "c3", createdAt: NOW });
-    expect(result).toEqual({ ok: true, value: { ...game, players: [...game.players, { id: "c3", name: "Чен", score: 0, createdAt: NOW }] } });
+    expect(result).toEqual({ ok: true, value: { ...game, players: [...game.players, { id: "c3", name: "Чен", score: 0, createdAt: NOW, history: [] }] } });
   });
   it("leaves the input game untouched", () => {
     const before = structuredClone(game);

@@ -1,20 +1,25 @@
 // React wrapper around the gg-counter-core game transitions: holds the game in a reducer, saves every
-// change to this browser (app/src/storage) and derives the ranking. All game rules live in core.
+// change to this browser (app/src/storage) and derives the ranking and the last-scored player. All game
+// rules (score history included, SPEC 1.1) live in core.
 import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import {
   addPlayer as addPlayerToGame,
   adjustScore as adjustScoreInGame,
+  lastScoredPlayerId,
   rank,
   removePlayer as removePlayerFromGame,
+  removeScoreEntry as removeScoreEntryInGame,
   renamePlayer as renamePlayerInGame,
+  resetPlayerScore as resetPlayerScoreInGame,
   resetScores as resetScoresInGame,
-  setScore as setScoreInGame,
   type AddPlayerErrorCode,
   type GameState,
   type NewPlayer,
   type Ranking,
   type RenamePlayerErrorCode,
   type Result,
+  type ScoreChange,
+  type ScoreEntryErrorCode,
   type ScoreErrorCode,
 } from "gg-counter-core";
 import { readGame, removeGame, writeGame } from "../storage/game";
@@ -23,8 +28,9 @@ type GameAction =
   | { type: "add-player"; player: NewPlayer }
   | { type: "remove-player"; id: string }
   | { type: "rename-player"; id: string; name: string }
-  | { type: "adjust-score"; id: string; delta: number }
-  | { type: "set-score"; id: string; score: number }
+  | { type: "adjust-score"; id: string; change: ScoreChange }
+  | { type: "remove-score-entry"; id: string; entryId: string }
+  | { type: "reset-player-score"; id: string }
   | { type: "reset-scores" }
   | { type: "replace"; state: GameState };
 
@@ -44,9 +50,11 @@ function gameReducer(state: GameState, action: GameAction): GameState {
     case "rename-player":
       return valueOr(state, renamePlayerInGame(state, action.id, action.name));
     case "adjust-score":
-      return valueOr(state, adjustScoreInGame(state, action.id, action.delta));
-    case "set-score":
-      return valueOr(state, setScoreInGame(state, action.id, action.score));
+      return valueOr(state, adjustScoreInGame(state, action.id, action.change));
+    case "remove-score-entry":
+      return valueOr(state, removeScoreEntryInGame(state, action.id, action.entryId));
+    case "reset-player-score":
+      return valueOr(state, resetPlayerScoreInGame(state, action.id));
     case "reset-scores":
       return resetScoresInGame(state);
     default:
@@ -62,9 +70,13 @@ export interface GameStateApi {
   removePlayer: (id: string) => void;
   /** Renames a player; the result says whether core accepted the name (limits, blank name). */
   renamePlayer: (id: string, name: string) => Result<GameState, RenamePlayerErrorCode>;
-  /** Changes a score; the result says whether core accepted it (score range). */
+  /** Changes a score and records it in the player's history; the result says whether core accepted it (score range). */
   adjustScore: (id: string, delta: number) => Result<GameState, ScoreErrorCode>;
-  setScore: (id: string, score: number) => void;
+  /** Removes one history entry and takes its points off the score (SPEC 1.1 F16); the result says why core refused. */
+  removeScoreEntry: (playerId: string, entryId: string) => Result<GameState, ScoreEntryErrorCode>;
+  /** Sets one player's score to 0 and empties their history; the player stays (SPEC 1.1 F14). */
+  resetPlayerScore: (id: string) => void;
+  /** Sets every score to 0 and empties every history; the players stay (SPEC F6, 1.1 F13). */
   resetScores: () => void;
   /** Deletes the saved game and starts an empty one. */
   resetGame: () => void;
@@ -73,8 +85,35 @@ export interface GameStateApi {
    * again, so a cleared game is not written back as an empty one.
    */
   reloadFromStorage: () => void;
-  /** Leaderboard order (ties in the order added), total score and leader. */
+  /** Leaderboard order (ties in the order added), places (ties share one), total score and leader. */
   ranking: Ranking;
+  /** The player with the newest history entry, or null (the last-scored highlight, SPEC 1.1 F17). */
+  lastScoredId: string | null;
+}
+
+/** The score actions of {@link useGameState}: change (recorded in the history), remove an entry, reset one or all. */
+function useScoreActions(state: GameState, dispatch: React.Dispatch<GameAction>): Pick<GameStateApi, "adjustScore" | "removeScoreEntry" | "resetPlayerScore" | "resetScores"> {
+  const adjustScore = useCallback(
+    (id: string, delta: number) => {
+      // Entry id and time are made here, once, so the reducer stays pure (as in addPlayer).
+      const change: ScoreChange = { delta, entryId: crypto.randomUUID(), at: new Date().toISOString() };
+      dispatch({ type: "adjust-score", id, change });
+      return adjustScoreInGame(state, id, change);
+    },
+    [state, dispatch]
+  );
+
+  const removeScoreEntry = useCallback(
+    (playerId: string, entryId: string) => {
+      dispatch({ type: "remove-score-entry", id: playerId, entryId });
+      return removeScoreEntryInGame(state, playerId, entryId);
+    },
+    [state, dispatch]
+  );
+
+  const resetPlayerScore = useCallback((id: string) => { dispatch({ type: "reset-player-score", id }); }, [dispatch]);
+  const resetScores = useCallback(() => { dispatch({ type: "reset-scores" }); }, [dispatch]);
+  return { adjustScore, removeScoreEntry, resetPlayerScore, resetScores };
 }
 
 /** Holds the game in a reducer and saves every change to this browser. */
@@ -111,18 +150,6 @@ export function useGameState(): GameStateApi {
     [state]
   );
 
-  const adjustScore = useCallback(
-    (id: string, delta: number) => {
-      dispatch({ type: "adjust-score", id, delta });
-      return adjustScoreInGame(state, id, delta);
-    },
-    [state]
-  );
-
-  const setScore = useCallback((id: string, score: number) => { dispatch({ type: "set-score", id, score }); }, []);
-
-  const resetScores = useCallback(() => { dispatch({ type: "reset-scores" }); }, []);
-
   const resetGame = useCallback(() => {
     removeGame();
     dispatch({ type: "replace", state: readGame() });
@@ -134,18 +161,19 @@ export function useGameState(): GameStateApi {
     dispatch({ type: "replace", state: stored });
   }, []);
 
+  const scoreActions = useScoreActions(state, dispatch);
   const ranking = useMemo(() => rank(state.players), [state.players]);
+  const lastScoredId = useMemo(() => lastScoredPlayerId(state), [state]);
 
   return {
     state,
     addPlayer,
     removePlayer,
     renamePlayer,
-    adjustScore,
-    setScore,
-    resetScores,
+    ...scoreActions,
     resetGame,
     reloadFromStorage,
     ranking,
+    lastScoredId,
   };
 }

@@ -30,18 +30,20 @@ The following image shows a player card: the name field and the trash button at 
 ## Remove a player
 
 1. In the player's card, select the trash button (**Remove**, followed by the player's name).
-2. In the **Remove player?** window, select **Remove**.
+2. In the **Remove player or score?** window, keep **Player and score** selected.
+3. Select **Remove**.
 
-The player and their score are gone. To keep the player, select **Cancel**.
+The player and their score are gone. To keep the player, select **Cancel**. To keep the player and set only their score to zero, select **Score only** in the same window. See [Change scores](change-scores.md#set-one-score-to-zero).
 
 ## Remove all players
 
 To start over with an empty game, remove every player at once:
 
 1. Select **Clear session**. It is the button with two circular arrows in the header, and the red text at the bottom of the **Leaderboard** card.
-2. In the **Clear session?** window, select **Clear**.
+2. In the **Clear session?** window, keep **Players and scores** selected.
+3. Select **Clear**.
 
-The game has no players and no scores. You can't undo this. To keep the players and set only the scores to zero, see [Change scores](change-scores.md#set-every-score-to-zero).
+The game has no players and no scores. You can't undo this. To keep the players and set only the scores to zero, select **Scores only** in the same window. See [Change scores](change-scores.md#set-every-score-to-zero).
 
 ## Related
 

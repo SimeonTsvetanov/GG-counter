@@ -44,14 +44,16 @@
     font-size: var(--text-md);
   }
 
-  /* Side by side like iOS, equal width; both go full width when a label does not fit one line. */
+  /* Side by side like iOS, equal width (they grow from 0 and never shrink below their one-line label); both go
+     full width, Cancel first and the confirm last in the thumb zone, when the labels do not fit one row. */
   .alert-actions {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
 
     & > * {
-      flex: 1 1 7rem;
+      flex: 1 1 0;
+      white-space: nowrap;
     }
   }
 

@@ -9,7 +9,7 @@ GG Counter saves your game only in the browser on the device you use. The file i
 1. Go to **Menu** > **Settings**.
 2. Under **Your data**, select **Export my data**.
 
-Your browser saves a file named `gg-counter-data-` followed by the date and `.json`, for example `gg-counter-data-2026-11-19.json`, and GG Counter shows a message that starts with **Saved** and names the file. The file holds the players, their scores, your theme and your language.
+Your browser saves a file named `gg-counter-data-` followed by the date and `.json`, for example `gg-counter-data-2026-11-19.json`, and GG Counter shows a message that starts with **Saved** and names the file. The file holds the players, their scores with the history of recent score changes, your theme and your language.
 
 The following image shows **Settings** with **Export my data**, **Import data** and **Clear my data**.
 

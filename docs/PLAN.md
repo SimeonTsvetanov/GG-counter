@@ -9,6 +9,8 @@
 - Pure functions + Zod schemas: `addPlayer`, `removePlayer`, `renamePlayer`, `adjustScore`, `setScore`,
   `resetScores`, `rank` (order, ties, totals), `formatLeaderboard` (share text), `parseSavedState`
   (reads version 1 exactly as today). Results are typed (`{ ok, value } | { ok, error }`).
+  1.1 (T-15): `adjustScore` records history; `removeScoreEntry`, `resetPlayerScore`, `lastScoredPlayerId`, `rank().places`,
+  `checkSavedGame` (strict import check); `setScore` removed (no caller; every change must be recorded).
 ### mcp — none (DECISIONS 2026-11-19).
 ### app (PWA, Level 2 — React)
 - `app/src/<feature>/` split of today's `app.tsx` (772 lines): players, score dialog, leaderboard, share.
@@ -152,6 +154,34 @@
   Open: forge `apps.json` entry; release gates still at FAIL — security-check (React DOM's `innerHTML` in the bundle;
   GitHub repo settings; the meta CSP is done) and pwa-check manifest id
   (kept on purpose); code/legal/ux/security reviews; Moni's "release approved"; tag `v1.0.0` + GitHub release.
+
+### T-15 · 1.1 part A: score history (data) and the two alerts with a choice
+- Goal: SPEC §10 F13–F15 — one "what to clear" alert for Clear session / Reset scores, the same pattern on each
+  player's delete button, every score change recorded (merge window, cap) and saved/exported with the game.
+- Files: `packages/core/src/{game,history,saved-history,saved-state,scores,ranking}.ts` (+ tests),
+  `app/src/storage/{index,game,migrate}.ts`, `app/src/hooks/use-game-state.ts`, `app/src/ui/choice-confirm-dialog.tsx`,
+  `app/src/styles/components/choice-list.css`, `app/src/session/`, `app/src/players/`, `app/src/leaderboard/`,
+  `app/src/i18n/{en,bg}.ts`, `tests/e2e/clear-and-history.spec.ts` (+ csp, game, i18n, storage specs), `tests/a11y/screens.json`,
+  `content/legal/privacy.md`, `docs/how-to/`, CHANGELOG.
+- Reading list: design → ui-patterns §2–4, accessibility §3–4, §6, css-architecture; engineering → browser-storage §8, §10,
+  code-quality, testing §3, react §6; app-shell → i18n §2, §5.
+- Acceptance: AC13–AC15; core properties (score = base + sum, cap, unique ids, range) with fast-check; 1.0.0 state and
+  export load unchanged (unit + e2e); `pnpm verify` ×2 green; a11y-check 0 FAIL en + bg with the new alert screens;
+  compliance-check 0 FAIL; no storage change needed by T-16.
+- Depends on: T-14 (1.0.0)
+- [x] done — 2026-11-20 (see STATUS); version bump to 1.1.0 waits for T-16.
+
+### T-16 · 1.1 part B: last changes, history sheet, last-scored highlight, rank badges, denser cards
+- Goal: SPEC §10 F16–F18 on the player cards, using T-15's data and API only (no storage change).
+- Files: `app/src/players/` (card, a history sheet), `app/src/styles/components/player-card.css`, i18n, e2e + a11y screens,
+  `docs/how-to/change-scores.md` (+ `tests/docs/shots.ts` images), CHANGELOG, version 1.1.0.
+- Reading list: design → ui-patterns §4–7 (sheets, undo vs confirm: × removes at once), moni-taste, responsive-layout;
+  engineering → react; app-shell → i18n. API: `Player.history`, `removeScoreEntry`, `lastScoredPlayerId` / hook
+  `lastScoredId`, `ranking.places` (SPEC §10).
+- Acceptance: AC16–AC18; `pnpm verify` ×2; a11y-check 0 FAIL en + bg incl. the history sheet; screenshots light + dark;
+  then version 1.1.0 (CHANGELOG dated, What's new).
+- Depends on: T-15
+- [ ] done
 
 ## 4. Follow-ups (dated)
 - **Not before 2026-12-19** — old-key removal release (T-14 rule above, DECISIONS 2026-11-19): delete

@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { DIRTY_STATE, MIGRATED_KEY, NEW_STATE_KEY, NEW_THEME_KEY, NULL_ENTRY_STATE, STATE_KEY, THEME_KEY, V0_STATE, V1_STATE } from "gg-counter-core/test-fixtures";
+import { DIRTY_STATE, MIGRATED_KEY, NEW_STATE_KEY, NEW_THEME_KEY, NULL_ENTRY_STATE, STATE_KEY, THEME_KEY, V0_STATE, V1_STATE, V1_STATE_READ } from "gg-counter-core/test-fixtures";
+import { GAME_VERSION } from "gg-counter-core";
 import { FakeStorage, OTHER_APPS, blockStorage, unblockStorage, useStorage } from "./fake-storage.ts";
 
 const NOW = "2026-11-19T12:00:00.000Z";
@@ -28,12 +29,12 @@ describe("migrateLegacyStorage", () => {
     const storage = useStorage(new FakeStorage({ [STATE_KEY]: OLD_STATE, [THEME_KEY]: "dark" }));
     const { migrateLegacyStorage, readGame, readTheme } = await start();
     expect(migrateLegacyStorage(NOW)).toEqual({ outcomes: { state: "copied", theme: "copied" }, markerWritten: true });
-    expect(JSON.parse(storage.getItem(NEW_STATE_KEY) ?? "")).toEqual(V1_STATE);
+    expect(JSON.parse(storage.getItem(NEW_STATE_KEY) ?? "")).toEqual(V1_STATE_READ);
     expect(storage.getItem(NEW_THEME_KEY)).toBe("\"dark\"");
     expect(markerOf(storage)).toEqual({ migratedAt: NOW, sourceVersion: 1, items: ["state", "theme"] });
     expect(storage.getItem(STATE_KEY)).toBe(OLD_STATE);
     expect(storage.getItem(THEME_KEY)).toBe("dark");
-    expect(readGame(NOW)).toEqual(V1_STATE);
+    expect(readGame(NOW)).toEqual(V1_STATE_READ);
     expect(readTheme()).toBe("dark");
   });
 
@@ -90,7 +91,7 @@ describe("migrateLegacyStorage", () => {
       migrateLegacyStorage(NOW);
       const game = readGame(NOW);
       expect(game.players.map((p) => p.name)).toEqual(names);
-      expect(game.version).toBe(1);
+      expect(game.version).toBe(GAME_VERSION);
     }
   });
 
@@ -124,7 +125,7 @@ describe("migrateLegacyStorage", () => {
       const { migrateLegacyStorage, readGame } = await start();
       expect(migrateLegacyStorage(NOW)).toEqual({ outcomes: { state: "not-saved", theme: "not-saved" }, markerWritten: false });
       expect(storage.snapshot()).toEqual({ [STATE_KEY]: OLD_STATE, [THEME_KEY]: "dark" });
-      expect(readGame(NOW)).toEqual(V1_STATE);
+      expect(readGame(NOW)).toEqual(V1_STATE_READ);
     }
   });
 

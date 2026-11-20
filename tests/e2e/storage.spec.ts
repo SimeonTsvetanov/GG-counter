@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { MIGRATED_KEY, NEW_STATE_KEY, NEW_THEME_KEY, STATE_KEY, THEME_KEY, V0_STATE, V1_STATE } from "../../packages/core/test/fixtures/saved-state";
+import { MIGRATED_KEY, NEW_STATE_KEY, NEW_THEME_KEY, STATE_KEY, THEME_KEY, V0_STATE, V1_STATE, V1_STATE_READ } from "../../packages/core/test/fixtures/saved-state";
 
 // PLAN T-07: the one-time copy of the pre-forge keys to `gg-counter:v1:*` in the real app, and the
 // shared origin: other apps' keys are never read or changed (engineering → browser-storage §2).
@@ -45,7 +45,9 @@ test("only old keys: after two reloads the new keys hold the same game and theme
   await expect(playerNames(page)).toHaveCount(3);
   await expect(page.locator("html")).toHaveClass(/dark/);
   const stored = await storageOf(page);
-  expect(gameIn(stored[NEW_STATE_KEY])).toEqual(V1_STATE);
+  // 1.1 (DECISIONS 2026-11-20): the copy is stored in the current game format — same players and scores,
+  // empty score histories, version 2; the marker still names the source format (version 1).
+  expect(gameIn(stored[NEW_STATE_KEY])).toEqual(V1_STATE_READ);
   expect(stored[NEW_THEME_KEY]).toBe("\"dark\"");
   expect(JSON.parse(stored[MIGRATED_KEY] ?? "null") as unknown).toMatchObject({ sourceVersion: 1, items: ["state", "theme"] });
   expect(stored[STATE_KEY]).toBe(oldState);

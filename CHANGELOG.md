@@ -4,6 +4,15 @@ All notable user-facing changes. Format: Keep a Changelog · SemVer.
 
 ## [Unreleased]
 
+### Added
+- Clear session now asks what to clear: **Players and scores** (as before, selected) or **Scores only**, which
+  keeps everyone in the game with 0 points — no more resetting players one by one for a new game. **Reset
+  scores** opens the same window with **Scores only** selected.
+- A player's delete button asks the same way: **Player and score** (as before, selected) or **Score only**,
+  which keeps the player with 0 points.
+- Every score change is now remembered with its time (up to the last 50 per player; quick taps in a row
+  count as one change), saved on this device and in the export file. Files exported by 1.0.0 still import.
+
 ### Fixed
 - The on-screen keyboard no longer covers the buttons of a window with a text field (for example Apply in Adjust score): the window now sits above the keyboard on Android and on iPhone.
 

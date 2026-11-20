@@ -90,9 +90,12 @@ test("add, score, rename and remove with a confirmation — in Bulgarian", async
   await page.getByRole("textbox", { name: "Име на играча Борис" }).press("Enter");
   await expect.poll(() => scoreOf(page, "Боби")).toBe(-1);
   await page.getByRole("button", { name: "Премахни Ана" }).click();
-  const confirm = page.getByRole("alertdialog", { name: "Да се премахне ли играчът?" });
-  await expect(confirm).toContainText("Това премахва Ана заедно с точките.");
-  await confirm.getByRole("button", { name: "Премахни" }).click();
+  // 1.1 (SPEC F14, DECISIONS 2026-11-20): the alert asks what to remove; "Играча и точките" is the default.
+  const confirm = page.getByRole("alertdialog", { name: "Да се премахне ли играчът или точките?" });
+  await expect(confirm).toContainText("Изберете какво да се премахне за Ана.");
+  await expect(confirm.getByRole("radio", { name: "Играча и точките" })).toBeChecked();
+  await expect(confirm.getByRole("radio", { name: "Само точките" })).not.toBeChecked();
+  await confirm.getByRole("button", { name: "Премахни", exact: true }).click();
   await expect(playerNames(page)).toHaveCount(1);
   await expect(page.getByText("1 играч", { exact: true }).first()).toBeVisible();
 });
@@ -117,7 +120,12 @@ test("leaderboard, share text and clear session — in Bulgarian", async ({ page
   await clear.getByRole("button", { name: "Отказ" }).click();
   await expect(playerNames(page)).toHaveCount(3);
   await page.getByRole("button", { name: "Изчисти сесията" }).first().click();
-  await clear.getByRole("button", { name: "Изчисти" }).click();
+  // 1.1 (SPEC F13): the default option "Играчите и точките" clears everything, as before.
+  await expect(clear.getByRole("radio", { name: "Играчите и точките" })).toBeChecked();
+  await clear.getByText("Само точките").click();
+  await expect(clear.getByRole("button").last()).toHaveText("Нулирай");
+  await clear.getByText("Играчите и точките").click();
+  await clear.getByRole("button", { name: "Изчисти", exact: true }).click();
   await expect(playerNames(page)).toHaveCount(0);
 });
 

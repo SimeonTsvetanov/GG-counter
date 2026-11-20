@@ -20,16 +20,22 @@ interface PlayerCardProps {
   isLeader: boolean;
   onRename: GameStateApi["renamePlayer"];
   onRemove: (id: string) => void;
+  /** Sets this player's score to 0 (the "Score only" option of the delete alert). */
+  onResetScore: (id: string) => void;
   onAdjust: GameStateApi["adjustScore"];
+  /** Moves focus to a logical next element once this card is gone (its player was removed). */
+  focusAfterRemove: () => void;
 }
 
-/** One player's card: editable name, remove (with confirmation) and score controls. */
+/** One player's card: editable name, remove or reset the score (one alert with a choice) and score controls. */
 export function PlayerCard({
   player,
   isLeader,
   onRename,
   onRemove,
+  onResetScore,
   onAdjust,
+  focusAfterRemove,
 }: PlayerCardProps): React.JSX.Element {
   const [name, setName] = useState(player.name);
   const [nameError, setNameError] = useState<LimitCode | null>(null);
@@ -87,7 +93,9 @@ export function PlayerCard({
           />
           <RemovePlayerButton
             playerName={player.name}
-            onConfirm={() => { onRemove(player.id); }}
+            onRemove={() => { onRemove(player.id); }}
+            onResetScore={() => { onResetScore(player.id); }}
+            focusAfterRemove={focusAfterRemove}
           />
         </div>
         <p id={ids.name} role="alert" className="field-error">{nameError && limitMessage(nameError)}</p>

@@ -8,7 +8,7 @@ import { leaderboardLabels, snapshotTime } from "../../src/share/share-text.ts";
 
 /** A player with `name` (also the id) and `score`. */
 function player(name: string, score: number): Player {
-  return { id: name, name, score, createdAt: "2026-11-19T10:00:00.000Z" };
+  return { id: name, name, score, createdAt: "2026-11-19T10:00:00.000Z", history: [] };
 }
 
 afterEach(async () => { await applyLanguage("en"); });

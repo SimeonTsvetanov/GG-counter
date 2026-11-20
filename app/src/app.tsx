@@ -11,11 +11,10 @@ import { CARD_WIDTH_CLASS, CONTAINER_CLASS } from "./lib/layout";
 import { PlayersSection } from "./players/players-section";
 import type { SessionActions } from "./session/action-bar";
 import { AppHeader } from "./session/app-header";
-import { ClearSessionDialog } from "./session/clear-session-dialog";
-import { ResetScoresDialog } from "./session/reset-scores-dialog";
+import { ClearSessionDialog, type ClearScope } from "./session/clear-session-dialog";
 import { shareLeaderboard } from "./share/share-leaderboard";
 import { useTheme } from "./providers/theme-provider";
-import { applyLanguage, t } from "./i18n";
+import { applyLanguage } from "./i18n";
 import { useLanguage } from "./i18n/use-language";
 import { AppFooter } from "./ui/app-footer";
 import { CrashTestHook } from "./ui/error-boundary";
@@ -29,14 +28,14 @@ const AT_TOP_THRESHOLD = 0;
 
 /** The whole GG Counter screen: players, scores, leaderboard, share, install banner, how it works and FAQ. */
 export function App(): React.JSX.Element {
-  // Re-renders the whole screen (every t() call below) when the language changes in Settings.
+  // Re-renders the whole screen (every t() call in it) when the language changes in Settings.
   const lang = useLanguage();
   const game = useGameState();
   const shell = useAppShell();
   const { setTheme } = useTheme();
   const [isLeaderboardDialogOpen, setIsLeaderboardDialogOpen] = useState(false);
-  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
-  const [isClearDialogOpen, setIsClearDialogOpen] = useState(false);
+  // The one Clear session alert: which option it opens with, or null while it is closed.
+  const [clearRequest, setClearRequest] = useState<ClearScope | null>(null);
 
   const addInputRef = useRef<HTMLInputElement>(null);
   const addCardRef = useRef<HTMLDivElement>(null);
@@ -57,8 +56,8 @@ export function App(): React.JSX.Element {
       addInputRef.current?.focus();
     },
     onShare: handleShare,
-    onRequestReset: () => { setIsResetDialogOpen(true); },
-    onRequestClear: () => { setIsClearDialogOpen(true); },
+    onRequestReset: () => { setClearRequest("scores"); },
+    onRequestClear: () => { setClearRequest("all"); },
   };
 
   return (
@@ -86,6 +85,7 @@ export function App(): React.JSX.Element {
             onAddPlayer={game.addPlayer}
             onRename={game.renamePlayer}
             onRemove={game.removePlayer}
+            onResetScore={game.resetPlayerScore}
             onAdjust={game.adjustScore}
             addCardRef={addCardRef}
             addInputRef={addInputRef}
@@ -95,7 +95,7 @@ export function App(): React.JSX.Element {
             ranking={game.ranking}
             onShare={handleShare}
             onRequestReset={actions.onRequestReset}
-            onClear={game.resetGame}
+            onRequestClear={actions.onRequestClear}
           />
           {/* How it works + FAQ from index.html, below the tool (filled by usePageInfo). */}
           <div ref={pageInfoSlotRef} className={CARD_WIDTH_CLASS} />
@@ -104,21 +104,12 @@ export function App(): React.JSX.Element {
         <AppFooter runItem={shell.runItem} />
       </div>
 
-      <ResetScoresDialog
-        open={isResetDialogOpen}
-        onOpenChange={setIsResetDialogOpen}
-        onConfirm={() => {
-          game.resetScores();
-          setIsResetDialogOpen(false);
-        }}
-      />
       <ClearSessionDialog
-        open={isClearDialogOpen}
-        onOpenChange={setIsClearDialogOpen}
-        description={t("app.session.clearFromHeader")}
-        onConfirm={() => {
-          game.resetGame();
-          setIsClearDialogOpen(false);
+        request={clearRequest}
+        onRequestChange={setClearRequest}
+        onConfirm={(scope) => {
+          if (scope === "all") game.resetGame();
+          else game.resetScores();
         }}
       />
       <ShellDialogs

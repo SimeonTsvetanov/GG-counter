@@ -211,6 +211,72 @@
     ]
   },
   {
+    "name": "clear-session-alert",
+    "actions": [
+      {
+        "fill": ".card-content input.field",
+        "text": "Ana"
+      },
+      {
+        "click": ".card-content .button--primary"
+      },
+      {
+        "click": "[data-action=\"clear-session\"]"
+      },
+      {
+        "wait": 400
+      }
+    ]
+  },
+  {
+    "name": "clear-session-scores-only",
+    "actions": [
+      {
+        "fill": ".card-content input.field",
+        "text": "Ana"
+      },
+      {
+        "click": ".card-content .button--primary"
+      },
+      {
+        "click": "[data-action=\"clear-session\"]"
+      },
+      {
+        "wait": 400
+      },
+      {
+        "click": "[role=\"alertdialog\"] .choice:last-of-type"
+      },
+      {
+        "wait": 200
+      }
+    ]
+  },
+  {
+    "name": "remove-alert-score-only",
+    "actions": [
+      {
+        "fill": ".card-content input.field",
+        "text": "Ana"
+      },
+      {
+        "click": ".card-content .button--primary"
+      },
+      {
+        "click": ".player-card-head .button"
+      },
+      {
+        "wait": 400
+      },
+      {
+        "click": "[role=\"alertdialog\"] .choice:last-of-type"
+      },
+      {
+        "wait": 200
+      }
+    ]
+  },
+  {
     "name": "score-dialog",
     "actions": [
       {

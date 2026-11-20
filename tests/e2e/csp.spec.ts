@@ -4,7 +4,8 @@ import { NEW_STATE_KEY, V1_STATE } from "../../packages/core/test/fixtures/saved
 
 // Security §1: the meta CSP of scripts/csp.ts must not block anything the app does. Every test records
 // `securitypolicyviolation` events (all pages, also after navigations) and the browser's CSP console
-// errors, and fails on any of them — main flows, dialogs, menus, Bulgarian, offline and the static pages.
+// errors, and fails on any of them — main flows, dialogs (1.1: the alerts with a choice), menus, Bulgarian,
+// offline and the static pages.
 
 /** Starts recording CSP violations of every document the page loads; returns the live list. */
 async function watchCsp(page: Page): Promise<string[]> {
@@ -71,6 +72,20 @@ test("the game, its dialogs, every menu entry and a theme change raise no CSP vi
   await adjust.getByRole("button", { name: "Apply" }).click();
   await expect(adjust).toBeHidden();
 
+  // The 1.1 alerts with a choice (SPEC 1.1 F13, F14): Clear session / Reset scores and a player's delete button.
+  await page.getByRole("button", { name: "Clear session" }).first().click();
+  const clear = page.getByRole("alertdialog", { name: "Clear session?" });
+  await clear.getByText("Scores only").click();
+  await expect(clear.getByRole("radio", { name: "Scores only" })).toBeChecked();
+  await expect.poll(() => bodyOverflow(page)).toBe("hidden");
+  await clear.getByRole("button", { name: "Cancel" }).click();
+  await expect(clear).toBeHidden();
+  await page.getByRole("button", { name: "Remove Ana" }).click();
+  const remove = page.getByRole("alertdialog", { name: "Remove player or score?" });
+  await remove.getByText("Score only").click();
+  await remove.getByRole("button", { name: "Reset", exact: true }).click();
+  await expect(remove).toBeHidden();
+
   for (const [item, dialog] of [["Help", "Help"], ["What's new", "What's new"], ["About", `About ${app.name}`], ["Report a problem", "Report a problem"], ["Privacy", "Privacy"]] as const) {
     await openAndClose(page, item, dialog);
   }
@@ -95,6 +110,10 @@ test("Bulgarian (the lazy language chunk) and its dialogs raise no CSP violation
   await page.getByRole("button", { name: "Промени точките на Ana" }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "Премахни Ana" }).click();
+  await page.getByRole("alertdialog").getByText("Само точките").click();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("alertdialog")).toBeHidden();
   for (const hash of ["#help", "#settings", "#about", "#privacy"]) {
     await page.goto(`./${hash}`);
     await expect(page.getByRole("dialog")).toBeVisible();

@@ -11,7 +11,7 @@ The header has icon buttons, in the following order. Each has a name that screen
 | **Open leaderboard** (trophy) | Opens the **Leaderboard** window with **Share**, **Reset scores** and **OK**. |
 | **Add player** (plus) | Scrolls to the **Add Player** card and puts the cursor in the name field. |
 | **Share session** (share icon) | Shares the leaderboard as text. Does nothing while the game has no players. |
-| **Clear session** (circular arrows) | Asks to remove all players and scores. |
+| **Clear session** (circular arrows) | Asks what to clear: **Players and scores** (selected) or **Scores only**. |
 | **Toggle theme** (sun or moon) | Opens a menu with **Light**, **Dark** and **System**. Shown only when the window is wider than 600 pixels. |
 | **Open menu** (three lines) | Opens the menu. |
 

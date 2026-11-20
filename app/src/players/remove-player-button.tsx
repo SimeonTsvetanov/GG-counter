@@ -1,54 +1,46 @@
-// The trash button on a player card and its "Remove player?" confirmation.
+// The trash button on a player card and its alert (SPEC F2, 1.1 F14): remove the player (the default) or reset
+// only their score — the same choice alert as Clear session (app/src/ui/choice-confirm-dialog.tsx).
 import { Trash2 } from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "../components/ui/alert-dialog";
 import { Button } from "../components/ui/button";
 import { t } from "../i18n";
+import { ChoiceConfirmDialog } from "../ui/choice-confirm-dialog";
+
+/** What the trash button removes: the player, or only the score and its history. */
+type RemoveScope = "player" | "score";
 
 /** Props of {@link RemovePlayerButton}. */
 interface RemovePlayerButtonProps {
   playerName: string;
-  /** Removes the player (after the confirmation). */
-  onConfirm: () => void;
+  /** Removes the player (after the alert). */
+  onRemove: () => void;
+  /** Sets the player's score to 0 and empties their history (after the alert). */
+  onResetScore: () => void;
+  /** Moves focus on once the player (and so this button) is gone. */
+  focusAfterRemove: () => void;
 }
 
-/** Asks before removing one player and their score. */
-export function RemovePlayerButton({ playerName, onConfirm }: RemovePlayerButtonProps): React.JSX.Element {
+/** Asks whether to remove one player or only their score, then does it. */
+export function RemovePlayerButton({ playerName, onRemove, onResetScore, focusAfterRemove }: RemovePlayerButtonProps): React.JSX.Element {
+  const name = { name: playerName };
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={t("app.players.remove", { name: playerName })}
-          className="text-text-secondary"
-        >
+    <ChoiceConfirmDialog<RemoveScope>
+      trigger={
+        <Button variant="ghost" size="icon" aria-label={t("app.players.remove", name)} className="text-text-secondary" data-remove-player="">
           <Trash2 aria-hidden />
         </Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>{t("app.players.removeTitle")}</AlertDialogTitle>
-          <AlertDialogDescription>
-            {t("app.players.removeMessage", { name: playerName })}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>{t("shell.cancel")}</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm}>
-            {t("app.players.removeConfirm")}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+      }
+      title={t("app.players.removeTitle")}
+      description={t("app.players.removeMessage", name)}
+      legend={t("app.players.removeLegend")}
+      options={[
+        { value: "player", label: t("app.players.removePlayer"), hint: t("app.players.removePlayerHint", name), confirm: t("app.players.removePlayerConfirm") },
+        { value: "score", label: t("app.players.removeScore"), hint: t("app.players.removeScoreHint", name), confirm: t("app.players.removeScoreConfirm") },
+      ]}
+      focusFallback={focusAfterRemove}
+      onConfirm={(scope) => {
+        if (scope === "player") onRemove();
+        else onResetScore();
+      }}
+    />
   );
 }

@@ -31,7 +31,7 @@ export function addPlayer(game: GameState, input: NewPlayer): Result<GameState, 
   if (game.players.length >= MAX_PLAYERS) {
     return fail("PLAYERS_TOO_MANY", `A game can have at most ${String(MAX_PLAYERS)} players.`);
   }
-  const player: Player = { id: input.id, name: name.value, score: 0, createdAt: input.createdAt };
+  const player: Player = { id: input.id, name: name.value, score: 0, createdAt: input.createdAt, history: [] };
   return ok({ ...game, players: [...game.players, player] });
 }
 

@@ -1,7 +1,7 @@
 // The storage module's "my data" functions (engineering → browser-storage §3, §8): export, import and
 // clear this app's data. Called by Settings and the error screen (PLAN T-08). The game, theme, language and migration
 // have their own files next to this one; nothing outside app/src/storage touches localStorage (ESLint rule).
-import { parseSavedState, type GameState, type Result } from "gg-counter-core";
+import { checkSavedGame, type GameState, type Result } from "gg-counter-core";
 import { APP_ID, STORAGE_KEYS, isOwnKey } from "./keys";
 import { listKeys, readRaw, removeRaw, writeRaw, type StorageErrorCode, type StorageResult } from "./local-store";
 import { encodeGame, readGame } from "./game";
@@ -9,10 +9,16 @@ import { isTheme, readTheme, writeTheme, type Theme } from "./theme";
 import { isLanguage, readLanguage, writeLanguage } from "./lang";
 import type { LanguageCode } from "../config";
 
-/** The export format version; bumped (with an import migration) when `data` changes shape. */
+/**
+ * The export format version; bumped (with an import migration) when the file's shape changes.
+ *
+ * @remarks Still 1 in GG Counter 1.1: the score history is an added field of each player, versioned by the
+ * game's own `version` (2), so 1.0.0 files import unchanged and a 1.0.0 app still imports a 1.1 file
+ * (without the history) — DECISIONS 2026-11-20.
+ */
 export const EXPORT_SCHEMA_VERSION = 1;
 
-/** Largest import accepted, in characters: a 50-player game is ~10 KB, so this bounds a hostile file. */
+/** Largest import accepted, in characters: a 50-player game with full histories is ~250 KB, so this bounds a hostile file. */
 export const MAX_IMPORT_CHARS = 1_000_000;
 
 /** The app's data as saved in an export file. */
@@ -93,12 +99,9 @@ export function checkImport(text: string, now: string = new Date().toISOString()
   }
   const lang = data.lang ?? null;
   if (lang !== null && !isLanguage(lang)) return rejected("IMPORT_INVALID", "The file is damaged: its language is unknown.");
-  const players = data.state.players;
-  const game = parseSavedState(data.state, now);
-  // because parseSavedState drops invalid players, and an import must never apply part of a game
-  if (!Array.isArray(players) || !game.ok || game.value.players.length !== players.length) {
-    return rejected("IMPORT_INVALID", "The file is damaged: some players cannot be read.");
-  }
+  // Strict: an import never applies part of a game (a dropped player or history entry refuses the file).
+  const game = checkSavedGame(data.state, now);
+  if (!game.ok) return rejected("IMPORT_INVALID", `The file is damaged. ${game.error.message}`);
   return { ok: true, value: { state: game.value, theme: data.theme, lang } };
 }
 

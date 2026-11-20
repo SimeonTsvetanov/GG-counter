@@ -5,7 +5,7 @@ import { rank, type Player } from "../src/index.ts";
 
 /** A player with `name` (also used as id) and `score`. */
 function player(name: string, score: number): Player {
-  return { id: name, name, score, createdAt: "2025-12-01T19:00:00.000Z" };
+  return { id: name, name, score, createdAt: "2025-12-01T19:00:00.000Z", history: [] };
 }
 
 const players = fc.uniqueArray(fc.record({ id: fc.string(), score: fc.integer({ min: -999_999, max: 999_999 }) }), { selector: (p) => p.id, maxLength: 60 }).map((list) => list.map((p) => player(p.id, p.score)));
@@ -23,7 +23,7 @@ describe("rank (examples)", () => {
     expect(ranking.leader?.name).toBe("B");
   });
   it("no players → empty order, total 0, no leader", () => {
-    expect(rank([])).toEqual({ players: [], totalScore: 0, leader: null });
+    expect(rank([])).toEqual({ players: [], places: new Map(), totalScore: 0, leader: null });
   });
   it("does not reorder the input array", () => {
     const input = [player("A", 1), player("B", 2)];
@@ -56,6 +56,23 @@ describe("rank (properties)", () => {
       const ranking = rank(list);
       expect(ranking.totalScore).toBe(list.reduce((sum, p) => sum + p.score, 0));
       expect(ranking.leader).toBe(ranking.players[0] ?? null);
+    }));
+  });
+});
+
+describe("rank → places (rank badges, SPEC 1.1 F18)", () => {
+  it("ties share a place and the next place skips (34, 27, 27, 5 → 1, 2, 2, 4)", () => {
+    const ranking = rank([player("A", 27), player("B", 34), player("C", 5), player("D", 27)]);
+    expect([...ranking.places]).toEqual([["B", 1], ["A", 2], ["D", 2], ["C", 4]]);
+  });
+  it("everyone at 0 shares place 1", () => {
+    expect([...rank([player("A", 0), player("B", 0)]).places.values()]).toEqual([1, 1]);
+  });
+  it("property: a place is 1 + the number of players with a higher score", () => {
+    fc.assert(fc.property(players, (list) => {
+      const { places } = rank(list);
+      expect(places.size).toBe(list.length);
+      for (const p of list) expect(places.get(p.id)).toBe(1 + list.filter((other) => other.score > p.score).length);
     }));
   });
 });

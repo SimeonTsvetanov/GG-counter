@@ -1,6 +1,6 @@
 // The players part of the main screen: the grid of player cards and the Add player card (alone
 // while there are no players, below the grid afterwards).
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { Player } from "gg-counter-core";
 import type { GameStateApi } from "../hooks/use-game-state";
 import { AddPlayerCard } from "./add-player-card";
@@ -16,11 +16,12 @@ interface PlayersSectionProps {
   onAddPlayer: GameStateApi["addPlayer"];
   onRename: GameStateApi["renamePlayer"];
   onRemove: GameStateApi["removePlayer"];
+  onResetScore: GameStateApi["resetPlayerScore"];
   onAdjust: GameStateApi["adjustScore"];
   /** Attached to the Add player card's wrapper. */
   addCardRef: React.Ref<HTMLDivElement>;
-  /** Attached to the Add player name field. */
-  addInputRef: React.Ref<HTMLInputElement>;
+  /** Attached to the Add player name field (also the focus target once the last player is removed). */
+  addInputRef: React.RefObject<HTMLInputElement | null>;
 }
 
 /** Renders the player cards and the Add player card; keeps the name being typed. */
@@ -30,12 +31,22 @@ export function PlayersSection({
   onAddPlayer,
   onRename,
   onRemove,
+  onResetScore,
   onAdjust,
   addCardRef,
   addInputRef,
 }: PlayersSectionProps): React.JSX.Element {
   const [newPlayerName, setNewPlayerName] = useState("");
   const [addError, setAddError] = useState<LimitCode | null>(null);
+  const gridRef = useRef<HTMLElement>(null);
+
+  /** After a player is removed, focuses the delete button now at `index` (the next player), else the last one, else the Add field (accessibility §3). */
+  const focusAfterRemove = (index: number) => {
+    const buttons = Array.from(gridRef.current?.querySelectorAll<HTMLElement>("[data-remove-player]") ?? []);
+    const next = buttons.at(Math.min(index, buttons.length - 1));
+    if (next === undefined) addInputRef.current?.focus();
+    else next.focus();
+  };
 
   const handleAddPlayer = () => {
     // Core trims the name and rejects a blank or over-limit one; rejected text stays in the field.
@@ -69,15 +80,17 @@ export function PlayersSection({
 
   return (
     <>
-      <section className="player-grid">
-        {players.map((player) => (
+      <section ref={gridRef} className="player-grid">
+        {players.map((player, index) => (
           <PlayerCard
             key={player.id}
             player={player}
             isLeader={leaderId === player.id}
             onRename={onRename}
             onRemove={onRemove}
+            onResetScore={onResetScore}
             onAdjust={onAdjust}
+            focusAfterRemove={() => { focusAfterRemove(index); }}
           />
         ))}
       </section>

@@ -4,7 +4,7 @@ GG Counter keeps your game on your device and nowhere else. This page explains w
 
 ## Everything stays on your device
 
-GG Counter has no server for your game, no accounts, no ads, no tracking, no cookies and no analytics. It loads nothing from other websites, and player names and scores never appear in the page address. The players, scores, theme and language you choose are kept in your browser's local storage on this device, so the game is still there the next time you open GG Counter. The author can't see, back up or recover it. Use **Export my data** if you want a copy, and enter only names of people who are fine with it.
+GG Counter has no server for your game, no accounts, no ads, no tracking, no cookies and no analytics. It loads nothing from other websites, and player names and scores never appear in the page address. The players, scores, the history of recent score changes (points and time of each, up to 50 per player), theme and language you choose are kept in your browser's local storage on this device, so the game is still there the next time you open GG Counter. The author can't see, back up or recover it. Use **Export my data** if you want a copy, and enter only names of people who are fine with it.
 
 ## The offline copy
 

@@ -1,5 +1,6 @@
 // The Leaderboard card at the end of the main screen: leader, ranked players, Share, Reset scores
-// and Clear session. The header watches this card to switch its layout when it scrolls away.
+// and Clear session (both open the one Clear session alert, SPEC 1.1 F13). The header watches this card
+// to switch its layout when it scrolls away.
 import type { Ranking } from "gg-counter-core";
 import { RefreshCw, Share2, Trophy } from "lucide-react";
 import { Button } from "../components/ui/button";
@@ -13,7 +14,6 @@ import {
 } from "../components/ui/card";
 import { CARD_WIDTH_CLASS } from "../lib/layout";
 import { t } from "../i18n";
-import { ClearSessionDialog } from "../session/clear-session-dialog";
 import { PodiumList } from "./podium-list";
 
 /** Props of {@link LeaderboardCard}. */
@@ -22,10 +22,10 @@ interface LeaderboardCardProps {
   ref: React.Ref<HTMLDivElement>;
   ranking: Ranking;
   onShare: () => void;
-  /** Asks to reset all scores (opens the reset confirmation). */
+  /** Opens the Clear session alert with "Scores only" checked. */
   onRequestReset: () => void;
-  /** Deletes all players and scores (after this card's own confirmation). */
-  onClear: () => void;
+  /** Opens the Clear session alert with "Players and scores" checked. */
+  onRequestClear: () => void;
 }
 
 /** Shows the leader and the ranked players with the session actions. */
@@ -34,7 +34,7 @@ export function LeaderboardCard({
   ranking,
   onShare,
   onRequestReset,
-  onClear,
+  onRequestClear,
 }: LeaderboardCardProps): React.JSX.Element {
   const isEmpty = ranking.players.length === 0;
 
@@ -66,9 +66,7 @@ export function LeaderboardCard({
           <Button variant="secondary" onClick={onRequestReset} disabled={isEmpty}>
             <RefreshCw aria-hidden /> {t("app.leaderboard.reset")}
           </Button>
-          <ClearSessionDialog description={t("app.session.clearFromCard")} onConfirm={onClear}>
-            <Button variant="destructive">{t("app.header.clear")}</Button>
-          </ClearSessionDialog>
+          <Button variant="destructive" onClick={onRequestClear}>{t("app.header.clear")}</Button>
         </CardFooter>
       </Card>
     </div>

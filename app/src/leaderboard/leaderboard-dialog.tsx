@@ -23,7 +23,7 @@ interface LeaderboardDialogProps {
   /** All players, ranked by score. */
   players: readonly Player[];
   onShare: () => void;
-  /** Asks to reset all scores (opens the reset confirmation). */
+  /** Opens the Clear session alert with "Scores only" checked. */
   onRequestReset: () => void;
   /** The button that opens the dialog. */
   children: React.ReactNode;

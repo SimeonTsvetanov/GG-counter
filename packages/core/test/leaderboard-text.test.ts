@@ -4,7 +4,7 @@ import { ENGLISH_LEADERBOARD_LABELS, bulgarianOrdinal, formatLeaderboard, type L
 
 /** A player with `name` (also used as id) and `score`. */
 function player(name: string, score: number): Player {
-  return { id: name, name, score, createdAt: "2025-12-01T19:00:00.000Z" };
+  return { id: name, name, score, createdAt: "2025-12-01T19:00:00.000Z", history: [] };
 }
 
 describe("formatLeaderboard", () => {

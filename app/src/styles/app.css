@@ -23,6 +23,7 @@
 @import "./components/disclosure.css";
 @import "./components/modal.css";
 @import "./components/alert.css";
+@import "./components/choice-list.css";
 @import "./components/menu.css";
 @import "./components/settings.css";
 @import "./components/help.css";

@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { expect, test, type Page } from "@playwright/test";
 import { app } from "../../app.config.ts";
-import { NEW_STATE_KEY, V1_STATE } from "../../packages/core/test/fixtures/saved-state";
+import { NEW_STATE_KEY, V1_STATE, V1_STATE_READ } from "../../packages/core/test/fixtures/saved-state";
 
 // PLAN T-08: the app shell — menu (keyboard), Settings (theme, export → clear → import), Help, What's
 // new, About, Report a problem, the limit messages and the error screen. Desktop + phone.
@@ -91,7 +91,8 @@ test("Settings: export → clear my data → import gives back the same game", a
   const fileText = await readFile(file, "utf8");
   const exported = JSON.parse(fileText) as { app: string; data: { state: { players: unknown[] } } };
   expect(exported.app).toBe("gg-counter");
-  expect(exported.data.state.players).toEqual(V1_STATE.players);
+  // 1.1 (DECISIONS 2026-11-20): the export carries each player's score history (empty for a 1.0.0 game).
+  expect(exported.data.state.players).toEqual(V1_STATE_READ.players);
 
   await settings.getByRole("button", { name: "Clear my data" }).click();
   const confirmClear = page.getByRole("alertdialog", { name: "Delete all your data?" });

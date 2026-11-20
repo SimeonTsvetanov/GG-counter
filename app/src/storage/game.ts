@@ -1,6 +1,7 @@
-// The saved game under `gg-counter:v1:state` (same JSON shape as the pre-forge `gg-counter/state`,
-// SPEC §4). Used by the use-game-state hook, the migration and export/import. The stored value is
-// untrusted: it is checked by core's parseSavedState every time it is read.
+// The saved game under `gg-counter:v1:state` (the JSON shape of the pre-forge `gg-counter/state`, SPEC §4,
+// plus each player's score history since 1.1 — game version 2, read from version 1 on load). Used by the
+// use-game-state hook, the migration and export/import. The stored value is untrusted: it is checked by
+// core's parseSavedState every time it is read.
 import { GAME_VERSION, createEmptyGame, parseSavedState, type GameState } from "gg-counter-core";
 import { STORAGE_KEYS } from "./keys";
 import { readRaw, removeRaw, writeRaw, type StorageResult } from "./local-store";

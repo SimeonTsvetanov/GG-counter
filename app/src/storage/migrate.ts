@@ -1,11 +1,16 @@
 // One-time copy of the pre-forge keys (`gg-counter/state`, `gg-counter-theme`) to the namespaced
 // keys (flow → migrate §1). Run by main.tsx before the first render, on every start: it is idempotent
 // and cheap. The old keys are never written or removed here (removal plan: LEGACY_KEYS in keys.ts).
-import { GAME_VERSION } from "gg-counter-core";
 import { LEGACY_KEYS, STORAGE_KEYS } from "./keys";
 import { readRaw, writeRaw } from "./local-store";
 import { decodeGame, encodeGame } from "./game";
 import { encodeTheme } from "./theme";
+
+/**
+ * The saved-game version of the pre-forge key, written to the marker as `sourceVersion`. Not core's
+ * `GAME_VERSION`, which moved to 2 in 1.1: the copied value is converted to it, the source stays 1.
+ */
+const LEGACY_GAME_VERSION = 1;
 
 /** A saved item that has a pre-forge key. */
 export type MigratedItem = "state" | "theme";
@@ -105,6 +110,6 @@ export function migrateLegacyStorage(now: string = new Date().toISOString()): Mi
   }
   if (migrated.size === before) return { outcomes, markerWritten: false };
   // sourceVersion: the pre-forge layout (unversioned keys, saved game version 1) the values came from.
-  const marker = { migratedAt: now, sourceVersion: GAME_VERSION, items: [...migrated] };
+  const marker = { migratedAt: now, sourceVersion: LEGACY_GAME_VERSION, items: [...migrated] };
   return { outcomes, markerWritten: writeRaw(STORAGE_KEYS.migrated, JSON.stringify(marker)).ok };
 }

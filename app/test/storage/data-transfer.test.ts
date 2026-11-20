@@ -1,6 +1,7 @@
 import fc from "fast-check";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { MIGRATED_KEY, NEW_STATE_KEY, NEW_THEME_KEY, NULL_ENTRY_STATE, STATE_KEY, THEME_KEY, V0_STATE, V1_STATE } from "gg-counter-core/test-fixtures";
+import { MIGRATED_KEY, NEW_STATE_KEY, NEW_THEME_KEY, NULL_ENTRY_STATE, STATE_KEY, THEME_KEY, V0_STATE, V1_STATE, V1_STATE_READ, V2_STATE } from "gg-counter-core/test-fixtures";
+import { GAME_VERSION } from "gg-counter-core";
 import { FakeStorage, OTHER_APPS, blockStorage, unblockStorage, useStorage } from "./fake-storage.ts";
 
 const NOW = "2026-11-19T12:00:00.000Z";
@@ -25,13 +26,42 @@ describe("exportData", () => {
   it("returns { app, schemaVersion, exportedAt, data: { state, theme, lang } }", async () => {
     useStorage(new FakeStorage({ [NEW_STATE_KEY]: JSON.stringify(V1_STATE), [NEW_THEME_KEY]: "\"dark\"", [LANG_KEY]: "\"bg\"" }));
     const { exportData } = await start();
-    expect(exportData(NOW)).toEqual({ app: "gg-counter", schemaVersion: 1, exportedAt: NOW, data: { state: V1_STATE, theme: "dark", lang: "bg" } });
+    expect(exportData(NOW)).toEqual({ app: "gg-counter", schemaVersion: 1, exportedAt: NOW, data: { state: V1_STATE_READ, theme: "dark", lang: "bg" } });
   });
 
   it("nothing saved → an empty game, the system theme and no language choice", async () => {
     useStorage(new FakeStorage({ [STATE_KEY]: JSON.stringify(V1_STATE), [LANG_KEY]: "\"de\"" }));
     const { exportData } = await start();
-    expect(exportData(NOW).data).toEqual({ state: { players: [], lastUpdated: NOW, version: 1 }, theme: "system", lang: null });
+    expect(exportData(NOW).data).toEqual({ state: { players: [], lastUpdated: NOW, version: GAME_VERSION }, theme: "system", lang: null });
+  });
+});
+
+describe("score history in export files (SPEC 1.1 F15)", () => {
+  it("an export carries each player's history; export → clear → import gives it back", async () => {
+    useStorage(new FakeStorage({ [NEW_STATE_KEY]: JSON.stringify(V2_STATE) }));
+    const { exportData, clearData, importData, readGame } = await start();
+    const file = exportData(NOW);
+    expect(file.data.state).toEqual(V2_STATE);
+    clearData();
+    expect(importData(JSON.stringify(file), NOW).ok).toBe(true);
+    expect(readGame(NOW)).toEqual(V2_STATE);
+  });
+
+  it("a 1.0.0 export file (no history) still imports: same players and scores, empty histories", async () => {
+    useStorage(new FakeStorage());
+    const { importData, readGame } = await start();
+    expect(importData(exportText(), NOW)).toMatchObject({ ok: true, value: { state: V1_STATE_READ } });
+    expect(readGame(NOW)).toEqual(V1_STATE_READ);
+  });
+
+  it("a damaged history is refused with the reason in the message", async () => {
+    useStorage(new FakeStorage());
+    const { checkImport } = await start();
+    const damaged = { ...V2_STATE, players: [V2_STATE.players[0], { ...V2_STATE.players[1], history: [{ id: "x", delta: "1", at: NOW }] }] };
+    expect(checkImport(exportText({}, { state: damaged }), NOW)).toEqual({
+      ok: false,
+      error: { code: "IMPORT_INVALID", message: "The file is damaged. The score history of player 2 is damaged." },
+    });
   });
 });
 
@@ -42,7 +72,7 @@ describe("importData", () => {
     const file = JSON.stringify(exportData(NOW));
     clearData();
     expect(storage.snapshot()).toEqual({});
-    expect(importData(file, NOW)).toEqual({ ok: true, value: { state: V1_STATE, theme: "light", lang: "en" } });
+    expect(importData(file, NOW)).toEqual({ ok: true, value: { state: V1_STATE_READ, theme: "light", lang: "en" } });
     expect(exportData(NOW)).toEqual(JSON.parse(file));
   });
 
@@ -50,7 +80,7 @@ describe("importData", () => {
     const storage = useStorage(new FakeStorage({ [NEW_STATE_KEY]: JSON.stringify(V0_STATE), [NEW_THEME_KEY]: "\"dark\"" }));
     const { importData, readGame } = await start();
     expect(importData(exportText({}, { theme: "system" }), NOW).ok).toBe(true);
-    expect(readGame(NOW)).toEqual(V1_STATE);
+    expect(readGame(NOW)).toEqual(V1_STATE_READ);
     expect(storage.getItem(NEW_THEME_KEY)).toBeNull();
   });
 
@@ -79,6 +109,8 @@ describe("importData", () => {
     ["state not an object", exportText({}, { state: [] }), "IMPORT_INVALID"],
     ["players missing", exportText({}, { state: { lastUpdated: NOW } }), "IMPORT_INVALID"],
     ["one player invalid (never imports part of a game)", exportText({}, { state: NULL_ENTRY_STATE }), "IMPORT_INVALID"],
+    ["a history that is not a list", exportText({}, { state: { ...V2_STATE, players: [{ ...V2_STATE.players[0], history: {} }] } }), "IMPORT_INVALID"],
+    ["a history entry with delta 0", exportText({}, { state: { ...V2_STATE, players: [{ ...V2_STATE.players[0], history: [{ id: "e", delta: 0, at: NOW }] }] } }), "IMPORT_INVALID"],
   ];
   for (const [label, text, code] of rejected) {
     it(`${label} → ${code}, nothing changed`, async () => {
@@ -151,7 +183,7 @@ describe("checkImport (Settings checks a file before asking to replace the game)
     const storage = useStorage(new FakeStorage({ [NEW_STATE_KEY]: JSON.stringify(V0_STATE), ...OTHER_APPS }));
     const before = storage.snapshot();
     const { checkImport } = await start();
-    expect(checkImport(exportText(), NOW)).toEqual({ ok: true, value: { state: V1_STATE, theme: "dark", lang: null } });
+    expect(checkImport(exportText(), NOW)).toEqual({ ok: true, value: { state: V1_STATE_READ, theme: "dark", lang: null } });
     expect(storage.snapshot()).toEqual(before);
   });
 
@@ -198,7 +230,7 @@ describe("clearData", () => {
     const storage = useStorage(new FakeStorage());
     storage.writeBehaviour = () => "full";
     const { clearData, writeGame, readGame } = await start();
-    writeGame(V1_STATE, NOW);
+    writeGame(V1_STATE_READ, NOW);
     expect(clearData()).toEqual({ ok: true });
     expect(readGame(NOW).players).toEqual([]);
   });
