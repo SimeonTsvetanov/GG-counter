@@ -63,6 +63,7 @@ export function ScoreDialog({ player, onApply }: ScoreDialogProps): React.JSX.El
         <button
           type="button"
           className="score"
+          data-adjust-score=""
           data-long={isLongScore(player.score) ? "" : undefined}
           aria-label={t("app.score.adjust", { name: player.name, score: player.score })}
         >

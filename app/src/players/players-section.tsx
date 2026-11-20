@@ -1,18 +1,25 @@
 // The players part of the main screen: the grid of player cards and the Add player card (alone
-// while there are no players, below the grid afterwards).
+// while there are no players, below the grid afterwards). The grid gets denser from the fifth player
+// (SPEC 1.1 F18): `data-density` picks the card layout and the column count in player-card.css.
 import { useRef, useState } from "react";
-import type { Player } from "gg-counter-core";
+import { podiumPlaces, type Player, type Ranking } from "gg-counter-core";
 import type { GameStateApi } from "../hooks/use-game-state";
 import { AddPlayerCard } from "./add-player-card";
 import { limitCode, limitMessage, type LimitCode } from "./limit-message";
+import type { HistoryActions } from "./history-sheet-content";
 import { PlayerCard } from "./player-card";
 
+/** Most players shown on roomy cards; from one more on, the cards get compact so more fit on a screen. */
+export const COMFORTABLE_MAX_PLAYERS = 4;
+
 /** Props of {@link PlayersSection}. */
-interface PlayersSectionProps {
-  /** The players in the order they were added. */
+interface PlayersSectionProps extends HistoryActions {
+  /** The players in the order they were added (the cards never reorder; the medals show the ranking). */
   players: readonly Player[];
-  /** Id of the current leader (highlighted), or null. */
-  leaderId: string | null;
+  /** The ranking, for the medals on the cards. */
+  ranking: Ranking;
+  /** The player with the newest change (their card is marked), or null. */
+  lastScoredId: string | null;
   onAddPlayer: GameStateApi["addPlayer"];
   onRename: GameStateApi["renamePlayer"];
   onRemove: GameStateApi["removePlayer"];
@@ -27,12 +34,15 @@ interface PlayersSectionProps {
 /** Renders the player cards and the Add player card; keeps the name being typed. */
 export function PlayersSection({
   players,
-  leaderId,
+  ranking,
+  lastScoredId,
   onAddPlayer,
   onRename,
   onRemove,
   onResetScore,
   onAdjust,
+  onRemoveEntry,
+  onRestoreEntry,
   addCardRef,
   addInputRef,
 }: PlayersSectionProps): React.JSX.Element {
@@ -78,18 +88,22 @@ export function PlayersSection({
     return addPlayerCard;
   }
 
+  const podium = podiumPlaces(ranking);
   return (
     <>
-      <section ref={gridRef} className="player-grid">
+      <section ref={gridRef} className="player-grid" data-density={players.length > COMFORTABLE_MAX_PLAYERS ? "compact" : "comfortable"}>
         {players.map((player, index) => (
           <PlayerCard
             key={player.id}
             player={player}
-            isLeader={leaderId === player.id}
+            medal={podium.get(player.id) ?? null}
+            isLastScored={lastScoredId === player.id}
             onRename={onRename}
             onRemove={onRemove}
             onResetScore={onResetScore}
             onAdjust={onAdjust}
+            onRemoveEntry={onRemoveEntry}
+            onRestoreEntry={onRestoreEntry}
             focusAfterRemove={() => { focusAfterRemove(index); }}
           />
         ))}

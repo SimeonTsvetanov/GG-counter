@@ -81,12 +81,15 @@ export function App(): React.JSX.Element {
         <main className={`${CONTAINER_CLASS} app-main`}>
           <PlayersSection
             players={game.state.players}
-            leaderId={game.ranking.leader?.id ?? null}
+            ranking={game.ranking}
+            lastScoredId={game.lastScoredId}
             onAddPlayer={game.addPlayer}
             onRename={game.renamePlayer}
             onRemove={game.removePlayer}
             onResetScore={game.resetPlayerScore}
             onAdjust={game.adjustScore}
+            onRemoveEntry={game.removeScoreEntry}
+            onRestoreEntry={game.restoreScoreEntry}
             addCardRef={addCardRef}
             addInputRef={addInputRef}
           />

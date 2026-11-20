@@ -4,8 +4,8 @@ import { NEW_STATE_KEY, V1_STATE } from "../../packages/core/test/fixtures/saved
 
 // Security §1: the meta CSP of scripts/csp.ts must not block anything the app does. Every test records
 // `securitypolicyviolation` events (all pages, also after navigations) and the browser's CSP console
-// errors, and fails on any of them — main flows, dialogs (1.1: the alerts with a choice), menus, Bulgarian,
-// offline and the static pages.
+// errors, and fails on any of them — main flows, dialogs (1.1: the alerts with a choice, the history sheet,
+// the medals and the compact cards), menus, Bulgarian, offline and the static pages.
 
 /** Starts recording CSP violations of every document the page loads; returns the live list. */
 async function watchCsp(page: Page): Promise<string[]> {
@@ -71,6 +71,21 @@ test("the game, its dialogs, every menu entry and a theme change raise no CSP vi
   await adjust.getByRole("spinbutton").fill("5");
   await adjust.getByRole("button", { name: "Apply" }).click();
   await expect(adjust).toBeHidden();
+
+  // 1.1 part B (SPEC 1.1 F16–F18): the history sheet with remove + Restore, the medals, compact cards.
+  await page.getByRole("button", { name: /^Score history for Boris/ }).click();
+  const history = page.getByRole("dialog", { name: "Boris" });
+  await history.getByRole("button", { name: "Remove +5 from Boris's score" }).click();
+  await history.getByRole("button", { name: "Restore +5" }).click();
+  await expect.poll(() => bodyOverflow(page)).toBe("hidden");
+  await page.keyboard.press("Escape");
+  await expect(history).toBeHidden();
+  await expect(page.getByRole("img", { name: "1st place" })).toBeVisible();
+  for (const name of ["Chen", "Dana", "Emil"]) {
+    await page.getByRole("textbox", { name: "Player name", exact: true }).fill(name);
+    await page.getByRole("button", { name: "Add", exact: true }).click();
+  }
+  await expect(page.locator(".player-grid")).toHaveAttribute("data-density", "compact");
 
   // The 1.1 alerts with a choice (SPEC 1.1 F13, F14): Clear session / Reset scores and a player's delete button.
   await page.getByRole("button", { name: "Clear session" }).first().click();

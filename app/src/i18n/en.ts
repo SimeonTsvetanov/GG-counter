@@ -198,6 +198,24 @@ export const en = {
       removeScore: "Score only",
       removeScoreHint: "{{name}} stays, with 0 points.",
       removeScoreConfirm: "Reset",
+      // The medal on a card (SPEC 1.1 F18): the place it shows, for screen readers.
+      medal1: "1st place",
+      medal2: "2nd place",
+      medal3: "3rd place",
+    },
+    // The "last changes" line on a card and the history sheet behind it (SPEC 1.1 F16–F17).
+    history: {
+      open: "Score history for {{name}}: {{changes}}",
+      openLast: "Score history for {{name}} (scored last): {{changes}}",
+      total_one: "Total: {{count}} point",
+      total_other: "Total: {{count}} points",
+      list: "Changes, newest first",
+      remove: "Remove {{change}} from {{name}}'s score",
+      earlier: "Earlier points",
+      empty: "No changes yet. Every + and − for {{name}} shows up here.",
+      removed: "Removed {{change}}. Total now {{total}}.",
+      restored: "Restored {{change}}. Total now {{total}}.",
+      restore: "Restore {{change}}",
     },
     score: {
       // The visible score is part of the name (WCAG 2.5.3 label in name, PLAN T-12).

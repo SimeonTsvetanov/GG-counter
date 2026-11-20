@@ -11,6 +11,7 @@ import {
   lastScoredPlayerId,
   removeScoreEntry,
   resetPlayerScore,
+  restoreScoreEntry,
   resetScores,
   scoreBase,
   sumOfDeltas,
@@ -192,6 +193,26 @@ describe("history (properties)", () => {
       if (!added.ok) return;
       const removed = removeScoreEntry(added.value, "A", "x");
       expect(removed.ok && removed.value.players[0]).toEqual(game.players[0]);
+    }));
+  });
+
+  it("removing any entry and restoring it at its index gives back the same game (Restore, F16)", () => {
+    fc.assert(fc.property(fc.array(step, { maxLength: 120 }), fc.nat(), (steps, pick) => {
+      let game = start;
+      let ms = 0;
+      steps.forEach((s, n) => {
+        ms += s.kind === "adjust" ? s.pause : 1;
+        game = apply(game, s, ms, n);
+      });
+      for (const p of game.players) {
+        const index = p.history.length === 0 ? -1 : pick % p.history.length;
+        const entry = p.history.at(index);
+        if (entry === undefined) continue;
+        const removed = removeScoreEntry(game, p.id, entry.id);
+        if (!removed.ok) continue;
+        const restored = restoreScoreEntry(removed.value, p.id, entry, index);
+        expect(restored.ok && restored.value).toEqual(game);
+      }
     }));
   });
 });

@@ -9,7 +9,16 @@ export { ENGLISH_LEADERBOARD_LABELS, formatLeaderboard, type LeaderboardTextInpu
 export { bulgarianOrdinal, ordinal } from "./ordinal.ts";
 export type { NameErrorCode } from "./player-name.ts";
 export { addPlayer, removePlayer, renamePlayer, type AddPlayerErrorCode, type NewPlayer, type RenamePlayerErrorCode } from "./players.ts";
-export { rank, type Ranking } from "./ranking.ts";
+export { podiumPlaces, rank, type PodiumPlace, type Ranking } from "./ranking.ts";
 export type { Failure, Result } from "./result.ts";
 export { checkSavedGame, parseSavedState, type SavedGameErrorCode, type SavedStateErrorCode } from "./saved-state.ts";
-export { adjustScore, removeScoreEntry, resetPlayerScore, resetScores, type ScoreEntryErrorCode, type ScoreErrorCode } from "./scores.ts";
+export {
+  adjustScore,
+  removeScoreEntry,
+  resetPlayerScore,
+  resetScores,
+  restoreScoreEntry,
+  type RestoreEntryErrorCode,
+  type ScoreEntryErrorCode,
+  type ScoreErrorCode,
+} from "./scores.ts";

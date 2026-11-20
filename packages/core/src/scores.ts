@@ -1,7 +1,7 @@
-// Score transitions (SPEC F3, F6; 1.1 F13–F15; limits SPEC §7): change a score (recorded in the player's
-// history), remove one history entry, reset one player's score, reset all scores.
-import type { GameState, Player } from "./game.ts";
-import { lastScoredPlayerId, recordChange, type ScoreChange } from "./history.ts";
+// Score transitions (SPEC F3, F6; 1.1 F13–F16; limits SPEC §7): change a score (recorded in the player's
+// history), remove one history entry and put it back (Restore), reset one player's score, reset all scores.
+import type { GameState, Player, ScoreEntry } from "./game.ts";
+import { capHistory, lastScoredPlayerId, recordChange, type ScoreChange } from "./history.ts";
 import { MAX_SCORE, MIN_SCORE } from "./limits.ts";
 import { fail, ok, type Failure, type Result } from "./result.ts";
 
@@ -10,6 +10,9 @@ export type ScoreErrorCode = "SCORE_INVALID" | "SCORE_OUT_OF_RANGE" | "PLAYER_NO
 
 /** Why {@link removeScoreEntry} was rejected. */
 export type ScoreEntryErrorCode = "SCORE_OUT_OF_RANGE" | "PLAYER_NOT_FOUND" | "SCORE_ENTRY_NOT_FOUND";
+
+/** Why {@link restoreScoreEntry} was rejected. */
+export type RestoreEntryErrorCode = "SCORE_INVALID" | "SCORE_OUT_OF_RANGE" | "PLAYER_NOT_FOUND" | "SCORE_ENTRY_EXISTS";
 
 const PLAYER_NOT_FOUND = "This player is no longer in the game.";
 
@@ -69,6 +72,28 @@ export function removeScoreEntry(game: GameState, playerId: string, entryId: str
   // because a finite score minus a finite delta stays finite, only the range can refuse it
   if (refused !== null) return fail("SCORE_OUT_OF_RANGE", refused.error.message);
   return ok(withPlayer(game, playerId, (current) => ({ ...current, score, history: current.history.filter((item) => item !== entry) })));
+}
+
+/**
+ * Returns the game with a removed history `entry` of player `playerId` put back at position `index` (oldest
+ * first; clamped to the history's length) and its delta added to the score again — the Restore of the
+ * history sheet (SPEC 1.1 F16), so `removeScoreEntry` followed by this gives back the same game.
+ *
+ * @remarks Refused with SCORE_ENTRY_EXISTS when the history already holds that id, SCORE_INVALID for a
+ * delta that is 0 or not finite, and SCORE_OUT_OF_RANGE by the same rule as {@link adjustScore}. The
+ * history is capped again, so an entry restored into a full history may fold the oldest one into the base.
+ */
+export function restoreScoreEntry(game: GameState, playerId: string, entry: ScoreEntry, index: number): Result<GameState, RestoreEntryErrorCode> {
+  const player = game.players.find((candidate) => candidate.id === playerId);
+  if (player === undefined) return fail("PLAYER_NOT_FOUND", PLAYER_NOT_FOUND);
+  if (player.history.some((candidate) => candidate.id === entry.id)) return fail("SCORE_ENTRY_EXISTS", "This change is already in the history.");
+  if (entry.delta === 0) return fail("SCORE_INVALID", "Enter a number.");
+  const score = player.score + entry.delta;
+  const refused = refuseScore(player.score, score);
+  if (refused !== null) return refused;
+  const at = Math.min(Math.max(0, Math.trunc(index)), player.history.length);
+  const history = capHistory([...player.history.slice(0, at), entry, ...player.history.slice(at)]);
+  return ok(withPlayer(game, playerId, (current) => ({ ...current, score, history })));
 }
 
 /** Returns the game with player `id`'s score set to 0 and their history emptied; the player stays (SPEC 1.1 F14). */

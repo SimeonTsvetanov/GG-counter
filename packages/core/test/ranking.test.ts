@@ -1,7 +1,7 @@
 // Ranking: example tests plus fast-check properties (sorted, ties stable, total = sum, leader).
 import { describe, expect, it } from "vitest";
 import fc from "fast-check";
-import { rank, type Player } from "../src/index.ts";
+import { podiumPlaces, rank, type Player } from "../src/index.ts";
 
 /** A player with `name` (also used as id) and `score`. */
 function player(name: string, score: number): Player {
@@ -73,6 +73,30 @@ describe("rank → places (rank badges, SPEC 1.1 F18)", () => {
       const { places } = rank(list);
       expect(places.size).toBe(list.length);
       for (const p of list) expect(places.get(p.id)).toBe(1 + list.filter((other) => other.score > p.score).length);
+    }));
+  });
+});
+
+describe("podiumPlaces (medals on the cards and the leaderboard, SPEC 1.1 F18)", () => {
+  const medals = (list: Player[]) => [...podiumPlaces(rank(list))];
+  it("34, 27, 27, 5 → 🥇 🥈 🥈 and no medal for place 4 (AC18)", () => {
+    expect(medals([player("A", 34), player("B", 27), player("C", 27), player("D", 5)])).toEqual([["A", 1], ["B", 2], ["C", 2]]);
+  });
+  it("nobody while every score is equal (a new game, one player, all tied)", () => {
+    expect(medals([player("A", 0), player("B", 0), player("C", 0)])).toEqual([]);
+    expect(medals([player("A", 12)])).toEqual([]);
+    expect(medals([])).toEqual([]);
+  });
+  it("the first points of a game: one 🥇, everyone still at 0 shares 🥈", () => {
+    expect(medals([player("A", 0), player("B", 5), player("C", 0)])).toEqual([["B", 1], ["A", 2], ["C", 2]]);
+  });
+  it("property: a medal is the player's place, 1–3, and there are medals exactly when two scores differ", () => {
+    fc.assert(fc.property(players, (list) => {
+      const ranking = rank(list);
+      const podium = podiumPlaces(ranking);
+      expect(podium.size > 0).toBe(new Set(list.map((p) => p.score)).size > 1);
+      for (const [id, place] of podium) expect(ranking.places.get(id)).toBe(place);
+      if (podium.size > 0) for (const [id, place] of ranking.places) expect(podium.has(id)).toBe(place <= 3);
     }));
   });
 });

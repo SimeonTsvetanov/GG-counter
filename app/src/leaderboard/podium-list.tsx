@@ -1,9 +1,9 @@
-// The ranked players as one list (leaderboard.css): the top three with 🥇🥈🥉 and their points, the rest
-// numbered and quieter — shared by the leaderboard card and dialog.
-import type { Player } from "gg-counter-core";
+// The ranked players as one list (leaderboard.css): the podium with 🥇🥈🥉 and their points, the rest
+// numbered and quieter — shared by the leaderboard card and dialog. Medals and numbers are the shared places
+// (ties share one, SPEC 1.1 F18), the same medals the player cards show.
+import { podiumPlaces, rank, type Player } from "gg-counter-core";
 import { t } from "../i18n";
-
-const MEDALS = ["🥇", "🥈", "🥉"];
+import { MEDALS } from "./medals";
 
 /** Props of {@link PodiumList}. */
 interface PodiumListProps {
@@ -18,18 +18,20 @@ interface PodiumListProps {
 /** Lists the ranked players, or `empty` when there is nobody. */
 export function PodiumList({ players, restRow, empty }: PodiumListProps): React.JSX.Element {
   if (players.length === 0) return <>{empty}</>;
+  const ranking = rank(players);
+  const podium = podiumPlaces(ranking);
   return (
     <div className="rank-list">
-      {players.map((player, index) => {
-        const medal = MEDALS.at(index);
+      {ranking.players.map((player, index) => {
+        const medal = podium.get(player.id);
         return medal === undefined ? (
           <div key={player.id} className="rank-row rank-row--rest">
-            <span className="rank-name">{t(restRow, { rank: index + 1, name: player.name })}</span>
+            <span className="rank-name">{t(restRow, { rank: ranking.places.get(player.id) ?? index + 1, name: player.name })}</span>
             <span className="rank-points">{player.score}</span>
           </div>
         ) : (
           <div key={player.id} className="rank-row">
-            <span className="rank-name">{medal} {player.name}</span>
+            <span className="rank-name">{MEDALS[medal]} {player.name}</span>
             <span className="rank-points">{t("app.leaderboard.points", { count: player.score })}</span>
           </div>
         );

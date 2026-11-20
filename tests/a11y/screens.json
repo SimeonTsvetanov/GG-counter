@@ -344,5 +344,163 @@
         "click": ".card-content .button--primary"
       }
     ]
+  },
+  {
+    "name": "cards-marked",
+    "actions": [
+      {
+        "fill": ".card-content input.field",
+        "text": "Ana"
+      },
+      {
+        "click": ".card-content .button--primary"
+      },
+      {
+        "fill": ".card-content input.field",
+        "text": "Boris"
+      },
+      {
+        "click": ".card-content .button--primary"
+      },
+      {
+        "click": ".player-card .score-step--plus"
+      },
+      {
+        "click": ".player-card .score-step--minus"
+      },
+      {
+        "click": ".player-card:nth-child(2) .score-step--plus"
+      },
+      {
+        "wait": 300
+      }
+    ]
+  },
+  {
+    "name": "history-sheet",
+    "actions": [
+      {
+        "fill": ".card-content input.field",
+        "text": "Ana"
+      },
+      {
+        "click": ".card-content .button--primary"
+      },
+      {
+        "fill": ".card-content input.field",
+        "text": "Boris"
+      },
+      {
+        "click": ".card-content .button--primary"
+      },
+      {
+        "click": ".player-card .score-step--plus"
+      },
+      {
+        "click": ".player-card .score-step--minus"
+      },
+      {
+        "click": ".player-card:nth-child(2) .score-step--plus"
+      },
+      {
+        "click": ".player-card .history-strip"
+      },
+      {
+        "wait": 500
+      }
+    ]
+  },
+  {
+    "name": "history-sheet-removed",
+    "actions": [
+      {
+        "fill": ".card-content input.field",
+        "text": "Ana"
+      },
+      {
+        "click": ".card-content .button--primary"
+      },
+      {
+        "fill": ".card-content input.field",
+        "text": "Boris"
+      },
+      {
+        "click": ".card-content .button--primary"
+      },
+      {
+        "click": ".player-card .score-step--plus"
+      },
+      {
+        "click": ".player-card .score-step--minus"
+      },
+      {
+        "click": ".player-card:nth-child(2) .score-step--plus"
+      },
+      {
+        "click": ".player-card .history-strip"
+      },
+      {
+        "wait": 500
+      },
+      {
+        "click": "[data-remove-entry]"
+      },
+      {
+        "wait": 300
+      }
+    ]
+  },
+  {
+    "name": "compact-cards",
+    "actions": [
+      {
+        "fill": ".card-content input.field",
+        "text": "Ana"
+      },
+      {
+        "click": ".card-content .button--primary"
+      },
+      {
+        "fill": ".card-content input.field",
+        "text": "Boris"
+      },
+      {
+        "click": ".card-content .button--primary"
+      },
+      {
+        "fill": ".card-content input.field",
+        "text": "Chen"
+      },
+      {
+        "click": ".card-content .button--primary"
+      },
+      {
+        "fill": ".card-content input.field",
+        "text": "Dana"
+      },
+      {
+        "click": ".card-content .button--primary"
+      },
+      {
+        "fill": ".card-content input.field",
+        "text": "Emil"
+      },
+      {
+        "click": ".card-content .button--primary"
+      },
+      {
+        "fill": ".card-content input.field",
+        "text": "Maximilian Alexander-Konstantinov"
+      },
+      {
+        "click": ".card-content .button--primary"
+      },
+      {
+        "click": ".player-card .score-step--plus"
+      },
+      {
+        "wait": 300
+      }
+    ]
   }
 ]

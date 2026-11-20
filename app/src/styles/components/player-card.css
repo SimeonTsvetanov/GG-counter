@@ -1,34 +1,63 @@
-/* Player cards (app/src/players/): two columns on phones, three from 900 px. Each card: the name field and
-   Remove, the score (a button that opens "Adjust score"), then − and + as two equal buttons. The score
-   has its own row, so a 6- or 7-character score fits a 390 px phone (PLAN T-12). */
+/* Player cards (app/src/players/). The grid keeps the order players were added; up to four players the cards
+   are roomy, from the fifth they get compact and the grid gains columns where there is room (SPEC 1.1 F18,
+   `data-density` on the grid, container `main` in layout.css). Each card: name + Remove, the "last changes"
+   line (history.css), the score, − and +. Roomy: the score on its own row, so a 7-character score fits a
+   390 px phone (PLAN T-12). Compact: a short score sits beside − and + like an iOS stepper, one row less.
+   One meaning per mark (DECISIONS 2026-11-20): the medal in the corner = place 1–3; the accent tint = the
+   player scored last (with the newest change as a pill on the line, history.css, so it is not colour alone). */
 @layer components {
   /* || Components: player grid */
   .player-grid {
+    --player-grid-columns: 2;
+
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(var(--player-grid-columns), minmax(0, 1fr));
     gap: var(--space-3);
 
-    @media (width > 900px) {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+    @container main (width > 45rem) {
+      --player-grid-columns: 4;
+
       gap: var(--space-4);
+    }
+
+    /* Compact: smaller gaps, and a column more wherever a compact card (≥ 9 rem) still fits. */
+    &[data-density="compact"] {
+      gap: var(--space-2);
+
+      @container main (width > 29rem) {
+        --player-grid-columns: 3;
+      }
+
+      @container main (width > 40rem) {
+        --player-grid-columns: 4;
+      }
+
+      @container main (width > 51rem) {
+        --player-grid-columns: 5;
+      }
     }
   }
 
   /* || Components: player card */
   .player-card {
+    container: player-card / inline-size;
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
+    gap: var(--space-1);
     padding: var(--space-3);
 
     @media (width > 600px) {
       padding: var(--space-4);
     }
 
-    /* The leader: an accent tint over the card (the leaderboard says it in words). */
-    &[data-leader] {
+    /* Scored last: an accent tint over the card — calm, and moving with every new score. */
+    &[data-last-scored] {
       background-image: linear-gradient(var(--color-accent-tint), var(--color-accent-tint));
-      box-shadow: var(--shadow-2);
+    }
+
+    .player-grid[data-density="compact"] & {
+      padding: var(--space-2);
     }
   }
 
@@ -38,14 +67,72 @@
     gap: var(--space-1);
   }
 
+  /* The medal of places 1–3, pinned to the card's corner so it costs no room in any layout. */
+  .place-medal {
+    position: absolute;
+    inset-block-start: calc(var(--space-3) * -1);
+    inset-inline-start: calc(var(--space-2) * -1);
+    font-size: var(--text-2xl);
+    line-height: var(--leading-tight);
+    pointer-events: none;
+    animation: medal-in var(--duration-alert) var(--ease-spring);
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: modal-fade-in var(--duration-fade) var(--ease-out);
+    }
+  }
+
+  /* || Components: score row */
+  /* Roomy: the score on its own row, − and + under it as two equal buttons. */
+  /* At the card's foot: when a neighbour in the row is taller, the extra room goes above the score. */
+  .score-row {
+    display: grid;
+    margin-block-start: auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "score score"
+      "minus plus";
+    gap: var(--space-2);
+  }
+
+  .score-step--minus {
+    grid-area: minus;
+  }
+
+  .score-step--plus {
+    grid-area: plus;
+  }
+
+  /* Compact with a short score (≤ 3 characters, players/score-size.ts): score, −, + in one row. */
+  @container player-card (width >= 9rem) {
+    .player-grid[data-density="compact"] .player-card[data-short-score] .score-row {
+      grid-template-columns: minmax(0, 1fr) var(--tap-target) var(--tap-target);
+      grid-template-areas: "score minus plus";
+      gap: var(--space-1);
+    }
+
+    /* Three tabular digits are ~1.9 em: shrink below the title size only on the narrowest phones (360 px). */
+    .player-grid[data-density="compact"] .player-card[data-short-score] .score {
+      padding-inline: 0;
+      font-size: min(var(--text-2xl), (100cqi - 2 * var(--tap-target) - 2 * var(--space-1)) / 2);
+      text-align: start;
+    }
+  }
+
   /* || Components: score */
+  /* The largest score within the limits, "-999999", is ~4.2 em in tabular bold: the size is capped by the
+     card's width (cqi of the player-card container), so it fits even a 320 px phone. */
   .score {
+    --score-fit: calc((100cqi - 2 * var(--space-1)) / 4.2);
+
     display: block;
+    grid-area: score;
     width: 100%;
+    min-width: 0;
     min-height: var(--tap-target);
-    padding: var(--space-1) var(--space-2);
+    padding: var(--space-1);
     border-radius: var(--radius-md);
-    font-size: var(--text-3xl);
+    font-size: min(var(--text-3xl), var(--score-fit));
     font-weight: var(--weight-bold);
     line-height: var(--leading-tight);
     letter-spacing: var(--tracking-tight);
@@ -63,6 +150,10 @@
       transform: scale(0.97);
     }
 
+    .player-grid[data-density="compact"] &:not([data-long]) {
+      font-size: min(var(--text-2xl), var(--score-fit));
+    }
+
     /* Saved games from before the limits may hold longer numbers: smaller, and wrapping as a last resort. */
     &[data-long] {
       font-size: var(--text-xl);
@@ -70,9 +161,9 @@
     }
   }
 
-  .score-steps {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-2);
+  @keyframes medal-in {
+    from {
+      transform: scale(0.6);
+    }
   }
 }

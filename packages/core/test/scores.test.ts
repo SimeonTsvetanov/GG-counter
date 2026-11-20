@@ -1,6 +1,6 @@
 // Example tests for the score transitions (SPEC F3, F6; 1.1 F13–F16; limits SPEC §7).
 import { describe, expect, it } from "vitest";
-import { MAX_SCORE, MIN_SCORE, adjustScore, removeScoreEntry, resetPlayerScore, resetScores, type GameState, type Result, type ScoreChange } from "../src/index.ts";
+import { MAX_HISTORY_ENTRIES, MAX_SCORE, MIN_SCORE, adjustScore, removeScoreEntry, resetPlayerScore, resetScores, restoreScoreEntry, type GameState, type Result, type ScoreChange, type ScoreEntry } from "../src/index.ts";
 
 const game: GameState = {
   players: [
@@ -58,6 +58,45 @@ describe("adjustScore", () => {
   });
   it("PLAYER_NOT_FOUND for an unknown id", () => {
     expect(adjustScore(game, "nope", change(1))).toMatchObject({ ok: false, error: { code: "PLAYER_NOT_FOUND" } });
+  });
+});
+
+describe("restoreScoreEntry (F16 Restore)", () => {
+  const entries: ScoreEntry[] = [
+    { id: "e1", delta: 4, at: "2025-12-01T21:00:00.000Z" },
+    { id: "e2", delta: -2, at: "2025-12-01T21:05:00.000Z" },
+    { id: "e3", delta: 12, at: "2025-12-01T21:10:00.000Z" },
+  ];
+  const three: GameState = { ...game, players: [{ ...game.players[0], score: 14, history: entries }] };
+  it("puts the removed entry back in the same place with its points (remove → restore = the same game)", () => {
+    for (const [index, entry] of entries.entries()) {
+      const removed = removeScoreEntry(three, "a1", entry.id);
+      const restored = removed.ok && restoreScoreEntry(removed.value, "a1", entry, index);
+      expect(restored && restored.ok && restored.value).toEqual(three);
+    }
+  });
+  it("clamps the position to the history (a stale index appends; a negative one puts it first)", () => {
+    const extra: ScoreEntry = { id: "x", delta: 1, at: AT };
+    expect(playerAfter(restoreScoreEntry(three, "a1", extra, 99), "a1")?.history.map((e) => e.id)).toEqual(["e1", "e2", "e3", "x"]);
+    expect(playerAfter(restoreScoreEntry(three, "a1", extra, -3), "a1")?.history.map((e) => e.id)).toEqual(["x", "e1", "e2", "e3"]);
+  });
+  it("SCORE_ENTRY_EXISTS when the id is already there (a second Restore changes nothing)", () => {
+    expect(restoreScoreEntry(three, "a1", entries[0] ?? { id: "", delta: 1, at: AT }, 0)).toMatchObject({ ok: false, error: { code: "SCORE_ENTRY_EXISTS" } });
+  });
+  it("SCORE_OUT_OF_RANGE by the same rule as a change; SCORE_INVALID for 0 or not a number; PLAYER_NOT_FOUND", () => {
+    const top: GameState = { ...game, players: [{ ...game.players[0], score: MAX_SCORE, history: [] }] };
+    expect(restoreScoreEntry(top, "a1", { id: "x", delta: 1, at: AT }, 0)).toMatchObject({ ok: false, error: { code: "SCORE_OUT_OF_RANGE" } });
+    expect(restoreScoreEntry(game, "b2", { id: "x", delta: 0, at: AT }, 0)).toMatchObject({ ok: false, error: { code: "SCORE_INVALID" } });
+    expect(restoreScoreEntry(game, "b2", { id: "x", delta: Number.NaN, at: AT }, 0)).toMatchObject({ ok: false, error: { code: "SCORE_INVALID" } });
+    expect(restoreScoreEntry(game, "nope", { id: "x", delta: 1, at: AT }, 0)).toMatchObject({ ok: false, error: { code: "PLAYER_NOT_FOUND" } });
+  });
+  it(`a full history stays at ${String(MAX_HISTORY_ENTRIES)} entries: the oldest folds into the base`, () => {
+    const full = Array.from({ length: MAX_HISTORY_ENTRIES }, (_, i): ScoreEntry => ({ id: `f${String(i)}`, delta: 1, at: AT }));
+    const crowded: GameState = { ...game, players: [{ ...game.players[0], score: MAX_HISTORY_ENTRIES, history: full }] };
+    const restored = playerAfter(restoreScoreEntry(crowded, "a1", { id: "x", delta: 5, at: AT }, MAX_HISTORY_ENTRIES), "a1");
+    expect(restored?.score).toBe(MAX_HISTORY_ENTRIES + 5);
+    expect(restored?.history).toHaveLength(MAX_HISTORY_ENTRIES);
+    expect(restored?.history.at(0)?.id).toBe("f1");
   });
 });
 
