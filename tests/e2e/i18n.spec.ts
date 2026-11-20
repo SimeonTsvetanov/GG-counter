@@ -114,8 +114,20 @@ test("leaderboard, share text and clear session — in Bulgarian", async ({ page
   await board.getByRole("button", { name: "Сподели" }).click();
   const text = await page.waitForFunction(() => (window as unknown as { shared?: string }).shared).then((handle) => handle.jsonValue());
   const lines = String(text).split("\n");
-  expect(lines.slice(0, 8)).toEqual(["🏆 Класиране в GG Counter", "", "🥇 1-во — Ana (34 точки)", "🥈 2-ро — Boris (27 точки)", "🥉 3-то — Чен (-3 точки)", "", "🎯 Общо точки: 58", "👥 Играчи: 3"]);
-  expect(lines[8]).toMatch(/^🕒 Към \d{1,2}\.\d{2}\.\d{4}/);
+  // 1.2 (SPEC F21): the new text in Bulgarian words; the attribution with the app link stays English.
+  expect(lines[0]).toBe("🏆 GG Counter — Класиране");
+  expect(lines[1]).toMatch(/^📅 \d{1,2}\.\d{2}\.\d{4}/);
+  expect(lines.slice(2)).toEqual([
+    "",
+    "🥇 34 · Ana",
+    "🥈 27 · Boris",
+    "🥉 −3 · Чен",
+    "",
+    "👑 Победител: Ana — 34 точки",
+    "👥 3 играчи · общо 58 точки",
+    "",
+    "— Made with GG Counter · https://simeontsvetanov.github.io/GG-counter/",
+  ]);
 
   await page.getByRole("button", { name: "Изчисти сесията" }).first().click();
   const clear = page.getByRole("alertdialog", { name: "Да се изчисти ли сесията?" });

@@ -2,13 +2,14 @@
 // sheet), the score (opens "Adjust score") and − / + (player-card.css). The card carries the medal of its
 // place and the last-scored mark (SPEC 1.1 F16–F18). A rename or score change that core refuses (name over
 // 40 characters, score out of range) says why on the card.
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { Player, PodiumPlace } from "gg-counter-core";
 import { Minus, Plus } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import type { GameStateApi } from "../hooks/use-game-state";
+import { useRevealWhileFocused } from "../hooks/use-reveal-while-focused";
 import { t } from "../i18n";
 import { MEDALS } from "../leaderboard/medals";
 import { HistorySheet } from "./history-sheet";
@@ -32,6 +33,8 @@ interface PlayerCardProps extends HistoryActions {
   onAdjust: GameStateApi["adjustScore"];
   /** Moves focus to a logical next element once this card is gone (its player was removed). */
   focusAfterRemove: () => void;
+  /** The card was just added (pops in) or its player was just removed (fades out, inert), else null. */
+  motion: "entering" | "leaving" | null;
 }
 
 /** The words for each medal place, read out instead of the emoji. */
@@ -47,6 +50,10 @@ function NameField({ player, onRename, children }: Pick<PlayerCardProps, "player
   const errorId = useId();
   const [name, setName] = useState(player.name);
   const [nameError, setNameError] = useState<LimitCode | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const headRef = useRef<HTMLDivElement>(null);
+  // A rename near the bottom of the screen stays above the keyboard, with the remove button beside it (SPEC 1.2 F19).
+  useRevealWhileFocused(inputRef, headRef);
 
   useEffect(() => {
     setName(player.name);
@@ -68,8 +75,9 @@ function NameField({ player, onRename, children }: Pick<PlayerCardProps, "player
 
   return (
     <div>
-      <div className="player-card-head">
+      <div ref={headRef} className="player-card-head">
         <Input
+          ref={inputRef}
           value={name}
           onChange={(event) => {
             setName(event.target.value);
@@ -96,7 +104,7 @@ function NameField({ player, onRename, children }: Pick<PlayerCardProps, "player
 }
 
 /** One player's card: name, remove or reset (one alert with a choice), last changes, score and − / +. */
-export function PlayerCard({ player, medal, isLastScored, onRename, onRemove, onResetScore, onAdjust, onRemoveEntry, onRestoreEntry, focusAfterRemove }: PlayerCardProps): React.JSX.Element {
+export function PlayerCard({ player, medal, isLastScored, motion, onRename, onRemove, onResetScore, onAdjust, onRemoveEntry, onRestoreEntry, focusAfterRemove }: PlayerCardProps): React.JSX.Element {
   const [scoreError, setScoreError] = useState<LimitCode | null>(null);
   const scoreErrorId = useId();
 
@@ -110,10 +118,16 @@ export function PlayerCard({ player, medal, isLastScored, onRename, onRemove, on
   return (
     <Card
       className="player-card"
+      data-flip={`main:${player.id}`}
+      data-motion={motion ?? undefined}
+      // A removed player's card stays for its fade-out only: not reachable, not read out (use-leaving.ts).
+      inert={motion === "leaving"}
+      aria-hidden={motion === "leaving" ? true : undefined}
       data-last-scored={isLastScored ? "" : undefined}
       data-short-score={isShortScore(player.score) ? "" : undefined}
     >
-      {medal !== null && <PlaceMedal place={medal} />}
+      {/* Keyed by place: a medal that changes pops in again (medal-in, player-card.css). */}
+      {medal !== null && <PlaceMedal key={medal} place={medal} />}
       <NameField player={player} onRename={onRename}>
         <RemovePlayerButton
           playerName={player.name}

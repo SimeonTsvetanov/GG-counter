@@ -4,7 +4,9 @@
    line (history.css), the score, − and +. Roomy: the score on its own row, so a 7-character score fits a
    390 px phone (PLAN T-12). Compact: a short score sits beside − and + like an iOS stepper, one row less.
    One meaning per mark (DECISIONS 2026-11-20): the medal in the corner = place 1–3; the accent tint = the
-   player scored last (with the newest change as a pill on the line, history.css, so it is not colour alone). */
+   player scored last, with a raised shadow as its non-colour cue (1.2: no pill on the line, Moni 2026-11-20).
+   Motion (SPEC 1.2 F20, DECISIONS 2026-11-20): a new card pops in, a removed one fades out in its slot
+   (`data-motion`, use-leaving.ts), the tint fades from card to card, the score rolls in from its direction. */
 @layer components {
   /* || Components: player grid */
   .player-grid {
@@ -42,18 +44,61 @@
   .player-card {
     container: player-card / inline-size;
     position: relative;
+    isolation: isolate;
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
     padding: var(--space-3);
+    transition: box-shadow var(--duration-base) var(--ease-standard);
 
     @media (width > 600px) {
       padding: var(--space-4);
     }
 
-    /* Scored last: an accent tint over the card — calm, and moving with every new score. */
+    /* The last-scored tint is a layer under the content, so it can fade out here and in on the next card. */
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      border-radius: inherit;
+      background: var(--color-accent-tint);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--duration-base) var(--ease-standard);
+
+      /* A fade is still a cue under reduced motion (accessibility §8). */
+      @media (prefers-reduced-motion: reduce) {
+        transition-duration: var(--duration-fade);
+      }
+    }
+
+    /* Scored last: the accent tint, and the card sits a little higher (shadow) — a quiet cue that is not colour. */
     &[data-last-scored] {
-      background-image: linear-gradient(var(--color-accent-tint), var(--color-accent-tint));
+      box-shadow: var(--shadow-2);
+
+      &::before {
+        opacity: 1;
+      }
+    }
+
+    &[data-motion="entering"] {
+      animation: card-in var(--duration-alert) var(--ease-spring);
+    }
+
+    /* Removed: fades out in its slot (inert), then the others slide into the gap (use-flip.ts). */
+    &[data-motion="leaving"] {
+      animation: card-out var(--duration-base) var(--ease-out) forwards;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      &[data-motion="entering"] {
+        animation: card-fade-in var(--duration-fade) var(--ease-out);
+      }
+
+      &[data-motion="leaving"] {
+        animation: card-fade-out var(--duration-fade) var(--ease-out) forwards;
+      }
     }
 
     .player-grid[data-density="compact"] & {
@@ -82,88 +127,35 @@
     }
   }
 
-  /* || Components: score row */
-  /* Roomy: the score on its own row, − and + under it as two equal buttons. */
-  /* At the card's foot: when a neighbour in the row is taller, the extra room goes above the score. */
-  .score-row {
-    display: grid;
-    margin-block-start: auto;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-areas:
-      "score score"
-      "minus plus";
-    gap: var(--space-2);
-  }
-
-  .score-step--minus {
-    grid-area: minus;
-  }
-
-  .score-step--plus {
-    grid-area: plus;
-  }
-
-  /* Compact with a short score (≤ 3 characters, players/score-size.ts): score, −, + in one row. */
-  @container player-card (width >= 9rem) {
-    .player-grid[data-density="compact"] .player-card[data-short-score] .score-row {
-      grid-template-columns: minmax(0, 1fr) var(--tap-target) var(--tap-target);
-      grid-template-areas: "score minus plus";
-      gap: var(--space-1);
-    }
-
-    /* Three tabular digits are ~1.9 em: shrink below the title size only on the narrowest phones (360 px). */
-    .player-grid[data-density="compact"] .player-card[data-short-score] .score {
-      padding-inline: 0;
-      font-size: min(var(--text-2xl), (100cqi - 2 * var(--tap-target) - 2 * var(--space-1)) / 2);
-      text-align: start;
-    }
-  }
-
-  /* || Components: score */
-  /* The largest score within the limits, "-999999", is ~4.2 em in tabular bold: the size is capped by the
-     card's width (cqi of the player-card container), so it fits even a 320 px phone. */
-  .score {
-    --score-fit: calc((100cqi - 2 * var(--space-1)) / 4.2);
-
-    display: block;
-    grid-area: score;
-    width: 100%;
-    min-width: 0;
-    min-height: var(--tap-target);
-    padding: var(--space-1);
-    border-radius: var(--radius-md);
-    font-size: min(var(--text-3xl), var(--score-fit));
-    font-weight: var(--weight-bold);
-    line-height: var(--leading-tight);
-    letter-spacing: var(--tracking-tight);
-    font-variant-numeric: tabular-nums;
-    transition: background-color var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-out);
-
-    @media (hover: hover) {
-      &:hover {
-        background: var(--color-fill);
-      }
-    }
-
-    &:active {
-      background: var(--color-fill);
-      transform: scale(0.97);
-    }
-
-    .player-grid[data-density="compact"] &:not([data-long]) {
-      font-size: min(var(--text-2xl), var(--score-fit));
-    }
-
-    /* Saved games from before the limits may hold longer numbers: smaller, and wrapping as a last resort. */
-    &[data-long] {
-      font-size: var(--text-xl);
-      overflow-wrap: anywhere;
-    }
-  }
-
   @keyframes medal-in {
     from {
       transform: scale(0.6);
+    }
+  }
+
+  @keyframes card-in {
+    from {
+      opacity: 0;
+      transform: scale(0.92);
+    }
+  }
+
+  @keyframes card-out {
+    to {
+      opacity: 0;
+      transform: scale(0.92);
+    }
+  }
+
+  @keyframes card-fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes card-fade-out {
+    to {
+      opacity: 0;
     }
   }
 }

@@ -173,7 +173,8 @@ export const bg: Messages = {
   app: {
     tagline: "Брояч на точки за настолни игри",
     shareTitle: "Сесия в {{name}}",
-    copiedSummary: "Класирането на сесията е копирано.",
+    shareFailed: "Споделянето и копирането са блокирани в този браузър. Опитайте с друг браузър.",
+    copiedSummary: "Класирането е копирано ✓",
     header: {
       leaderboard: "Отвори класирането",
       addPlayer: "Добави играч",
@@ -258,13 +259,15 @@ export const bg: Messages = {
       support: "Ако ме подкрепите: „Заровете да са с вас!“",
     },
     share: {
-      title: "Класиране в {{name}}",
-      line: "{{place}} — {{name}} ({{points}})",
-      points_one: "{{count}} точка",
-      points_other: "{{count}} точки",
-      total: "Общо точки: {{total}}",
-      players: "Играчи: {{players}}",
-      snapshot: "Към {{time}}",
+      title: "{{name}} — Класиране",
+      points_one: "{{score}} точка",
+      points_other: "{{score}} точки",
+      winner_one: "Победител: {{names}} — {{points}}",
+      winner_other: "Победители: {{names}} — по {{points}}",
+      tie: "Всички са равни — по {{points}}",
+      players_one: "{{count}} играч",
+      players_other: "{{count}} играчи",
+      summary: "{{players}} · общо {{points}}",
     },
     page: {
       label: "За {{name}}",

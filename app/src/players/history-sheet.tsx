@@ -5,6 +5,7 @@
 import { useRef, useState } from "react";
 import type { Player } from "gg-counter-core";
 import { Dialog, DialogTrigger } from "../components/ui/dialog";
+import { useFreshKey } from "../hooks/use-change";
 import { t } from "../i18n";
 import { formatDelta } from "./history-format";
 import { HistorySheetContent, type HistoryActions } from "./history-sheet-content";
@@ -33,6 +34,8 @@ export function HistorySheet({ player, isLastScored, onRemoveEntry, onRestoreEnt
   const slotRef = useRef<HTMLDivElement>(null);
   // Newest first in the markup: the row runs right to left (player-card.css), so the newest sits at the right end.
   const recent = player.history.slice(-STRIP_ENTRIES).reverse();
+  // A change that arrived after the card appeared slides into the line (SPEC 1.2 F20); merged taps keep the same entry.
+  const freshId = useFreshKey(recent[0]?.id ?? null);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -42,7 +45,12 @@ export function HistorySheet({ player, isLastScored, onRemoveEntry, onRestoreEnt
             <button type="button" className="history-strip" aria-label={stripLabel(player, isLastScored)}>
               <span className="history-strip-items" aria-hidden>
                 {recent.map((entry, index) => (
-                  <span key={entry.id} className="history-strip-item" data-newest={index === 0 ? "" : undefined}>
+                  <span
+                    key={entry.id}
+                    className="history-strip-item"
+                    data-newest={index === 0 ? "" : undefined}
+                    data-fresh={index === 0 && entry.id === freshId ? "" : undefined}
+                  >
                     {formatDelta(entry.delta)}
                   </span>
                 ))}

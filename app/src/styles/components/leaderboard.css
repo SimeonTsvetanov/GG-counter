@@ -2,7 +2,9 @@
    card (ui-patterns §7), medals for the top three, points right-aligned in tabular numbers. */
 @layer components {
   /* || Components: rank list */
+  /* Positioned: a row that changes place slides against it (use-flip.ts, SPEC 1.2 F20). */
   .rank-list {
+    position: relative;
     display: flex;
     flex-direction: column;
   }

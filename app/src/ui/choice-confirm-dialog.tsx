@@ -113,7 +113,8 @@ export function ChoiceConfirmDialog<V extends string>({ open, onOpenChange, trig
   const openerRef = useRef<Element | null>(null);
   const returnFocus = (event: Event) => {
     const opener = openerRef.current;
-    if (opener instanceof HTMLElement && opener.isConnected) {
+    // An opener inside an inert subtree (a removed card still fading out, SPEC 1.2 F20) cannot take focus.
+    if (opener instanceof HTMLElement && opener.isConnected && opener.closest("[inert]") === null) {
       event.preventDefault();
       opener.focus();
     } else if (focusFallback !== undefined) {

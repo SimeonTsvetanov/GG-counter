@@ -15,6 +15,7 @@ import {
   DialogTrigger,
 } from "../components/ui/dialog";
 import { Input } from "../components/ui/input";
+import { useTrend } from "../hooks/use-change";
 import { t } from "../i18n";
 import { limitMessage, type LimitCode } from "./limit-message";
 import { isLongScore } from "./score-size";
@@ -32,6 +33,7 @@ export function ScoreDialog({ player, onApply }: ScoreDialogProps): React.JSX.El
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState<LimitCode | null>(null);
   const errorId = useId();
+  const trend = useTrend(player.score);
 
   const handleApplyCustom = () => {
     const parsed = Number(customAmount);
@@ -67,7 +69,8 @@ export function ScoreDialog({ player, onApply }: ScoreDialogProps): React.JSX.El
           data-long={isLongScore(player.score) ? "" : undefined}
           aria-label={t("app.score.adjust", { name: player.name, score: player.score })}
         >
-          {player.score}
+          {/* Keyed by the score, so every change rolls in once from its direction; quick taps restart it, never queue (SPEC 1.2 F20). */}
+          <span key={player.score} className="score-value" data-trend={trend ?? undefined}>{player.score}</span>
         </button>
       </DialogTrigger>
       <DialogContent>

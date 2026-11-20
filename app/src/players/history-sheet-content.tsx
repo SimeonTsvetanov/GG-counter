@@ -58,6 +58,7 @@ export function HistorySheetContent({ player, onRemoveEntry, onRestoreEntry, onC
   const closeRef = useRef<HTMLButtonElement>(null);
   const focusRequest = useFocusAfterRender(listRef, closeRef);
   const [removed, setRemoved] = useState<Removed | null>(null);
+  const [restoredId, setRestoredId] = useState<string | null>(null);
   const [refusedId, setRefusedId] = useState<string | null>(null);
   const [restoreRefused, setRestoreRefused] = useState(false);
   // Read out politely after each removal or restore: the total changed although focus did not move to it.
@@ -71,6 +72,7 @@ export function HistorySheetContent({ player, onRemoveEntry, onRestoreEntry, onC
     }
     setRefusedId(null);
     setRestoreRefused(false);
+    setRestoredId(null);
     setRemoved({ entry, index });
     setAnnouncement(t("app.history.removed", { change: formatDelta(entry.delta), total: player.score - entry.delta }));
     focusRequest.current = { position };
@@ -82,6 +84,7 @@ export function HistorySheetContent({ player, onRemoveEntry, onRestoreEntry, onC
     setRestoreRefused(!result.ok);
     if (!result.ok) return;
     setRemoved(null);
+    setRestoredId(removed.entry.id);
     setAnnouncement(t("app.history.restored", { change: formatDelta(removed.entry.delta), total: player.score + removed.entry.delta }));
     focusRequest.current = { entryId: removed.entry.id };
   };
@@ -101,7 +104,7 @@ export function HistorySheetContent({ player, onRemoveEntry, onRestoreEntry, onC
         <DialogDescription className="history-total">{t("app.history.total", { count: player.score })}</DialogDescription>
       </DialogHeader>
       <DialogBody>
-        <HistoryList player={player} listRef={listRef} refusedId={refusedId} onRemove={remove} />
+        <HistoryList player={player} listRef={listRef} restoredId={restoredId} refusedId={refusedId} onRemove={remove} />
         <p role="status" className="sr-only">{announcement}</p>
         <p role="alert" className="field-error">{restoreRefused && limitMessage("SCORE_OUT_OF_RANGE")}</p>
       </DialogBody>

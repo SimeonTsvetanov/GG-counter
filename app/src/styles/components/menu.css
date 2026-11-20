@@ -68,6 +68,11 @@
       background: var(--color-fill);
     }
 
+    /* Pressed on touch, where nothing highlights the row first (design-system §9: pressed state visible). */
+    &:active:not([data-disabled]) {
+      background: var(--color-fill);
+    }
+
     &:focus-visible {
       outline: var(--focus-ring-width) solid var(--color-focus);
       outline-offset: calc(-1 * var(--focus-ring-width));

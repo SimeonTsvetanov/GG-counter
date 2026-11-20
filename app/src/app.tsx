@@ -14,11 +14,12 @@ import { AppHeader } from "./session/app-header";
 import { ClearSessionDialog, type ClearScope } from "./session/clear-session-dialog";
 import { shareLeaderboard } from "./share/share-leaderboard";
 import { useTheme } from "./providers/theme-provider";
-import { applyLanguage } from "./i18n";
+import { applyLanguage, t } from "./i18n";
 import { useLanguage } from "./i18n/use-language";
 import { AppFooter } from "./ui/app-footer";
 import { CrashTestHook } from "./ui/error-boundary";
 import { ShellDialogs } from "./ui/shell-dialogs";
+import { useToast } from "./ui/toast";
 import { useAppShell } from "./ui/use-app-shell";
 
 /** Share of the leaderboard card that must be on screen for the full header layout. */
@@ -33,12 +34,13 @@ export function App(): React.JSX.Element {
   const game = useGameState();
   const shell = useAppShell();
   const { setTheme } = useTheme();
+  const showToast = useToast();
   const [isLeaderboardDialogOpen, setIsLeaderboardDialogOpen] = useState(false);
   // The one Clear session alert: which option it opens with, or null while it is closed.
   const [clearRequest, setClearRequest] = useState<ClearScope | null>(null);
 
   const addInputRef = useRef<HTMLInputElement>(null);
-  const addCardRef = useRef<HTMLDivElement>(null);
+  const mainRef = useRef<HTMLElement>(null);
   const leaderboardCardRef = useRef<HTMLDivElement>(null);
   const isLeaderboardInView = useInView(leaderboardCardRef, LEADERBOARD_IN_VIEW_THRESHOLD);
   const topSentinelRef = useRef<HTMLSpanElement>(null);
@@ -47,14 +49,16 @@ export function App(): React.JSX.Element {
   usePageInfo(pageInfoSlotRef, lang);
 
   const handleShare = () => {
-    void shareLeaderboard(game.state.players, () => { setIsLeaderboardDialogOpen(false); });
+    void shareLeaderboard(game.state.players).then((outcome) => {
+      if (outcome === "shared" || outcome === "copied") setIsLeaderboardDialogOpen(false);
+      if (outcome === "copied") showToast({ message: t("app.copiedSummary") });
+      if (outcome === "failed") showToast({ message: t("app.shareFailed") });
+    });
   };
 
   const actions: SessionActions = {
-    onQuickAdd: () => {
-      addCardRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-      addInputRef.current?.focus();
-    },
+    // The field scrolls itself into the visible area on focus (useRevealWhileFocused, SPEC 1.2 F19).
+    onQuickAdd: () => { addInputRef.current?.focus({ preventScroll: true }); },
     onShare: handleShare,
     onRequestReset: () => { setClearRequest("scores"); },
     onRequestClear: () => { setClearRequest("all"); },
@@ -78,7 +82,7 @@ export function App(): React.JSX.Element {
 
         <StatusBanner install={shell.install} />
 
-        <main className={`${CONTAINER_CLASS} app-main`}>
+        <main ref={mainRef} className={`${CONTAINER_CLASS} app-main`}>
           <PlayersSection
             players={game.state.players}
             ranking={game.ranking}
@@ -90,7 +94,7 @@ export function App(): React.JSX.Element {
             onAdjust={game.adjustScore}
             onRemoveEntry={game.removeScoreEntry}
             onRestoreEntry={game.restoreScoreEntry}
-            addCardRef={addCardRef}
+            flipRootRef={mainRef}
             addInputRef={addInputRef}
           />
           <LeaderboardCard
@@ -101,7 +105,7 @@ export function App(): React.JSX.Element {
             onRequestClear={actions.onRequestClear}
           />
           {/* How it works + FAQ from index.html, below the tool (filled by usePageInfo). */}
-          <div ref={pageInfoSlotRef} className={CARD_WIDTH_CLASS} />
+          <div ref={pageInfoSlotRef} className={CARD_WIDTH_CLASS} data-flip="main:info" />
         </main>
 
         <AppFooter runItem={shell.runItem} />

@@ -114,6 +114,21 @@ test("F17: the mark follows the newest change and goes back when it is removed (
   await expect(markedCards(page).getByRole("textbox")).toHaveAccessibleName("Player name for Boris");
 });
 
+// 1.2 (SPEC F22, Moni on the live 1.1.0): no shape around the newest change; the marked card's non-colour cue
+// is its raised shadow; the score's button is 52 px tall and the card keeps its 1.1 height.
+test("F22: no pill on the line, a raised last-scored card, a taller score at the same card height", async ({ page }, testInfo) => {
+  await openWith(page, withHistory);
+  const newest = markedCards(page).locator(".history-strip-item[data-newest]");
+  await expect(newest).toHaveCSS("border-top-width", "0px");
+  await expect(newest).toHaveCSS("padding-left", "0px");
+  const shadow = (locator: ReturnType<Page["locator"]>) => locator.evaluate((element) => getComputedStyle(element).boxShadow);
+  expect(await shadow(markedCards(page))).not.toBe(await shadow(page.locator(".player-card:not([data-last-scored])").first()));
+  const score = await page.getByRole("button", { name: /^Adjust score for Ana/ }).boundingBox();
+  expect(score?.height).toBeGreaterThanOrEqual(52);
+  // 1.1.0 measured 220 px for a roomy phone card (320 and 390 px; DECISIONS 2026-11-20, F22 before/after).
+  if (testInfo.project.name === "phone") expect(Math.round((await page.locator(".player-card").first().boundingBox())?.height ?? 0)).toBeLessThanOrEqual(220);
+});
+
 test("F18: medals 1, 2, 2 for 34, 27, 27 on the cards and in the leaderboard; none while all scores are equal (AC18)", async ({ page }) => {
   await openWith(page, gameOf([["Ana", 34], ["Boris", 27], ["Aisha", 27], ["Kenji", 5]]));
   await expect(card(page, "Ana").getByRole("img", { name: "1st place" })).toBeVisible();

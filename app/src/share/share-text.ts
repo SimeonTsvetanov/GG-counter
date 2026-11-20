@@ -1,31 +1,36 @@
-// The words of the share text in the active UI language (PLAN T-09). Core owns the format (emoji, line
-// order); the dictionary gives the words. In English they give core's public format byte for byte
-// (SPEC §4, e2e AC5; app/test/ui/share-text.test.ts). Numbers stay plain digits ("-3", "1234"), as
-// before, so the text reads the same in any chat.
-import { bulgarianOrdinal, ordinal, type LeaderboardTextLabels } from "gg-counter-core";
-import { app, type LanguageCode } from "../config";
+// The words of the share text in the active UI language (SPEC §4, 1.2 F21). Core owns the layout (emoji, rows,
+// line order); the dictionary gives the words. The English words give core's englishLeaderboardLabels exactly
+// (app/test/ui/share-text.test.ts). The attribution line with the app link stays English in every language
+// (app-shell → i18n §2: values sent out of the app stay English).
+import { formatScore, type LeaderboardTextLabels } from "gg-counter-core";
+import { app } from "../config";
 import { getLanguage, t } from "../i18n";
 
-/** The ordinal of a place ("1st", "1-во") in each UI language. */
-const PLACE: Readonly<Record<LanguageCode, (place: number) => string>> = { en: ordinal, bg: bulgarianOrdinal };
+/** The last line of every shared text (app-shell §8). */
+export const ATTRIBUTION = `— Made with ${app.name} · ${app.url}`;
+
+/** Returns "34 points" / "34 точки" with a true minus sign for negative scores. */
+function points(score: number): string {
+  return t("app.share.points", { count: score, score: formatScore(score) });
+}
 
 /** Returns the share-text labels in the active language. */
 export function leaderboardLabels(): LeaderboardTextLabels {
-  const place = PLACE[getLanguage()];
+  const list = new Intl.ListFormat(getLanguage(), { type: "conjunction" });
   return {
     title: t("app.share.title", { name: app.name }),
-    line: (position, name, score) => t("app.share.line", { place: place(position), name, points: t("app.share.points", { count: score }) }),
-    total: (total) => t("app.share.total", { total }),
-    players: (count) => t("app.share.players", { players: count }),
-    snapshot: (time) => t("app.share.snapshot", { time }),
+    winners: (names, score) => t("app.share.winner", { count: names.length, names: list.format(names), points: points(score) }),
+    tie: (score) => t("app.share.tie", { points: points(score) }),
+    summary: (count, total) => t("app.share.summary", { players: t("app.share.players", { count }), points: points(total) }),
+    attribution: ATTRIBUTION,
   };
 }
 
 /**
- * Returns the time for the snapshot line. English keeps the browser's own date format, as before
- * T-09; another UI language uses its own (19.11.2026 г., 10:00:00).
+ * Returns the date and time for the 📅 line: the browser's own format in English (as the snapshot line was
+ * before), the UI language's otherwise ("20.11.2026 г., 21:45 ч.").
  */
-export function snapshotTime(date: Date): string {
+export function shareDate(date: Date): string {
   const lang = getLanguage();
-  return date.toLocaleString(lang === "en" ? undefined : lang);
+  return date.toLocaleString(lang === "en" ? undefined : lang, { dateStyle: "medium", timeStyle: "short" });
 }

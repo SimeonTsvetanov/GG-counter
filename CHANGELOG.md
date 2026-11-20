@@ -4,6 +4,30 @@ All notable user-facing changes. Format: Keep a Changelog · SemVer.
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-11-20
+
+### Added
+- Small, quick animations show what just changed: a new player's card pops in, a removed one fades out
+  and the others slide into its place, the score rolls up or down, a new change slides into the line
+  above it, medals pop, the tint moves from card to card, and leaderboard rows slide to their new place.
+  With "Reduce motion" turned on in your device settings they fade or stay still.
+
+### Changed
+- The shared leaderboard is easier to read: the date, a medal or place number and the score at the
+  start of each line, the winner (or a tie), the number of players and the total — and a link to
+  GG Counter at the end, so your friends can open it too. Bulgarian gets the same layout in Bulgarian.
+- Where the device has no share menu, the leaderboard is copied with a short note at the bottom of the
+  screen instead of a browser message; closing the share menu no longer copies anything.
+- The score on each card is bigger and its button taller, so it is easier to tap for a custom amount.
+  The cards stay the same size.
+- The card of the player scored last keeps its tint and sits a little higher; the line of last changes
+  no longer draws a pill around the newest change.
+
+### Fixed
+- The name field stays above the on-screen keyboard while you add players one after another, together
+  with the **Add** button, and keeps the keyboard open after **Add** — also for the first player. A
+  player's name field on a card moves above the keyboard too when you rename them.
+
 ## [1.1.0] - 2026-11-20
 
 ### Added

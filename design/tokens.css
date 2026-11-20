@@ -164,5 +164,7 @@
      renders inside it (accessibility §5). */
   :root {
     --z-modal: 40;
+    /* The score on a player card, a notch over the large title (Moni 2026-11-20, SPEC 1.2 F22): 32 → 40 px. */
+    --text-score: clamp(2rem, 1.4rem + 3.2vw, 2.5rem);
   }
 }

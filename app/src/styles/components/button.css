@@ -110,12 +110,16 @@
     color: var(--color-accent-text);
     font-weight: var(--weight-semibold);
     text-align: start;
-    transition: opacity var(--duration-fast) var(--ease-standard);
+    transition: opacity var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-out);
 
     @media (hover: hover) {
       &:hover {
         opacity: 0.8;
       }
+    }
+
+    &:active {
+      transform: scale(0.97);
     }
   }
 

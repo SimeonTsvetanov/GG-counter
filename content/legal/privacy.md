@@ -27,7 +27,7 @@
   app's own files (not your game) in its Cache Storage, managed by a service worker. {App} does
   not ask the browser to make its storage persistent. Clearing this site's data removes the
   offline copy too.
-- **Sharing:** when you tap **Share**, the leaderboard text (player names, scores and the time)
+- **Sharing:** when you tap **Share**, the leaderboard text (player names, scores, the date and time, and a link to {App})
   goes to the app you choose in your device's share menu, or is copied to the clipboard where
   there is no share menu, and is then covered by that app's own privacy terms. **Share app**
   shares only the link to {App}. Nothing is ever shared automatically.

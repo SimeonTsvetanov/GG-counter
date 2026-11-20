@@ -7,7 +7,7 @@ This guide shows you how to put the players of a game into GG Counter, change a 
 1. In the **Add Player** card, enter the name in the **Player Name** field.
 2. Select **Add**. With a keyboard, you can use the Enter key instead.
 
-The player appears as a card with a score of 0, and the counter in the **Add Player** card counts one more player.
+The player appears as a card with a score of 0, and the counter in the **Add Player** card counts one more player. The name field stays ready for the next name: on a phone, the keyboard stays open, and the field and **Add** stay in view however many players you add.
 
 To jump to the **Add Player** card from anywhere on the page, select the plus button (**Add player**) in the header. The name field is ready for typing.
 
@@ -25,13 +25,13 @@ The card and the leaderboard show the edited name. If you delete the whole name 
 A card shows, from top to bottom, the name field and the trash button, the most recent score changes (see [Change scores](change-scores.md#see-and-remove-recent-changes)), the score, and the **−** and **+** buttons. The cards stay in the order you added the players. Two marks show how the game stands:
 
 - **A medal in the top-left corner** shows the player's place: 🥇, 🥈 or 🥉. Players with the same score share a place, so 34, 27 and 27 points give 🥇, 🥈 and 🥈. While every score is the same, no card has a medal. The leaderboard uses the same medals.
-- **A tinted card** shows the player whose points you entered last. Its newest change also sits in a filled pill. The mark moves each time you enter points, and goes back to the previous player if you remove that change.
+- **A tinted card** that sits a little higher than the others shows the player whose points you entered last. The mark moves each time you enter points, and goes back to the previous player if you remove that change.
 
 The following image shows five player cards. Maria has 🥇, Liam 🥈 and Aisha 🥉. Liam's card is tinted because his points were entered last.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../images/manage-players/player-card-dark.png">
-  <img src="../images/manage-players/player-card-light.png" alt="Five player cards: Maria with a gold medal, Liam with a silver medal on a tinted card with +10 in a pill, Aisha with a bronze medal, Kenji and Elena." width="390">
+  <img src="../images/manage-players/player-card-light.png" alt="Five player cards: Maria with a gold medal, Liam with a silver medal on a tinted, slightly raised card, Aisha with a bronze medal, Kenji and Elena." width="390">
 </picture>
 
 From the fifth player on, the cards get smaller so more fit on the screen. A short score then sits next to **−** and **+**, and wider screens show more cards per row.

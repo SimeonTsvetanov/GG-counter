@@ -170,7 +170,8 @@ export const en = {
   app: {
     tagline: "Boardgames score tracker",
     shareTitle: "{{name}} session",
-    copiedSummary: "Session summary copied to clipboard.",
+    shareFailed: "Sharing and copying are blocked in this browser. Try another browser.",
+    copiedSummary: "Leaderboard copied ✓",
     header: {
       leaderboard: "Open leaderboard",
       addPlayer: "Add player",
@@ -259,16 +260,18 @@ export const en = {
     footer: {
       support: "If you support me \"May the dice be with you\"",
     },
-    // The share text (SPEC §4): the English words must give core's ENGLISH_LEADERBOARD_LABELS exactly
-    // (unit test in app/test/ui/share-text.test.ts); numbers stay plain digits like before.
+    // The share text (SPEC §4, 1.2 F21): the English words must give core's englishLeaderboardLabels exactly
+    // (unit test in app/test/ui/share-text.test.ts); scores are plain digits with a true minus sign.
     share: {
-      title: "{{name}} Leaderboard",
-      line: "{{place}} — {{name}} ({{points}})",
-      points_one: "{{count}} pts",
-      points_other: "{{count}} pts",
-      total: "Total score: {{total}}",
-      players: "Players: {{players}}",
-      snapshot: "Snapshot: {{time}}",
+      title: "{{name}} — Leaderboard",
+      points_one: "{{score}} point",
+      points_other: "{{score}} points",
+      winner_one: "Winner: {{names}} — {{points}}",
+      winner_other: "Winners: {{names}} — {{points}} each",
+      tie: "All tied — {{points}} each",
+      players_one: "{{count}} player",
+      players_other: "{{count}} players",
+      summary: "{{players}} · {{points}} in total",
     },
     // The "about, how it works, FAQ" block of index.html (scripts/static-page.ts writes these English
     // texts into the static HTML; app/src/hooks/use-page-info.ts translates the block in the app).

@@ -84,18 +84,81 @@ test("AC4: the leaderboard is sorted by score with medals and totals", async ({ 
   await expect(board).toContainText("34 pts");
 });
 
-test("AC5: Share gives the leaderboard text in the known format", async ({ page }) => {
+// 1.2 (SPEC F21, DECISIONS 2026-11-20): Moni asked for a nicer text with the app link, so the pre-forge format
+// of AC5 changed on purpose. Every leaderboard Share (header, card, dialog) hands the same text to Web Share,
+// without `url` — the link is the text's last line, and apps that append `url` would print it twice.
+const APP_URL = "https://simeontsvetanov.github.io/GG-counter/";
+
+/** Records what the page hands to `navigator.share`. */
+async function recordShares(page: Page) {
   await page.addInitScript(() => {
-    const record = (text: string) => ((window as unknown as { shared: string }).shared = text);
-    Object.defineProperty(navigator, "share", { configurable: true, value: (data: { text: string }) => (record(data.text), Promise.resolve()) });
+    const shared: unknown[] = [];
+    Object.assign(window, { shared });
+    Object.defineProperty(navigator, "share", { configurable: true, value: (data: unknown) => { shared.push(data); return Promise.resolve(); } });
+  });
+}
+
+/** Returns the last data handed to `navigator.share`, once there are `count` of them. */
+async function lastShare(page: Page, count: number) {
+  await expect.poll(() => page.evaluate(() => (window as unknown as { shared: unknown[] }).shared.length)).toBe(count);
+  return page.evaluate(() => (window as unknown as { shared: { title?: string; text: string; url?: string }[] }).shared.at(-1));
+}
+
+test("AC5: every leaderboard Share sends the 1.2 text with the app link once, without a separate url", async ({ page }) => {
+  await recordShares(page);
+  await openWith(page, V1_STATE);
+  const openers = [
+    () => page.getByRole("button", { name: "Share session" }).first().click(),
+    () => page.locator("[data-flip='main:leaderboard']").getByRole("button", { name: "Share", exact: true }).click(),
+    async () => {
+      await page.getByRole("button", { name: "Open leaderboard" }).first().click();
+      await page.getByRole("dialog", { name: "Leaderboard" }).getByRole("button", { name: "Share", exact: true }).click();
+      await expect(page.getByRole("dialog", { name: "Leaderboard" })).toBeHidden();
+    },
+  ];
+  for (const [index, open] of openers.entries()) {
+    await open();
+    const data = await lastShare(page, index + 1);
+    expect(data?.title).toBe("GG Counter session");
+    expect(data?.url).toBeUndefined();
+    const lines = String(data?.text).split("\n");
+    expect(lines[0]).toBe("🏆 GG Counter — Leaderboard");
+    expect(lines[1]).toMatch(/^📅 \S/);
+    expect(lines.slice(2)).toEqual([
+      "",
+      "🥇 34 · Ana",
+      "🥈 27 · Boris",
+      "🥉 −3 · Чен",
+      "",
+      "👑 Winner: Ana — 34 points",
+      "👥 3 players · 58 points in total",
+      "",
+      `— Made with GG Counter · ${APP_URL}`,
+    ]);
+    expect(String(data?.text).split(APP_URL)).toHaveLength(2);
+  }
+});
+
+test("AC5: without Web Share the same text is copied and a toast says so; a cancelled share sheet does nothing", async ({ page }) => {
+  await page.addInitScript(() => {
+    const copied: string[] = [];
+    Object.assign(window, { copied });
+    Object.defineProperty(navigator, "share", { configurable: true, value: undefined });
+    Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: (text: string) => { copied.push(text); return Promise.resolve(); } } });
   });
   await openWith(page, V1_STATE);
   await page.getByRole("button", { name: "Share session" }).first().click();
-  const text = await page.waitForFunction(() => (window as unknown as { shared?: string }).shared).then((h) => h.jsonValue());
-  const lines = String(text).split("\n");
-  expect(lines.slice(0, 7)).toEqual(["🏆 GG Counter Leaderboard", "", "🥇 1st — Ana (34 pts)", "🥈 2nd — Boris (27 pts)", "🥉 3rd — Чен (-3 pts)", "", "🎯 Total score: 58"]);
-  expect(lines[7]).toBe("👥 Players: 3");
-  expect(lines[8]).toMatch(/^🕒 Snapshot: /);
+  await expect(page.getByText("Leaderboard copied ✓")).toBeVisible();
+  const copied = await page.evaluate(() => (window as unknown as { copied: string[] }).copied);
+  expect(copied).toHaveLength(1);
+  expect(copied[0]?.split("\n").at(-1)).toBe(`— Made with GG Counter · ${APP_URL}`);
+
+  // The user closes the share sheet: nothing is copied, no toast.
+  await page.evaluate(() => {
+    Object.defineProperty(navigator, "share", { configurable: true, value: () => Promise.reject(new DOMException("cancelled", "AbortError")) });
+  });
+  await page.getByRole("button", { name: "Share session" }).first().click();
+  await expect.poll(() => page.evaluate(() => (window as unknown as { copied: string[] }).copied.length)).toBe(1);
 });
 
 // 1.1 (SPEC F13): the alert now has a choice; its default "Players and scores" (confirm = the last button)

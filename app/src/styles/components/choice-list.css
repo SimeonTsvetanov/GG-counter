@@ -25,11 +25,16 @@
     cursor: pointer;
     -webkit-user-select: none;
     user-select: none;
-    transition: background-color var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast) var(--ease-standard);
+    transition: background-color var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-out);
 
     &:has(input:checked) {
       background: var(--color-thumb);
       box-shadow: var(--shadow-1);
+    }
+
+    /* Presses scale to 0.97, like every button (design-system §9). */
+    &:active {
+      transform: scale(0.97);
     }
 
     &:has(input:focus-visible) {

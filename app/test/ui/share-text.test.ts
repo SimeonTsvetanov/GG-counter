@@ -1,49 +1,67 @@
-// The share text in the UI language (PLAN T-09): English stays byte for byte the public format of
-// SPEC §4 (core's default labels); Bulgarian uses its own words, ordinals and plurals.
+// The share text in the UI language (SPEC §4, 1.2 F21): the English dictionary gives core's English labels
+// exactly; Bulgarian uses its own words and plurals; the attribution with the app link stays English.
 import fc from "fast-check";
 import { afterEach, describe, expect, it } from "vitest";
-import { formatLeaderboard, type Player } from "gg-counter-core";
+import { englishLeaderboardLabels, formatLeaderboard, type Player } from "gg-counter-core";
+import { app } from "../../src/config.ts";
 import { applyLanguage } from "../../src/i18n/index.ts";
-import { leaderboardLabels, snapshotTime } from "../../src/share/share-text.ts";
+import { leaderboardLabels, shareDate } from "../../src/share/share-text.ts";
 
 /** A player with `name` (also the id) and `score`. */
 function player(name: string, score: number): Player {
   return { id: name, name, score, createdAt: "2026-11-19T10:00:00.000Z", history: [] };
 }
 
+/** The 1.2 example game: a tie for 2nd and a negative score. */
+const GAME = [player("Ana", 34), player("Boris", 27), player("Chen", 27), player("Dana", -3)];
+
 afterEach(async () => { await applyLanguage("en"); });
 
 describe("share text", () => {
-  it("property: English labels give core's public format exactly, for any names and scores", () => {
+  it("property: the English dictionary gives core's English labels exactly, for any names and scores", () => {
     const players = fc.uniqueArray(fc.record({ name: fc.string({ maxLength: 40 }), score: fc.integer({ min: -999_999, max: 999_999 }) }), { maxLength: 60, selector: (p) => p.name })
       .map((list) => list.map((p) => player(p.name, p.score)));
     fc.assert(
-      fc.property(players, fc.string(), (list, snapshot) => {
-        expect(formatLeaderboard({ players: list, snapshot, labels: leaderboardLabels() })).toBe(formatLeaderboard({ players: list, snapshot }));
+      fc.property(players, fc.string(), (list, date) => {
+        expect(formatLeaderboard({ players: list, date, labels: leaderboardLabels() })).toBe(formatLeaderboard({ players: list, date, labels: englishLeaderboardLabels(app.url) }));
       }),
     );
   });
 
-  it("Bulgarian: heading, ordinals, plurals and totals in Bulgarian, same emoji and lines", async () => {
-    await applyLanguage("bg");
-    const text = formatLeaderboard({ players: [player("Ана", 34), player("Борис", 1), player("Чен", -3)], snapshot: "19.11.2026 г., 10:00:00", labels: leaderboardLabels() });
-    expect(text.split("\n")).toEqual([
-      "🏆 Класиране в GG Counter",
-      "",
-      "🥇 1-во — Ана (34 точки)",
-      "🥈 2-ро — Борис (1 точка)",
-      "🥉 3-то — Чен (-3 точки)",
-      "",
-      "🎯 Общо точки: 32",
-      "👥 Играчи: 3",
-      "🕒 Към 19.11.2026 г., 10:00:00",
-    ]);
+  it("English: the 1.2 example ends with the app link", () => {
+    const text = formatLeaderboard({ players: GAME, date: "Nov 20, 2026, 9:45 PM", labels: leaderboardLabels() });
+    expect(text.split("\n").slice(-4)).toEqual(["👑 Winner: Ana — 34 points", "👥 4 players · 85 points in total", "", `— Made with GG Counter · ${app.url}`]);
   });
 
-  it("the snapshot uses the browser's format in English and the UI language otherwise", async () => {
-    const date = new Date(2026, 10, 19, 10, 0, 0);
-    expect(snapshotTime(date)).toBe(date.toLocaleString());
+  it("Bulgarian: words, plurals and lists in Bulgarian, the same emoji and rows, the attribution in English", async () => {
     await applyLanguage("bg");
-    expect(snapshotTime(date)).toBe(date.toLocaleString("bg"));
+    const text = formatLeaderboard({ players: GAME, date: "20.11.2026 г., 21:45 ч.", labels: leaderboardLabels() });
+    expect(text.split("\n")).toEqual([
+      "🏆 GG Counter — Класиране",
+      "📅 20.11.2026 г., 21:45 ч.",
+      "",
+      "🥇 34 · Ana",
+      "🥈 27 · Boris",
+      "🥈 27 · Chen",
+      "4️⃣ −3 · Dana",
+      "",
+      "👑 Победител: Ana — 34 точки",
+      "👥 4 играчи · общо 85 точки",
+      "",
+      `— Made with GG Counter · ${app.url}`,
+    ]);
+    const tie = formatLeaderboard({ players: [player("Ана", 1), player("Боби", 1)], date: "-", labels: leaderboardLabels() }).split("\n");
+    expect(tie[6]).toBe("🤝 Всички са равни — по 1 точка");
+    const winners = formatLeaderboard({ players: [player("Ана", 5), player("Боби", 5), player("Чен", 5), player("Дан", 0)], date: "-", labels: leaderboardLabels() }).split("\n");
+    expect(winners[8]).toBe("👑 Победители: Ана, Боби и Чен — по 5 точки");
+    expect(winners[9]).toBe("👥 4 играчи · общо 15 точки");
+  });
+
+  it("the date uses the browser's format in English and the UI language otherwise", async () => {
+    const date = new Date(2026, 10, 20, 21, 45, 0);
+    const style = { dateStyle: "medium", timeStyle: "short" } as const;
+    expect(shareDate(date)).toBe(date.toLocaleString(undefined, style));
+    await applyLanguage("bg");
+    expect(shareDate(date)).toBe(date.toLocaleString("bg", style));
   });
 });

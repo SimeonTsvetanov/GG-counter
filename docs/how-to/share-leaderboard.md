@@ -17,29 +17,33 @@ The trophy button (**Open leaderboard**) in the header opens the same list in a 
 
 1. In the **Leaderboard** card, select **Share**.
 2. If your device opens a share sheet, choose the app and the chat, and send the message.
-3. If there is no share sheet, which is common on computers, GG Counter copies the text and the browser tells you with "Session summary copied to clipboard." Paste the text into any chat, email or document.
+3. If there is no share sheet, which is common on computers, GG Counter copies the text and shows "Leaderboard copied ✓" at the bottom of the screen. Paste the text into any chat, email or document.
+
+If you close the share sheet without choosing an app, nothing is shared or copied.
 
 **Share** is also in the window of the trophy button, and the share button (**Share session**) in the header does the same.
 
 **Share** in the **Leaderboard** card is turned off while the game has no players.
 
-The shared text looks like the following example. The last line shows the date and time on your device, in its usual format.
+The shared text looks like the following example. The second line shows the date and time on your device, in its usual format. Each line starts with the medal or the place number and the score, so the scores line up in most chat apps. Players with the same score share a place. The last line is a link to GG Counter, so the people you send it to can open the app too.
 
 ```text
-🏆 GG Counter Leaderboard
+🏆 GG Counter — Leaderboard
+📅 Nov 20, 2026, 9:45 PM
 
-🥇 1st — Maria (34 pts)
-🥈 2nd — Liam (27 pts)
-🥉 3rd — Aisha (19 pts)
-🎲 4th — Kenji (12 pts)
-🎲 5th — Elena (8 pts)
+🥇 34 · Maria
+🥈 27 · Liam
+🥈 27 · Aisha
+4️⃣ 12 · Kenji
+5️⃣ −3 · Elena
 
-🎯 Total score: 100
-👥 Players: 5
-🕒 Snapshot: 11/19/2026, 10:00:00 AM
+👑 Winner: Maria — 34 points
+👥 5 players · 97 points in total
+
+— Made with GG Counter · https://simeontsvetanov.github.io/GG-counter/
 ```
 
-In Bulgarian, the text has the same emoji and lines with Bulgarian words. The text goes to the app you choose only when you select **Share**, and that app's privacy terms apply after that.
+In Bulgarian, the text has the same emoji and lines with Bulgarian words. The last line with the link stays in English. The text goes to the app you choose only when you select **Share**, and that app's privacy terms apply after that.
 
 ## Related
 

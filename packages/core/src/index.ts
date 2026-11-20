@@ -5,8 +5,14 @@
 export { GAME_VERSION, createEmptyGame, type GameState, type Player, type ScoreEntry } from "./game.ts";
 export { MAX_HISTORY_ENTRIES, MERGE_WINDOW_MS, lastScoredPlayerId, scoreBase, sumOfDeltas, type ScoreChange } from "./history.ts";
 export { MAX_NAME_LENGTH, MAX_PLAYERS, MAX_SCORE, MIN_SCORE } from "./limits.ts";
-export { ENGLISH_LEADERBOARD_LABELS, formatLeaderboard, type LeaderboardTextInput, type LeaderboardTextLabels } from "./leaderboard-text.ts";
-export { bulgarianOrdinal, ordinal } from "./ordinal.ts";
+export {
+  englishLeaderboardLabels,
+  formatLeaderboard,
+  formatScore,
+  placeMark,
+  type LeaderboardTextInput,
+  type LeaderboardTextLabels,
+} from "./leaderboard-text.ts";
 export type { NameErrorCode } from "./player-name.ts";
 export { addPlayer, removePlayer, renamePlayer, type AddPlayerErrorCode, type NewPlayer, type RenamePlayerErrorCode } from "./players.ts";
 export { podiumPlaces, rank, type PodiumPlace, type Ranking } from "./ranking.ts";

@@ -18,8 +18,10 @@
 
   /* || Layout: main */
   /* A container (`main`), so the player grid picks its columns by the room it really has (player-card.css). */
+  /* Positioned: its blocks slide against it when a player card comes or goes (use-flip.ts, SPEC 1.2 F20). */
   .app-main {
     container: main / inline-size;
+    position: relative;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -78,6 +80,11 @@
     min-height: var(--tap-target);
     color: var(--color-accent-text);
     font-weight: var(--weight-semibold);
+    transition: transform var(--duration-fast) var(--ease-out);
+
+    &:active {
+      transform: scale(0.97);
+    }
   }
 
   /* || Layout: toast region */

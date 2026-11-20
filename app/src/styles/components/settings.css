@@ -48,12 +48,16 @@
       font-size: var(--text-md);
       font-weight: var(--weight-medium);
       cursor: pointer;
-      transition: background-color var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast) var(--ease-standard);
+      transition: background-color var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-out);
 
       &:has(input:checked) {
         background: var(--color-thumb);
         box-shadow: var(--shadow-1);
         font-weight: var(--weight-semibold);
+      }
+
+      &:active {
+        transform: scale(0.97);
       }
 
       &:has(input:focus-visible) {

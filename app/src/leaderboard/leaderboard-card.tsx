@@ -39,7 +39,7 @@ export function LeaderboardCard({
   const isEmpty = ranking.players.length === 0;
 
   return (
-    <div ref={ref} className={CARD_WIDTH_CLASS}>
+    <div ref={ref} className={CARD_WIDTH_CLASS} data-flip="main:leaderboard">
       <Card>
         <CardHeader>
           <CardTitle>

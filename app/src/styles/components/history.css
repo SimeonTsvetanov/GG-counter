@@ -3,15 +3,20 @@
    oldest → newest from left to right, the newest at the right end, a little heavier. */
 @layer components {
   /* || Components: last changes line */
-  /* Always there, empty or not, so cards stay equal and nothing jumps at the first change. */
+  /* Always there, empty or not, so cards stay equal and nothing jumps at the first change. It takes a little
+     less room than a 44 px row (1.2: the bigger score got that room, player-card.css); the line's button keeps
+     its 44 px target by reaching into the gaps above and below it, where there is no other control. */
   .history-slot {
-    min-height: var(--tap-target);
+    --history-line: calc(var(--tap-target) - var(--space-2));
+
+    min-height: var(--history-line);
   }
 
   .history-strip {
     display: flex;
     width: 100%;
     min-height: var(--tap-target);
+    margin-block: calc((var(--history-line) - var(--tap-target)) / 2);
     padding-inline: var(--space-2);
     border-radius: var(--radius-md);
     color: var(--color-text-secondary);
@@ -65,17 +70,32 @@
     }
 
     /* Quiet on purpose (Moni 2026-11-20: "noticeable, but not quite", like a calculator's tape): the newest
-       change keeps the line's grey and is only a little heavier. */
+       change keeps the line's grey and is only a little heavier — on every card, no shape around it (1.2: the
+       outlined pill on the last-scored card is gone, Moni: "the accent is a bit misplaced"). */
     &[data-newest] {
       font-weight: var(--weight-semibold);
     }
 
-    /* The last-scored card: its newest change sits in a thin outlined pill — the mark is a shape too, not
-       colour alone — in the same grey as the line. */
-    .player-card[data-last-scored] &[data-newest] {
-      padding-inline: var(--space-2);
-      border: 1px solid currentcolor;
-      border-radius: var(--radius-full);
+    /* A change that just arrived slides in at the right end (SPEC 1.2 F20); merged quick taps do not replay. */
+    &[data-fresh] {
+      animation: strip-in var(--duration-base) var(--ease-out);
+
+      @media (prefers-reduced-motion: reduce) {
+        animation: strip-fade-in var(--duration-fade) var(--ease-out);
+      }
+    }
+  }
+
+  @keyframes strip-in {
+    from {
+      opacity: 0;
+      transform: translateX(0.75em);
+    }
+  }
+
+  @keyframes strip-fade-in {
+    from {
+      opacity: 0;
     }
   }
 
@@ -91,7 +111,9 @@
   }
 
   /* Rows separated by inset hairlines inside one list (ui-patterns §7): amount, time, ×. */
+  /* Positioned: the rows slide against it when one is removed or restored (use-flip.ts). */
   .history-list {
+    position: relative;
     display: flex;
     flex-direction: column;
   }
@@ -105,6 +127,15 @@
 
     & + & {
       box-shadow: inset 0 1px 0 var(--color-separator);
+    }
+
+    /* Put back by Restore: fades in where it was, the rows below slide down (SPEC 1.2 F20). */
+    &[data-restored] {
+      animation: strip-fade-in var(--duration-base) var(--ease-out);
+
+      @media (prefers-reduced-motion: reduce) {
+        animation-duration: var(--duration-fade);
+      }
     }
   }
 

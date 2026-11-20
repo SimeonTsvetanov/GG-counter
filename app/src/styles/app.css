@@ -18,6 +18,7 @@
 @import "./components/card.css";
 @import "./components/header.css";
 @import "./components/player-card.css";
+@import "./components/score.css";
 @import "./components/leaderboard.css";
 @import "./components/page-info.css";
 @import "./components/disclosure.css";

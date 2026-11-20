@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 // The on-screen keyboard must not cover a sheet's buttons (DECISIONS 2026-11-20). Android resizes the
 // layout viewport through the viewport meta; iOS Safari only shrinks the visual viewport, which a
@@ -46,4 +46,74 @@ test("a keyboard that only shrinks the visual viewport lifts the sheet: Apply st
     viewport.dispatchEvent(new Event("resize"));
   });
   await expect.poll(async () => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--keyboard-inset"))).toBe("0px");
+});
+
+// SPEC 1.2 F19: the field you type in stays on screen. Each Add grows the grid above the Add card, which used to
+// push the focused field under the keyboard.
+
+/** Replaces `visualViewport` with one the test controls (as above), before the app starts. */
+async function fakeViewport(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    const target = new EventTarget();
+    const fake = Object.assign(target, { height: window.innerHeight, offsetTop: 0, scale: 1 });
+    Object.defineProperty(window, "visualViewport", { configurable: true, value: fake });
+  });
+}
+
+/** Opens the keyboard: the visual viewport loses `keyboard` px at the bottom. Returns the visible height. */
+async function openKeyboard(page: Page, keyboard: number): Promise<number> {
+  return page.evaluate((height) => {
+    const viewport = window.visualViewport as unknown as EventTarget & { height: number };
+    viewport.height = window.innerHeight - height;
+    viewport.dispatchEvent(new Event("resize"));
+    return viewport.height;
+  }, keyboard);
+}
+
+/** Waits until every locator is between the header's bottom and `visible`. */
+async function expectOnScreen(page: Page, locators: readonly Locator[], visible: number): Promise<void> {
+  const header = (await page.locator(".app-header").boundingBox())?.height ?? 0;
+  for (const locator of locators) {
+    await expect.poll(async () => {
+      const box = await locator.boundingBox();
+      return box !== null && box.y >= header - 1 && box.y + box.height <= visible + 1;
+    }, { message: "field and button between the header and the keyboard" }).toBe(true);
+  }
+}
+
+test("8 players in a row with the keyboard open: the field keeps focus and stays above the keyboard with Add", async ({ page }) => {
+  await fakeViewport(page);
+  await page.goto("./");
+  const field = page.getByRole("textbox", { name: "Player name", exact: true });
+  const add = page.getByRole("button", { name: "Add", exact: true });
+  await field.focus();
+  const visible = await openKeyboard(page, KEYBOARD);
+  for (let index = 1; index <= 8; index++) {
+    await field.fill(`Player ${String(index)}`);
+    // Enter and a tap on Add both keep the focus in the field (the keyboard would close otherwise).
+    if (index % 2 === 0) await add.click();
+    else await field.press("Enter");
+    await expect(page.getByRole("textbox", { name: `Player name for Player ${String(index)}` })).toBeVisible();
+    await expect(field).toBeFocused();
+    await expect(field).toHaveValue("");
+    await expectOnScreen(page, [field, add], visible);
+  }
+});
+
+test("a player's name field focused under the keyboard moves above it", async ({ page }) => {
+  await fakeViewport(page);
+  await page.goto("./");
+  const field = page.getByRole("textbox", { name: "Player name", exact: true });
+  for (const name of ["Ana", "Boris", "Chen", "Dana", "Emil", "Fia"]) {
+    await field.fill(name);
+    await field.press("Enter");
+  }
+  const visible = await openKeyboard(page, KEYBOARD);
+  const rename = page.getByRole("textbox", { name: "Player name for Fia" });
+  // Put the card's name field just under the keyboard's top, then focus it without the browser's own scrolling.
+  await rename.evaluate((element, top) => {
+    window.scrollBy({ top: element.getBoundingClientRect().top - top, behavior: "instant" });
+    (element as HTMLInputElement).focus({ preventScroll: true });
+  }, visible + 20);
+  await expectOnScreen(page, [rename], visible);
 });

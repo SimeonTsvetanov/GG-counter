@@ -187,9 +187,26 @@
   (container queries; phone card 180 → 160 px), core `restoreScoreEntry`; EN + BG; e2e `history-and-cards.spec.ts`,
   csp + a11y screens; docs + images; version 1.1.0 (DECISIONS 2026-11-20, T-16 entries).
 
+### T-17 · 1.2: the field stays on screen, quiet motion, a nicer shared leaderboard
+- Goal: SPEC §11 F19–F22, version 1.2.0.
+- Files: `app/src/lib/{reveal,motion,flip}.ts`, `app/src/hooks/{use-reveal-while-focused,use-flip,use-change}.ts`,
+  `app/src/players/` (add card, card, section, history line and list), `app/src/leaderboard/podium-list.tsx`,
+  `app/src/styles/` (player-card, history, leaderboard, layout, button, menu, choice-list, settings),
+  `packages/core/src/leaderboard-text.ts` (+ tests), `app/src/share/`, i18n, e2e (`keyboard`, `motion`, game, i18n),
+  docs (`share-leaderboard.md`, `manage-players.md`), `content/legal/privacy.md`, CHANGELOG, version 1.2.0.
+- Reading list: design → design-system §9, ui-patterns §4, §6, accessibility §8, responsive-layout §5, moni-taste,
+  css-architecture; app-shell → app-shell §8, i18n §2; engineering → react §6–7, code-quality, testing.
+- Acceptance: AC19–AC22; `pnpm verify` ×2; touched e2e `--repeat-each 5`; a11y-check 0 FAIL en + bg; perf-check
+  `--js-kb 125`; compliance-check 0 FAIL.
+- Depends on: T-16
+- [x] done — 2026-11-20: reveal helper + hook, motion (CSS keyframes + WAAPI FLIP, `use-leaving`), core share text v2,
+  F22 card changes; e2e `motion.spec.ts`, keyboard + AC5 + i18n + F22 tests (`--repeat-each 5` green); version 1.2.0.
+
 ## 4. Follow-ups (dated)
 - **Not before 2026-12-19** — old-key removal release (T-14 rule above, DECISIONS 2026-11-19): delete
   `gg-counter/state` / `gg-counter-theme` only where `gg-counter:v1:migrated` lists the item; drop the `theme-init.js`
   fallback; CHANGELOG + Privacy "Last updated" in the same commit.
 - Lighthouse budgets in CI (`lighthouserc.json` from the forge template) — would make the 125 KB JS budget and LCP/CLS
   automatic; needs its own task (DECISIONS 2026-11-19, JS budget).
+- Share fallback sheet (app-shell §8: WhatsApp + Copy where there is no share sheet, most desktops) — today both Share
+  buttons copy instead; noticed in T-17, not built (DECISIONS 2026-11-20).

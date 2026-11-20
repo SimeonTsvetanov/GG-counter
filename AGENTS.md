@@ -43,7 +43,7 @@ packages/core   gg-counter-core (private): pure score logic + Vitest/fast-check;
 app/src/        app.tsx (composition root); players/ (cards, history sheet), leaderboard/, session/ (header, actions, alerts), share/;
                 ui/ = app shell (menu + lazy header menus, shell dialogs, Settings, footer, toasts, pwa.ts, error screen);
                 i18n/ (en.ts = every UI text, bg.ts lazy, no JSX string literals); storage/ (the only storage access);
-                styles/ (CSS layers), components/ui/ (vendored shadcn/Radix), hooks/, lib/, providers/ (theme), config.ts
+                styles/ (CSS layers), components/ui/ (vendored shadcn/Radix), hooks/ + lib/ (motion: flip, leaving; reveal), providers/, config.ts
 app/test/       storage/, ui/, lib/ unit tests         tests/e2e  Playwright (desktop + phone; en-US, i18n.spec bg-BG)
 design/         tokens.css (forge)                  tests/a11y screens.json for the forge a11y-check (--screens)
 docs/           SPEC, PLAN, DECISIONS (dev) · index.md, how-to/, reference/, about/, images/ = user docs (English)
