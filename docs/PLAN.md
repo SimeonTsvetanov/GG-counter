@@ -181,7 +181,11 @@
 - Acceptance: AC16–AC18; `pnpm verify` ×2; a11y-check 0 FAIL en + bg incl. the history sheet; screenshots light + dark;
   then version 1.1.0 (CHANGELOG dated, What's new).
 - Depends on: T-15
-- [ ] done
+- [x] done — 2026-11-20: "last changes" line (44 px button, calculator tape, newest right) → history sheet (×
+  removes at once, Restore beside Close, "Earlier points", clock times), last-scored tint + pill, medals 🥇🥈🥉
+  in the card corner (core `podiumPlaces`; leaderboard uses the same places), compact cards from 5 players
+  (container queries; phone card 180 → 160 px), core `restoreScoreEntry`; EN + BG; e2e `history-and-cards.spec.ts`,
+  csp + a11y screens; docs + images; version 1.1.0 (DECISIONS 2026-11-20, T-16 entries).
 
 ## 4. Follow-ups (dated)
 - **Not before 2026-12-19** — old-key removal release (T-14 rule above, DECISIONS 2026-11-19): delete

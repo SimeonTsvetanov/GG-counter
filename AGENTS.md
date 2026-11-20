@@ -40,7 +40,7 @@ Offline score tracker for board-game nights — a free micro-app by Simeon "Moni
 ## Where things are (workspace since PLAN T-04, features since T-05)
 ```
 packages/core   gg-counter-core (private): pure score logic + Vitest/fast-check; test/fixtures/ (also used by tests/e2e)
-app/src/        app.tsx (composition root); players/, leaderboard/, session/ (header, actions, confirmations), share/;
+app/src/        app.tsx (composition root); players/ (cards, history sheet), leaderboard/, session/ (header, actions, alerts), share/;
                 ui/ = app shell (menu + lazy header menus, shell dialogs, Settings, footer, toasts, pwa.ts, error screen);
                 i18n/ (en.ts = every UI text, bg.ts lazy, no JSX string literals); storage/ (the only storage access);
                 styles/ (CSS layers), components/ui/ (vendored shadcn/Radix), hooks/, lib/, providers/ (theme), config.ts

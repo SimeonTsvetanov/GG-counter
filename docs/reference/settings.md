@@ -64,13 +64,17 @@ The following limits apply when you enter something.
 | Players in one game | 50 |
 | Characters in a name | 40. Spaces at the start and end don't count, and a simple emoji counts as one character. |
 | Score | -999,999 to 999,999 |
+| Score changes kept per player | 50. Older changes are added to **Earlier points**. |
 | Import file | About 1 MB |
 
 Other rules:
 
 - A blank name adds nobody, and `0` or an empty field in **Adjust score** changes nothing. GG Counter shows no message for these.
 - Two players can have the same name.
-- The leaderboard ranks players by score, highest first. Players with the same score stay in the order you added them.
+- The leaderboard ranks players by score, highest first. Players with the same score share a place and stay in the order you added them.
+- The player cards never move: they stay in the order you added the players. Medals show places 1 to 3.
+- Taps on **+** or **−** for the same player within 3 seconds count as one change in the list of changes.
+- From 5 players on, the player cards are compact.
 - A game saved with larger values before these limits existed loads unchanged.
 
 ## URL parameter

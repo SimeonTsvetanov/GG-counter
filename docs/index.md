@@ -6,8 +6,8 @@ GG Counter keeps score at board-game nights: up to 50 players, +1/−1 or any am
 
 The following guides each cover one task:
 
-- [Manage players](how-to/manage-players.md) — add, rename and remove players, or start over with an empty game.
-- [Change scores](how-to/change-scores.md) — add or subtract points, or set every score back to zero.
+- [Manage players](how-to/manage-players.md) — add, rename and remove players, read the medals on the cards, or start over with an empty game.
+- [Change scores](how-to/change-scores.md) — add or subtract points, see and remove recent changes, or set every score back to zero.
 - [Share the leaderboard](how-to/share-leaderboard.md) — read the ranking and send it to a chat as text.
 - [Manage your data](how-to/manage-your-data.md) — save the game to a file, load it on any device, or delete it.
 - [Install GG Counter and use it offline](how-to/install-app.md) — open GG Counter like an app, with or without internet.

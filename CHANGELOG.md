@@ -4,7 +4,19 @@ All notable user-facing changes. Format: Keep a Changelog · SemVer.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-20
+
 ### Added
+- Each player's card shows the latest score changes in a small line above the score, newest at the
+  right (`+5  −2  +12`). Select the line to see every change with its time and remove a wrong one
+  with **×** — the points come off the total at once, and **Restore** puts the change back.
+- A medal in the corner of the cards in 1st, 2nd and 3rd place (🥇 🥈 🥉), updated with every point.
+  Players with the same score share a medal, here and in the leaderboard; while every score is the
+  same, nobody has one. The cards keep the order the players were added in.
+- The card of the player whose points you entered last is tinted, with their newest change in a pill,
+  so you always see whom you scored last.
+- From the fifth player on, the cards are smaller, so more fit on the screen: a short score sits next
+  to − and +, and wider screens show up to five cards per row.
 - Clear session now asks what to clear: **Players and scores** (as before, selected) or **Scores only**, which
   keeps everyone in the game with 0 points — no more resetting players one by one for a new game. **Reset
   scores** opens the same window with **Scores only** selected.
@@ -12,6 +24,9 @@ All notable user-facing changes. Format: Keep a Changelog · SemVer.
   which keeps the player with 0 points.
 - Every score change is now remembered with its time (up to the last 50 per player; quick taps in a row
   count as one change), saved on this device and in the export file. Files exported by 1.0.0 still import.
+
+### Changed
+- The tinted card now marks the player scored last; the leader has the 🥇 medal instead.
 
 ### Fixed
 - The on-screen keyboard no longer covers the buttons of a window with a text field (for example Apply in Adjust score): the window now sits above the keyboard on Android and on iPhone.

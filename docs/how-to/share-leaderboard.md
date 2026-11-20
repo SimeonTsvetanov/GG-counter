@@ -4,7 +4,7 @@ This guide shows you how to read the ranking and send it to a chat as text. Firs
 
 ## Read the leaderboard
 
-The **Leaderboard** card at the end of the page lists the players by score, highest first. The top three have the medals 🥇, 🥈 and 🥉, and the others are numbered. Players with the same score stay in the order you added them. The name of the leader is at the top right of the card.
+The **Leaderboard** card at the end of the page lists the players by score, highest first. The top three places have the medals 🥇, 🥈 and 🥉, and the others are numbered. Players with the same score share a place and stay in the order you added them. While every score is the same, the list has numbers only. The name of the leader is at the top right of the card.
 
 The trophy button (**Open leaderboard**) in the header opens the same list in a window, so you can check the ranking without scrolling.
 

@@ -83,8 +83,10 @@ test("add, score, rename and remove with a confirmation — in Bulgarian", async
   await dialog.getByRole("button", { name: "Приложи" }).click();
   await expect.poll(() => scoreOf(page, "Ана")).toBe(13);
   await expect.poll(() => scoreOf(page, "Борис")).toBe(-1);
-  // The closing dialog gives focus back to the score button; typing before that would be blurred mid-rename.
+  // The closing dialog gives focus back to the score button (Radix does it a tick after the dialog is gone);
+  // typing before that would be blurred mid-rename, so wait for the focus itself.
   await expect(dialog).toBeHidden();
+  await expect(page.getByRole("button", { name: "Промени точките на Ана: 13" })).toBeFocused();
 
   await page.getByRole("textbox", { name: "Име на играча Борис" }).fill("Боби");
   await page.getByRole("textbox", { name: "Име на играча Борис" }).press("Enter");

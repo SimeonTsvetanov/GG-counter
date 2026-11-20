@@ -30,6 +30,11 @@
       background: var(--color-fill);
       transform: scale(0.97);
     }
+
+    /* The secondary grey on the tinted card is 4.34:1 (light), under AA for small text: full text colour there. */
+    .player-card[data-last-scored] & {
+      color: var(--color-text);
+    }
   }
 
   /* Newest first in the markup, laid out right to left. The auto margins of the two outer items centre the
@@ -63,12 +68,14 @@
       font-weight: var(--weight-semibold);
     }
 
-    /* The last-scored card: its newest change is a pill — the mark is a shape too, not colour alone. */
+    /* The last-scored card: its newest change is a pill — the mark is a shape too, not colour alone. The
+       accent-text colour keeps the pill ≥ 4.6:1 against the tinted card in both themes (accent fill: 2:1 dark),
+       and the card's surface colour reads on it (6.7:1 light, 6.0:1 dark; DECISIONS 2026-11-20). */
     .player-card[data-last-scored] &[data-newest] {
       padding-inline: var(--space-2);
       border-radius: var(--radius-full);
-      background: var(--color-accent);
-      color: var(--color-on-accent);
+      background: var(--color-accent-text);
+      color: var(--color-surface);
     }
   }
 
