@@ -7,8 +7,8 @@ All notable user-facing changes. Format: Keep a Changelog · SemVer.
 ## [1.2.1] - 2026-11-20
 
 ### Removed
-- The share button in the header. With no players it showed a wrong message ("Sharing and copying are
-  blocked"), and Share is already in the Leaderboard card, the leaderboard window and the menu.
+- The share button in the header is gone. With no players it showed a wrong message ("Sharing and
+  copying are blocked"), and Share is already in the Leaderboard card, the leaderboard window and the menu.
 
 ## [1.2.0] - 2026-11-20
 
