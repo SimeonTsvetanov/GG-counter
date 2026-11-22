@@ -4,7 +4,12 @@
  * robots.txt and 404.html are generated from this object (scripts/generate.ts, app/vite.config.ts).
  * Only the sections this app uses: no embed, API, MCP or n8n (DECISIONS 2026-11-19); the one URL
  * parameter is `?lang=` (PLAN T-09, app-shell → i18n), never in the sitemap or canonical.
+ * The steps, features and FAQ live in the game screen's package (packages/miniapp/src/help/), which
+ * Quizzard's Help reads too; this file takes them from there (Bulgarian only into `l10n`, so it stays out
+ * of the first load).
  */
+import { faqBg, featureNamesBg, stepsBg } from "gg-counter-miniapp/help/bg";
+import { faqEn, featureNamesEn, stepsEn } from "gg-counter-miniapp/help/en";
 
 /** One question of the FAQ: shown in `<details>`, in the FAQPage JSON-LD and in llms.txt. */
 export interface FaqItem {
@@ -152,51 +157,9 @@ export const app = {
     display: "standalone",
     orientation: "portrait-primary",
   },
-  steps: [
-    "Type a player's name and tap Add. Repeat for everyone at the table, up to 50 players.",
-    "Tap + or − on a player's card to change that score by one point.",
-    "Tap the score itself to add or subtract any amount, for example 12 or −12, then tap Apply.",
-    "Check the Leaderboard card: players are ranked by score, with 🥇 🥈 🥉 for the top three.",
-    "Tap Share to send the leaderboard as text, or Reset scores to play again with the same players.",
-  ],
-  features: [
-    "Up to 50 players per game",
-    "+1 / −1 buttons and custom score changes",
-    "Leaderboard ranked by score",
-    "Share the leaderboard as text",
-    "Works offline after the first visit",
-    "Game saved on the device only",
-  ],
-  faq: [
-    {
-      q: "Is GG Counter free?",
-      a: "Yes. GG Counter is free to use, with no account, no sign-up and no ads. The source code is open under the MIT licence.",
-    },
-    {
-      q: "Does GG Counter work offline?",
-      a: "Yes, after the first visit. Your browser keeps a copy of GG Counter, so it opens and keeps score without internet. A notice under the header shows when you are offline.",
-    },
-    {
-      q: "Where are my scores saved, and are they sent anywhere?",
-      a: "GG Counter saves players and scores in your browser's storage on this device only. Nothing is sent to a server: there are no accounts, cookies or analytics. Clearing the browser's data for the site deletes the saved game.",
-    },
-    {
-      q: "How many players can I add?",
-      a: "GG Counter takes up to 50 players per game. Each score can go from −999,999 to 999,999.",
-    },
-    {
-      q: "How do I share the result?",
-      a: "Tap Share on the Leaderboard card. GG Counter opens your device's share menu with the ranked leaderboard as text; where there is no share menu, GG Counter copies the text so you can paste it into any chat.",
-    },
-    {
-      q: "How do I install GG Counter on my phone?",
-      a: "On Android, open GG Counter in Chrome and tap Install app when the banner offers it, or choose Add to Home screen in the browser menu. On iPhone or iPad, open GG Counter in Safari, tap Share, then Add to Home Screen.",
-    },
-    {
-      q: "Does GG Counter work for any game?",
-      a: "Yes, for any game scored in points, such as Carcassonne, Star Realms, card games or a quiz night. GG Counter adds and subtracts the points you enter; it does not know the rules of any game.",
-    },
-  ],
+  steps: stepsEn,
+  features: featureNamesEn,
+  faq: faqEn,
   shell: {
     menu: [
       { id: "use", items: ["help", "settings", "whats-new"] },
@@ -224,50 +187,8 @@ export const l10n = {
       "GG Counter брои точките на вечерите с настолни игри: до 50 играчи, +1/−1 или произволна стойност, класиране, което споделяте като текст. Безплатно, без акаунт, работи без интернет.",
     answer:
       "GG Counter е безплатен брояч на точки за вечери с настолни игри: добавяте до 50 играчи, променяте точките с +1, −1 или произволна стойност и споделяте класирането като текст. GG Counter не иска акаунт, работи без интернет след първото отваряне и пази играта само на Вашето устройство.",
-    steps: [
-      "Напишете името на играч и натиснете „Добави“. Повторете за всички на масата — до 50 играчи.",
-      "Натиснете + или − на картата на играча, за да промените точките му с една.",
-      "Натиснете самия резултат, за да добавите или извадите произволна стойност, например 12 или −12, после натиснете „Приложи“.",
-      "Вижте картата „Класиране“: играчите са подредени по точки, с 🥇 🥈 🥉 за първите трима.",
-      "Натиснете „Сподели“, за да изпратите класирането като текст, или „Нулирай точките“, за да играете отново със същите играчи.",
-    ],
-    features: [
-      "До 50 играчи в една игра",
-      "Бутони +1 / −1 и произволна промяна на точките",
-      "Класиране по точки",
-      "Споделяне на класирането като текст",
-      "Работи без интернет след първото отваряне",
-      "Играта се пази само на устройството",
-    ],
-    faq: [
-      {
-        q: "Безплатен ли е GG Counter?",
-        a: "Да. GG Counter е безплатен — без акаунт, без регистрация и без реклами. Изходният код е отворен под лиценза MIT.",
-      },
-      {
-        q: "Работи ли GG Counter без интернет?",
-        a: "Да, след първото отваряне. Браузърът пази копие на GG Counter, така че той се отваря и брои точки и без интернет. Под заглавната лента се показва известие, когато сте без интернет.",
-      },
-      {
-        q: "Къде се пазят точките и изпращат ли се някъде?",
-        a: "GG Counter пази играчите и точките в хранилището на браузъра, само на това устройство. Нищо не се изпраща към сървър: няма акаунти, бисквитки или статистики. Ако изтриете данните на браузъра за сайта, запазената игра се изтрива.",
-      },
-      {
-        q: "Колко играчи мога да добавя?",
-        a: "GG Counter приема до 50 играчи в една игра. Всеки резултат може да е от −999 999 до 999 999.",
-      },
-      {
-        q: "Как да споделя резултата?",
-        a: "Натиснете „Сподели“ в картата „Класиране“. GG Counter отваря менюто за споделяне на устройството с класирането като текст; където няма такова меню, GG Counter копира текста, за да го поставите във всеки чат.",
-      },
-      {
-        q: "Как да инсталирам GG Counter на телефона си?",
-        a: "На Android отворете GG Counter в Chrome и натиснете „Инсталирай приложението“, когато банерът го предложи, или изберете Add to Home screen в менюто на браузъра. На iPhone или iPad отворете GG Counter в Safari, натиснете Share, после Add to Home Screen.",
-      },
-      {
-        q: "Става ли GG Counter за всяка игра?",
-        a: "Да, за всяка игра с точки — Carcassonne, Star Realms, игри с карти или куиз вечер. GG Counter събира и изважда точките, които въвеждате; не знае правилата на никоя игра.",
-      },
-    ],
+    steps: stepsBg,
+    features: featureNamesBg,
+    faq: faqBg,
   },
 } as const satisfies Readonly<Record<Exclude<LanguageCode, "en">, AppText>>;

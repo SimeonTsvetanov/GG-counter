@@ -4,7 +4,7 @@
 // there; the title, date line and buttons are translated. Lazy chunk: costs nothing at first load.
 // Links look like every link (base.css: accent + semibold, no underline — the weight is the WCAG 1.4.1
 // cue; PLAN T-12 replaced the T-10 underline, DECISIONS 2026-11-19).
-import { Button } from "../components/ui/button";
+import { Button } from "gg-counter-miniapp/components/ui/button";
 import { app } from "../config";
 import { getLanguage, t } from "../i18n";
 import type { LegalBlock, LegalInline, PolicyPageId } from "./legal-document";

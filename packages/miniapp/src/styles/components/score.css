@@ -1,0 +1,119 @@
+/* The score on a player card (src/players/score-dialog.tsx) and its row with − and + (SPEC F3; 1.1 F18
+   compact; 1.2 F20 roll, F22 size). Split from player-card.css (css-architecture: one concept per file). */
+@layer components {
+  /* || Components: score row */
+  /* Roomy: the score on its own row, − and + under it as two equal buttons. */
+  /* At the card's foot: when a neighbour in the row is taller, the extra room goes above the score. */
+  .score-row {
+    display: grid;
+    margin-block-start: auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "score score"
+      "minus plus";
+    gap: var(--space-2);
+  }
+
+  .score-step--minus {
+    grid-area: minus;
+  }
+
+  .score-step--plus {
+    grid-area: plus;
+  }
+
+  /* Compact with a short score (≤ 3 characters, players/score-size.ts): score, −, + in one row. */
+  @container player-card (width >= 9rem) {
+    .player-grid[data-density="compact"] .player-card[data-short-score] .score-row {
+      grid-template-columns: minmax(0, 1fr) var(--tap-target) var(--tap-target);
+      grid-template-areas: "score minus plus";
+      gap: var(--space-1);
+    }
+
+    /* Three tabular digits are ~1.9 em: the score size where it fits beside − and +, smaller on narrow phones. */
+    .player-grid[data-density="compact"] .player-card[data-short-score] .score {
+      padding-inline: 0;
+      font-size: min(var(--text-score), (100cqi - 2 * var(--tap-target) - 2 * var(--space-1)) / 2);
+      text-align: start;
+    }
+  }
+
+  /* || Components: score */
+  /* The largest score within the limits, "-999999", is ~4.2 em in tabular bold: the size is capped by the
+     card's width (cqi of the player-card container), so it fits even a 320 px phone. A short score (≤ 3
+     characters) needs only ~2 em, so it may grow up to the score size on any phone. The target is a notch
+     taller than the other controls (Moni 2026-11-20: more room to press it); the history line gave up the
+     same height (history.css), so cards keep their 1.1 height. */
+  .score {
+    --score-fit: calc((100cqi - 2 * var(--space-1)) / 4.4);
+
+    display: block;
+    grid-area: score;
+    width: 100%;
+    min-width: 0;
+    min-height: calc(var(--tap-target) + var(--space-2));
+    padding: var(--space-1);
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    font-size: min(var(--text-score), var(--score-fit));
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+    font-variant-numeric: tabular-nums;
+    transition: background-color var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-out);
+
+    @media (hover: hover) {
+      &:hover {
+        background: var(--color-fill);
+      }
+    }
+
+    &:active {
+      background: var(--color-fill);
+      transform: scale(0.97);
+    }
+
+    .player-card[data-short-score] & {
+      --score-fit: calc((100cqi - 2 * var(--space-1)) / 2.2);
+    }
+
+    /* Saved games from before the limits may hold longer numbers: smaller, and wrapping as a last resort. */
+    &[data-long] {
+      font-size: var(--text-xl);
+      overflow-wrap: anywhere;
+    }
+  }
+
+  /* The digits roll in from the direction of the change (keyed by the score, so a quick tap restarts it and
+     nothing queues). Transform only: the digits keep full contrast in every frame. */
+  .score-value {
+    display: inline-block;
+
+    &[data-trend="up"] {
+      animation: score-roll-up var(--duration-base) var(--ease-spring);
+    }
+
+    &[data-trend="down"] {
+      animation: score-roll-down var(--duration-base) var(--ease-spring);
+    }
+
+    /* Reduced motion: the new number is the cue; nothing moves (accessibility §8). */
+    @media (prefers-reduced-motion: reduce) {
+      &[data-trend] {
+        animation: none;
+      }
+    }
+  }
+
+  @keyframes score-roll-up {
+    from {
+      transform: translateY(0.35em);
+    }
+  }
+
+  @keyframes score-roll-down {
+    from {
+      transform: translateY(-0.35em);
+    }
+  }
+}

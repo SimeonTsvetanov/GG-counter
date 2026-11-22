@@ -1,7 +1,7 @@
 // Report a problem (app-shell §6, rule 7): the user describes the problem, chooses whether technical
 // details are added, and sends it as a GitHub issue or an email. Nothing is sent by the app itself.
 import { useId, useState } from "react";
-import { Button } from "../components/ui/button";
+import { Button } from "gg-counter-miniapp/components/ui/button";
 import { app } from "../config";
 import { t } from "../i18n";
 import { diagnostics, githubIssueUrl, mailtoUrl, type ProblemReport } from "./report-links";

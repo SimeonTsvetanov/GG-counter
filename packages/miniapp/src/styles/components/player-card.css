@@ -1,0 +1,161 @@
+/* Player cards (src/players/). The grid keeps the order players were added; up to four players the cards
+   are roomy, from the fifth they get compact and the grid gains columns where there is room (SPEC 1.1 F18,
+   `data-density` on the grid, container `main` in layout.css). Each card: name + Remove, the "last changes"
+   line (history.css), the score, − and +. Roomy: the score on its own row, so a 7-character score fits a
+   390 px phone (PLAN T-12). Compact: a short score sits beside − and + like an iOS stepper, one row less.
+   One meaning per mark (DECISIONS 2026-11-20): the medal in the corner = place 1–3; the accent tint = the
+   player scored last, with a raised shadow as its non-colour cue (1.2: no pill on the line, Moni 2026-11-20).
+   Motion (SPEC 1.2 F20, DECISIONS 2026-11-20): a new card pops in, a removed one fades out in its slot
+   (`data-motion`, use-leaving.ts), the tint fades from card to card, the score rolls in from its direction. */
+@layer components {
+  /* || Components: player grid */
+  .player-grid {
+    --player-grid-columns: 2;
+
+    display: grid;
+    grid-template-columns: repeat(var(--player-grid-columns), minmax(0, 1fr));
+    gap: var(--space-3);
+
+    @container main (width > 45rem) {
+      --player-grid-columns: 4;
+
+      gap: var(--space-4);
+    }
+
+    /* Compact: smaller gaps, and a column more wherever a compact card (≥ 9 rem) still fits. */
+    &[data-density="compact"] {
+      gap: var(--space-2);
+
+      @container main (width > 29rem) {
+        --player-grid-columns: 3;
+      }
+
+      @container main (width > 40rem) {
+        --player-grid-columns: 4;
+      }
+
+      @container main (width > 51rem) {
+        --player-grid-columns: 5;
+      }
+    }
+  }
+
+  /* || Components: player card */
+  .player-card {
+    container: player-card / inline-size;
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-3);
+    transition: box-shadow var(--duration-base) var(--ease-standard);
+
+    @media (width > 600px) {
+      padding: var(--space-4);
+    }
+
+    /* The last-scored tint is a layer under the content, so it can fade out here and in on the next card. */
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      border-radius: inherit;
+      background: var(--color-accent-tint);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--duration-base) var(--ease-standard);
+
+      /* A fade is still a cue under reduced motion (accessibility §8). */
+      @media (prefers-reduced-motion: reduce) {
+        transition-duration: var(--duration-fade);
+      }
+    }
+
+    /* Scored last: the accent tint, and the card sits a little higher (shadow) — a quiet cue that is not colour. */
+    &[data-last-scored] {
+      box-shadow: var(--shadow-2);
+
+      &::before {
+        opacity: 1;
+      }
+    }
+
+    &[data-motion="entering"] {
+      animation: card-in var(--duration-alert) var(--ease-spring);
+    }
+
+    /* Removed: fades out in its slot (inert), then the others slide into the gap (use-flip.ts). */
+    &[data-motion="leaving"] {
+      animation: card-out var(--duration-base) var(--ease-out) forwards;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      &[data-motion="entering"] {
+        animation: card-fade-in var(--duration-fade) var(--ease-out);
+      }
+
+      &[data-motion="leaving"] {
+        animation: card-fade-out var(--duration-fade) var(--ease-out) forwards;
+      }
+    }
+
+    .player-grid[data-density="compact"] & {
+      padding: var(--space-2);
+    }
+  }
+
+  .player-card-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  /* The medal of places 1–3, pinned to the card's corner so it costs no room in any layout. */
+  .place-medal {
+    position: absolute;
+    inset-block-start: calc(var(--space-3) * -1);
+    inset-inline-start: calc(var(--space-2) * -1);
+    font-size: var(--text-2xl);
+    line-height: var(--leading-tight);
+    pointer-events: none;
+    animation: medal-in var(--duration-alert) var(--ease-spring);
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: modal-fade-in var(--duration-fade) var(--ease-out);
+    }
+  }
+
+  @keyframes medal-in {
+    from {
+      transform: scale(0.6);
+    }
+  }
+
+  @keyframes card-in {
+    from {
+      opacity: 0;
+      transform: scale(0.92);
+    }
+  }
+
+  @keyframes card-out {
+    to {
+      opacity: 0;
+      transform: scale(0.92);
+    }
+  }
+
+  @keyframes card-fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes card-fade-out {
+    to {
+      opacity: 0;
+    }
+  }
+}

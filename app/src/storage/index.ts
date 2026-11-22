@@ -2,10 +2,10 @@
 // clear this app's data. Called by Settings and the error screen (PLAN T-08). The game, theme, language and migration
 // have their own files next to this one; nothing outside app/src/storage touches localStorage (ESLint rule).
 import { checkSavedGame, type GameState, type Result } from "gg-counter-core";
-import { APP_ID, STORAGE_KEYS, isOwnKey } from "./keys";
-import { listKeys, readRaw, removeRaw, writeRaw, type StorageErrorCode, type StorageResult } from "./local-store";
-import { encodeGame, readGame } from "./game";
-import { isTheme, readTheme, writeTheme, type Theme } from "./theme";
+import { APP_ID, STORAGE_KEYS, isOwnKey } from "gg-counter-miniapp/storage/keys";
+import { listKeys, readRaw, removeRaw, writeRaw, type StorageErrorCode, type StorageResult } from "gg-counter-miniapp/storage/local-store";
+import { encodeGame, readGame } from "gg-counter-miniapp/storage/game";
+import { isTheme, readTheme, writeTheme, type Theme } from "gg-counter-miniapp/storage/theme";
 import { isLanguage, readLanguage, writeLanguage } from "./lang";
 import type { LanguageCode } from "../config";
 

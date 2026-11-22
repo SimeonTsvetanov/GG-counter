@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { FakeStorage, blockStorage, unblockStorage, useStorage } from "./fake-storage.ts";
+import { FakeStorage, blockStorage, unblockStorage, useStorage } from "gg-counter-miniapp/test/fake-storage";
 
 /** Loads fresh copies of the modules (the memory fallback of local-store is per module instance). */
 async function start() {

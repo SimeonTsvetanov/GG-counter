@@ -1,0 +1,49 @@
+/* Cards (design → ui-patterns §7): surface, large radius, resting shadow — no borders. Set by
+   src/components/ui/card.tsx. */
+@layer components {
+  /* || Components: card */
+  .card {
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    color: var(--color-text);
+    box-shadow: var(--shadow-1);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-5) var(--space-5) var(--space-3);
+  }
+
+  .card-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+
+    & svg {
+      width: 1em;
+      height: 1em;
+      color: var(--color-accent-text);
+    }
+  }
+
+  .card-meta {
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .card-content {
+    padding: 0 var(--space-5) var(--space-5);
+  }
+
+  .card-footer {
+    padding: 0 var(--space-5) var(--space-5);
+  }
+}

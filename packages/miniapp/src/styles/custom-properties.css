@@ -1,0 +1,17 @@
+/* The game screen's own custom properties (Quizzard PLAN §1.3): what it needs beyond the forge tokens
+   every host supplies (design/tokens.css + accent). `:root` is the page on the standalone site and the
+   screen's scope root inside Quizzard (the miniapp-css transform maps it). */
+@layer tokens {
+  :root {
+    /* Radix dialogs are not in the browser's top layer (native <dialog> is), so they need a stacking
+       level: above the header (10) and the toast region (30) — while a modal is open, the toast renders
+       inside it (accessibility §5). The standalone shell's menus use it too. */
+    --z-modal: 40;
+    /* The score on a player card, a notch over the large title (Moni 2026-11-20, SPEC 1.2 F22): 32 → 40 px. */
+    --text-score: clamp(2rem, 1.4rem + 3.2vw, 2.5rem);
+    /* Set from JS while the screen is mounted (lib/keyboard-inset.ts): how much of the layout viewport
+       the iOS keyboard covers, and the visible height. These are the values with no keyboard. */
+    --keyboard-inset: 0px;
+    --visual-height: 100dvh;
+  }
+}

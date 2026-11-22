@@ -1,7 +1,7 @@
 // The header's theme button (from 600 px up): a menu of Light / Dark / System. The icon shows the theme
 // in use (sun in light, moon in dark). Loaded after the first paint like the app menu (ui/header-menus.tsx).
 import { useRef } from "react";
-import { Button } from "./ui/button";
+import { Button } from "gg-counter-miniapp/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,

@@ -3,8 +3,8 @@
 // menu and the header theme menu); sub-menus, checkbox items and shortcuts were removed.
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { Check } from "lucide-react";
-import { cn } from "../../lib/utils";
-import { usePortalContainer } from "./portal-container";
+import { cn } from "gg-counter-miniapp/lib/utils";
+import { usePortalContainer } from "gg-counter-miniapp/components/ui/portal-container";
 import { forwardRef } from "react";
 
 const DropdownMenu = DropdownMenuPrimitive.Root;

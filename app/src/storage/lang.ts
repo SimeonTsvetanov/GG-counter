@@ -2,8 +2,8 @@
 // other values of the namespace. No value = no choice yet: the app starts in English (no browser detection).
 // Used by app/src/i18n and by export/import (index.ts).
 import { app, type LanguageCode } from "../config";
-import { STORAGE_KEYS } from "./keys";
-import { readRaw, writeRaw, type StorageResult } from "./local-store";
+import { STORAGE_KEYS } from "gg-counter-miniapp/storage/keys";
+import { readRaw, writeRaw, type StorageResult } from "gg-counter-miniapp/storage/local-store";
 
 /** Returns true when `value` is one of the app's UI languages (app.config.ts `languages`). */
 export function isLanguage(value: unknown): value is LanguageCode {

@@ -1,32 +1,23 @@
 @layer tokens, theme, base, layout, components, utilities, overrides;
 /* App stylesheet entry (main.tsx imports only this file). The line above fixes the cascade order once
    (design → css-architecture §1); Tailwind 4's own layers (theme, base, utilities) take their place in
-   it, so utilities in JSX beat component blocks and overrides beat both. Components are imported in
-   on-screen order. Every value comes from design/tokens.css (+ the generated accent). */
+   it, so utilities in JSX beat component blocks and overrides beat both. The game screen's stylesheet
+   (gg-counter-miniapp body.css: its tokens, Tailwind theme, base, layout, components and overrides)
+   comes first, then the page's own parts in on-screen order. Every value comes from design/tokens.css
+   (+ the generated accent). */
 
 @import "../../../design/tokens.css";
 /* Per-app accent from app.config.ts (scripts/accent.ts); after tokens.css, same `tokens` layer. */
 @import "../generated/accent.css";
 @import "tailwindcss/preflight.css" layer(base);
 @import "tailwindcss/utilities.css" layer(utilities);
-@import "./theme.css";
+@import "gg-counter-miniapp/styles/body.css";
 @import "./fonts.css";
 @import "./base.css";
 @import "./layout.css";
-@import "./components/button.css";
-@import "./components/field.css";
-@import "./components/card.css";
 @import "./components/header.css";
-@import "./components/player-card.css";
-@import "./components/score.css";
-@import "./components/leaderboard.css";
 @import "./components/page-info.css";
 @import "./components/disclosure.css";
-@import "./components/modal.css";
-@import "./components/alert.css";
-/* After modal.css: the history sheet's button row changes the sheet's. */
-@import "./components/history.css";
-@import "./components/choice-list.css";
 @import "./components/menu.css";
 @import "./components/settings.css";
 @import "./components/help.css";

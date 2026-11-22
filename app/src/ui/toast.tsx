@@ -4,10 +4,10 @@
 // the toast renders inside the top dialog, because Radix makes everything outside it inert.
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { Button } from "../components/ui/button";
+import { Button } from "gg-counter-miniapp/components/ui/button";
 import { t } from "../i18n";
 import { useLanguage } from "../i18n/use-language";
-import { cn } from "../lib/utils";
+import { cn } from "gg-counter-miniapp/lib/utils";
 
 /** How long an info toast stays (ui-patterns §6: 4–6 s). */
 export const TOAST_DURATION_MS = 5000;

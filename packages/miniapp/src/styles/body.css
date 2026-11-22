@@ -1,0 +1,27 @@
+/* The game screen's stylesheet without the forge tokens, the accent or fonts (Quizzard PLAN §1.3: the
+   host supplies them). Two hosts import it: the standalone app.css (after its tokens, Tailwind and the
+   layer order) and miniapp.css (Quizzard). Components in on-screen order; every value is a token. */
+
+/* The screen's own sources, for Tailwind's utilities: relative to this file, so it works from any Vite
+   root (the standalone app's or Quizzard's). Code only: words in these stylesheets are no class names,
+   nor are those in the comments of the verbatim contract copy (its `filter` would add a utility). */
+@source "../**/*.{ts,tsx}";
+@source not "../contract.ts";
+
+/* Not named tokens.css: the host's token file is the one a mini-app must never import (check-miniapp-tokens). */
+@import "./custom-properties.css";
+@import "./theme.css";
+@import "./base.css";
+@import "./layout.css";
+@import "./components/button.css";
+@import "./components/field.css";
+@import "./components/card.css";
+@import "./components/player-card.css";
+@import "./components/score.css";
+@import "./components/leaderboard.css";
+@import "./components/modal.css";
+@import "./components/alert.css";
+/* After modal.css: the history sheet's button row changes the sheet's. */
+@import "./components/history.css";
+@import "./components/choice-list.css";
+@import "./overrides.css";

@@ -12,7 +12,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { readTheme, writeTheme, type Theme } from "../storage/theme";
+import { readTheme, writeTheme, type Theme } from "gg-counter-miniapp/storage/theme";
 
 interface ThemeProviderProps {
   children: ReactNode;

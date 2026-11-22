@@ -1,7 +1,7 @@
 // Builds app/public/theme-init.js (written by generate.ts): a tiny blocking script in <head> that puts
 // the saved theme's class on <html> before the first paint, so dark users see no light flash; a saved
-// choice also sets `data-theme`, which design/tokens.css turns into the color-scheme (PLAN T-12). It mirrors
-// app/src/storage/theme.ts and the migration rule of app/src/storage/migrate.ts (checked by tests).
+// choice also sets `data-theme`, which design/tokens.css turns into the color-scheme (PLAN T-12). It
+// mirrors the theme and migration rules of packages/miniapp/src/storage (theme.ts, migrate.ts; tests check).
 import type { AppConfig } from "../app.config.ts";
 
 /** The pre-forge theme key (SPEC §4): read only while the migration marker does not list the theme. */

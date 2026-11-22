@@ -1,0 +1,77 @@
+/* Base layer of the game screen: element defaults for everything it renders (Tailwind's preflight is
+   imported into this layer first). `html` and `body` are the page on the standalone site and the
+   screen's scope root inside Quizzard (miniapp-css transform). What acts on the whole document — scroll
+   padding under the sticky header, text-size adjust, page transitions, the full-height body — belongs
+   to the page and stays in the standalone shell's base.css. */
+@layer base {
+  html {
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    /* No grey flash on tap — every control has its own visible pressed state instead. */
+    -webkit-tap-highlight-color: transparent;
+    /* Native checkboxes use the app accent. */
+    accent-color: var(--color-accent);
+  }
+
+  body {
+    line-height: var(--leading-normal);
+    font-size: var(--text-base);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Moni: no underlines (forge DECISIONS 2026-11-06). Accent + semibold mark a link: the weight is the
+     non-colour cue of WCAG 1.4.1 (technique G182), because the dark accent text is under 3:1 against the
+     body text (PLAN T-12 measured it; DECISIONS 2026-11-19). Hover fades the link a little. */
+  a {
+    color: var(--color-accent-text);
+    font-weight: var(--weight-semibold);
+    text-decoration: none;
+    transition: opacity var(--duration-fast) var(--ease-standard);
+
+    @media (hover: hover) {
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  }
+
+  /* One focus ring everywhere (accessibility §3): 2 px in --color-focus, ≥ 3:1 on every surface. */
+  :focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  /* Buttons look clickable (Tailwind 4 preflight resets them to the default cursor). */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  /* UI chrome is not text: no selection callout on a long-press of a button. */
+  button {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Native fields follow the theme (Windows dark mode, design-system §4). */
+  input,
+  textarea,
+  select {
+    background-color: var(--color-fill);
+    color: var(--color-text);
+  }
+
+  ::placeholder {
+    color: var(--color-text-secondary);
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    background: var(--color-fill);
+    padding: 0 var(--space-1);
+    border-radius: var(--radius-sm);
+  }
+}

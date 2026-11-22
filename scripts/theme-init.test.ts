@@ -1,7 +1,7 @@
 import { runInNewContext } from "node:vm";
 import { describe, expect, it } from "vitest";
 import { app } from "../app.config.ts";
-import { LEGACY_KEYS, STORAGE_KEYS } from "../app/src/storage/keys.ts";
+import { LEGACY_KEYS, STORAGE_KEYS } from "gg-counter-miniapp/storage/keys";
 import { LEGACY_THEME_KEY, themeInitScript } from "./theme-init.ts";
 
 const script = themeInitScript(app);

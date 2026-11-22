@@ -4,15 +4,15 @@
 // 2026-11-06): buttons and menu items = short imperative ("Добави", "Изтрий данните ми"); sentences =
 // polite plural ("Изберете", "Вашите"); plain everyday words, one word per idea — играч, точки,
 // класиране, сесия; iOS and Android labels (Share, Add to Home Screen) as the device shows them;
-// Bulgarian quotes „…“. Written and reviewed by Claude.
+// Bulgarian quotes „…“. Written and reviewed by Claude. The game screen's texts come from its package (en.ts).
+import { bg as gameBg } from "gg-counter-miniapp/i18n/bg";
 import type { AppText } from "../config";
 import type { Messages } from "./index";
 
 /** The Bulgarian dictionary. */
 export const bg: Messages = {
   shell: {
-    cancel: "Отказ",
-    close: "Затвори",
+    ...gameBg.shell,
     copy: "Копирай подробностите",
     copied: "Копирано ✓",
     dismiss: "Скрий",
@@ -172,101 +172,9 @@ export const bg: Messages = {
   },
   app: {
     tagline: "Брояч на точки за настолни игри",
-    shareTitle: "Сесия в {{name}}",
-    shareFailed: "Споделянето и копирането са блокирани в този браузър. Опитайте с друг браузър.",
-    copiedSummary: "Класирането е копирано ✓",
-    header: {
-      leaderboard: "Отвори класирането",
-      addPlayer: "Добави играч",
-      clear: "Изчисти сесията",
-    },
-    players: {
-      addTitle: "Добави играч",
-      count_one: "{{count}} играч",
-      count_other: "{{count}} играчи",
-      namePlaceholder: "Име на играч",
-      nameLabel: "Име на играч",
-      add: "Добави",
-      nameFor: "Име на играча {{name}}",
-      decrease: "Намали точките на {{name}}",
-      increase: "Увеличи точките на {{name}}",
-      remove: "Премахни {{name}}",
-      removeTitle: "Да се премахне ли играчът или точките?",
-      removeMessage: "Изберете какво да се премахне за {{name}}. Действието не може да се отмени.",
-      removeLegend: "Какво да се премахне",
-      removePlayer: "Играча и точките",
-      removePlayerHint: "{{name}} излиза от играта.",
-      removePlayerConfirm: "Премахни",
-      removeScore: "Само точките",
-      removeScoreHint: "{{name}} остава с 0 точки.",
-      removeScoreConfirm: "Нулирай",
-      medal1: "1-во място",
-      medal2: "2-ро място",
-      medal3: "3-то място",
-    },
-    history: {
-      open: "История на точките на {{name}}: {{changes}}",
-      openLast: "История на точките на {{name}} (последна промяна в играта): {{changes}}",
-      total_one: "Общо: {{count}} точка",
-      total_other: "Общо: {{count}} точки",
-      list: "Промени, най-новите първи",
-      remove: "Премахни {{change}} от точките на {{name}}",
-      earlier: "По-ранни точки",
-      empty: "Още няма промени. Всяко + и − за {{name}} ще се появи тук.",
-      removed: "Премахнато {{change}}. Общо вече {{total}}.",
-      restored: "Върнато {{change}}. Общо вече {{total}}.",
-      restore: "Върни {{change}}",
-    },
-    score: {
-      adjust: "Промени точките на {{name}}: {{score}}",
-      title: "Промени точките",
-      description: "Добавете или извадете точки на {{name}}. За изваждане въведете число с минус.",
-      amount: "Промяна на точките",
-      apply: "Приложи",
-    },
-    leaderboard: {
-      title: "Класиране",
-      highlights: "Най-добрите в текущата сесия",
-      noPlayers: "Още няма играчи",
-      emptyCard: "Добавете играчи, за да се появи класирането.",
-      emptyDialog: "Още няма играчи. Добавете някого, за да започнете.",
-      points_one: "{{count}} точка",
-      points_other: "{{count}} точки",
-      rankRow: "{{rank}}. {{name}}",
-      rankRowDialog: "🎲 {{rank}} — {{name}}",
-      share: "Сподели",
-      reset: "Нулирай точките",
-      ok: "Добре",
-    },
-    session: {
-      clearTitle: "Да се изчисти ли сесията?",
-      clearMessage: "Изберете какво да се изчисти. Действието не може да се отмени.",
-      clearLegend: "Какво да се изчисти",
-      clearAll: "Играчите и точките",
-      clearAllHint: "Премахва всички играчи — за нова група.",
-      clearAllConfirm: "Изчисти",
-      clearScores: "Само точките",
-      clearScoresHint: "Всички играчи остават с 0 точки — за нова игра.",
-      clearScoresConfirm: "Нулирай",
-    },
-    limits: {
-      PLAYERS_TOO_MANY: "В една игра може да има до {{max}} играчи. Премахнете играч, за да добавите друг.",
-      NAME_TOO_LONG: "Имената могат да са до {{max}} знака. Съкратете името и опитайте отново.",
-      SCORE_OUT_OF_RANGE: "Точките са от {{min}} до {{max}}. Тази промяна излиза извън границата.",
-    },
+    ...gameBg.app,
     footer: {
       support: "Ако ме подкрепите: „Заровете да са с вас!“",
-    },
-    share: {
-      title: "{{name}} — Класиране",
-      points_one: "{{score}} точка",
-      points_other: "{{score}} точки",
-      winner_one: "Победител: {{names}} — {{points}}",
-      winner_other: "Победители: {{names}} — по {{points}}",
-      tie: "Всички са равни — по {{points}}",
-      players_one: "{{count}} играч",
-      players_other: "{{count}} играчи",
-      summary: "{{players}} · общо {{points}}",
     },
     page: {
       label: "За {{name}}",

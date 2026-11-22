@@ -1,7 +1,13 @@
-// The page's text sharing (app-shell §8), behind `Host.share` (host.ts): the device's share sheet, else
-// the clipboard. Cancelling the sheet is not an error. The body decides what to share and what to say
-// about the outcome (share/share-leaderboard.ts, app.tsx).
-import type { HostShareData, ShareOutcome } from "../host";
+// The page's text sharing (app-shell §8), behind the contract's `shell.share` (miniapp/context.ts): the
+// device's share sheet, else the clipboard. Cancelling the sheet is not an error. The game screen decides
+// what to share and what to say about the outcome (gg-counter-miniapp share/share-leaderboard.ts).
+import type { MiniAppContext } from "gg-counter-miniapp/contract";
+
+/** What is shared: a text, with an optional title and address. */
+type ShareRequest = Parameters<MiniAppContext["shell"]["share"]>[0];
+
+/** How sharing ended: handed to the share sheet, copied, cancelled by the user, or not possible. */
+type ShareOutcome = Awaited<ReturnType<MiniAppContext["shell"]["share"]>>;
 
 /** Returns true when `error` means the user closed the share sheet (app-shell §8: silent). */
 function isCancel(error: unknown): boolean {
@@ -25,7 +31,7 @@ async function copy(nav: Partial<Navigator>, text: string): Promise<boolean> {
  * @remarks A cancelled share sheet does nothing; any other refusal of Web Share (e.g. not allowed
  * outside a tap) falls back to the clipboard. Only the given fields reach the share sheet.
  */
-export async function shareOrCopy({ title, text, url }: HostShareData): Promise<ShareOutcome> {
+export async function shareOrCopy({ title, text, url }: ShareRequest): Promise<ShareOutcome> {
   // because lib.dom types share and clipboard as always present, but browsers omit them
   const nav: Partial<Navigator> = typeof navigator === "undefined" ? {} : navigator;
   if (nav.share) {

@@ -1,0 +1,37 @@
+/* Layout layer of the game screen: the page column and the screen's own box. The standalone shell's
+   header, banner and footer use the same column, so every section lines up; the side safe areas are
+   applied here, once (APP-STANDARD §12.1). */
+@layer layout {
+  /* One centred column shared by header, banner, the screen and footer, so every section lines up. */
+  .page-column {
+    width: 100%;
+    max-width: calc(var(--content-max) + 2 * var(--space-4));
+    margin-inline: auto;
+    padding-inline: calc(var(--space-4) + var(--safe-left)) calc(var(--space-4) + var(--safe-right));
+  }
+
+  /* || Layout: the screen */
+  /* A container (`main`), so the player grid picks its columns by the room it really has (player-card.css). */
+  /* Positioned: its blocks slide against it when a player card comes or goes (use-flip.ts, SPEC 1.2 F20). */
+  .app-main {
+    container: main / inline-size;
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    padding-block: var(--space-4) var(--space-10);
+
+    @media (width > 600px) {
+      gap: var(--space-8);
+      padding-block: var(--space-8) var(--space-12);
+    }
+  }
+
+  /* Single-column cards (Add player, Leaderboard, how it works). */
+  .narrow-column {
+    width: 100%;
+    max-width: var(--content-narrow);
+    margin-inline: auto;
+  }
+}

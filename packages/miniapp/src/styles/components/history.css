@@ -1,0 +1,182 @@
+/* Score history (src/players/history-*.tsx, SPEC 1.1 F16): the "last changes" line on each player card
+   and the history sheet behind it. The line reads like a calculator's tape above its result: small, dimmed,
+   oldest → newest from left to right, the newest at the right end, a little heavier. */
+@layer components {
+  /* || Components: last changes line */
+  /* Always there, empty or not, so cards stay equal and nothing jumps at the first change. It takes a little
+     less room than a 44 px row (1.2: the bigger score got that room, player-card.css); the line's button keeps
+     its 44 px target by reaching into the gaps above and below it, where there is no other control. */
+  .history-slot {
+    --history-line: calc(var(--tap-target) - var(--space-2));
+
+    min-height: var(--history-line);
+  }
+
+  .history-strip {
+    display: flex;
+    width: 100%;
+    min-height: var(--tap-target);
+    margin-block: calc((var(--history-line) - var(--tap-target)) / 2);
+    padding-inline: var(--space-2);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+    transition: background-color var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-out);
+
+    @media (hover: hover) {
+      &:hover {
+        background: var(--color-fill);
+        color: var(--color-text);
+      }
+    }
+
+    &:active {
+      background: var(--color-fill);
+      transform: scale(0.97);
+    }
+
+    /* The secondary grey on the tinted card is 4.34:1 (light), under AA for small text: a slightly darker
+       grey there (≈ 5:1), still in the background like the rest (Moni 2026-11-20). */
+    .player-card[data-last-scored] & {
+      color: color-mix(in oklab, var(--color-text-secondary) 75%, var(--color-text));
+    }
+  }
+
+  /* Newest first in the markup, laid out right to left. The auto margins of the two outer items centre the
+     line while it fits; when it does not they become 0, so the newest end stays in view and the oldest are cut
+     at the left edge, which fades out. (`justify-content: safe center` falls back to the left edge instead.) */
+  .history-strip-items {
+    display: flex;
+    flex: 1;
+    flex-direction: row-reverse;
+    align-items: center;
+    gap: var(--space-2);
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    mask-image: linear-gradient(to right, transparent, var(--color-text) var(--space-4));
+  }
+
+  .history-strip-item {
+    flex-shrink: 0;
+
+    &:first-child {
+      margin-inline-end: auto;
+    }
+
+    &:last-child {
+      margin-inline-start: auto;
+    }
+
+    /* Quiet on purpose (Moni 2026-11-20: "noticeable, but not quite", like a calculator's tape): the newest
+       change keeps the line's grey and is only a little heavier — on every card, no shape around it (1.2: the
+       outlined pill on the last-scored card is gone, Moni: "the accent is a bit misplaced"). */
+    &[data-newest] {
+      font-weight: var(--weight-semibold);
+    }
+
+    /* A change that just arrived slides in at the right end (SPEC 1.2 F20); merged quick taps do not replay. */
+    &[data-fresh] {
+      animation: strip-in var(--duration-base) var(--ease-out);
+
+      @media (prefers-reduced-motion: reduce) {
+        animation: strip-fade-in var(--duration-fade) var(--ease-out);
+      }
+    }
+  }
+
+  @keyframes strip-in {
+    from {
+      opacity: 0;
+      transform: translateX(0.75em);
+    }
+  }
+
+  @keyframes strip-fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* || Components: history sheet */
+  .history-total {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .history-empty {
+    padding-block: var(--space-4);
+    color: var(--color-text-secondary);
+    font-size: var(--text-md);
+  }
+
+  /* Rows separated by inset hairlines inside one list (ui-patterns §7): amount, time, ×. */
+  /* Positioned: the rows slide against it when one is removed or restored (use-flip.ts). */
+  .history-list {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .history-row {
+    display: grid;
+    grid-template-columns: minmax(5ch, auto) minmax(0, 1fr) var(--tap-target);
+    align-items: center;
+    column-gap: var(--space-3);
+    min-height: calc(var(--tap-target) + var(--space-2));
+
+    & + & {
+      box-shadow: inset 0 1px 0 var(--color-separator);
+    }
+
+    /* Put back by Restore: fades in where it was, the rows below slide down (SPEC 1.2 F20). */
+    &[data-restored] {
+      animation: strip-fade-in var(--duration-base) var(--ease-out);
+
+      @media (prefers-reduced-motion: reduce) {
+        animation-duration: var(--duration-fade);
+      }
+    }
+  }
+
+  .history-amount {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .history-time {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--color-text-secondary);
+    font-size: var(--text-md);
+    font-variant-numeric: tabular-nums;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .history-remove {
+    color: var(--color-text-secondary);
+  }
+
+  /* Points from before the history: quieter, no × (they cannot be removed one by one). */
+  .history-row--earlier {
+    color: var(--color-text-secondary);
+
+    & .history-amount {
+      font-weight: var(--weight-medium);
+    }
+  }
+
+  .history-error {
+    grid-column: 1 / -1;
+    padding-block-end: var(--space-2);
+  }
+
+  /* Restore and Close side by side at every width, so Restore appearing never moves the rows above. */
+  .history-actions {
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+  }
+}

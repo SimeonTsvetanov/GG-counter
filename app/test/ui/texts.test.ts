@@ -1,8 +1,8 @@
-// Unit tests for the UI texts (app/src/i18n), the limit messages and the deep-link parser of the shell.
+// Unit tests for the UI texts (app/src/i18n) and the deep-link parser of the shell (the limit messages
+// moved with the game screen: packages/miniapp/test/ui/limit-message.test.ts).
 import { describe, expect, it } from "vitest";
 import { en } from "../../src/i18n/en.ts";
 import { formatNumber, t, type MessageKey } from "../../src/i18n/index.ts";
-import { limitCode, limitMessage } from "../../src/players/limit-message.ts";
 import { SHELL_DIALOGS, dialogFromHash } from "../../src/ui/use-shell-dialog.ts";
 import { app } from "../../src/config.ts";
 
@@ -54,22 +54,6 @@ describe("t()", () => {
 
   it("formats numbers with digit grouping", () => {
     expect(formatNumber(-999_999)).toBe("-999,999");
-  });
-});
-
-describe("limitMessage", () => {
-  it("keeps only the codes that have a message", () => {
-    expect(["PLAYERS_TOO_MANY", "NAME_TOO_LONG", "SCORE_OUT_OF_RANGE", "NAME_EMPTY", "x"].map(limitCode)).toEqual(["PLAYERS_TOO_MANY", "NAME_TOO_LONG", "SCORE_OUT_OF_RANGE", null, null]);
-  });
-
-  it("explains the three limits with their numbers", () => {
-    expect(limitMessage("PLAYERS_TOO_MANY")).toBe("A game can have up to 50 players. Remove a player to add another.");
-    expect(limitMessage("NAME_TOO_LONG")).toMatch(/up to 40 characters/);
-    expect(limitMessage("SCORE_OUT_OF_RANGE")).toMatch(/from -999,999 to 999,999/);
-  });
-
-  it("stays silent where the pre-forge app was silent (blank name, not a number, missing player)", () => {
-    for (const code of ["NAME_EMPTY", "SCORE_INVALID", "PLAYER_NOT_FOUND"]) expect(limitMessage(code)).toBeNull();
   });
 });
 

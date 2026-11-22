@@ -10,5 +10,5 @@
     "allowImportingTsExtensions": true
   },
   "include": ["src", "../app.config.ts"],
-  "references": [{ "path": "../packages/core" }, { "path": "./tsconfig.node.json" }]
+  "references": [{ "path": "../packages/core" }, { "path": "../packages/miniapp" }, { "path": "./tsconfig.node.json" }]
 }

@@ -2,7 +2,7 @@
 // and what is safe, Reload (primary), Export my data, Report a problem, Copy details and the technical
 // details. Shown by the error boundary instead of a blank page; focus moves to the title.
 import { useEffect, useRef, useState } from "react";
-import { Button } from "../components/ui/button";
+import { Button } from "gg-counter-miniapp/components/ui/button";
 import { app } from "../config";
 import { t } from "../i18n";
 import { downloadExport } from "./download-export";

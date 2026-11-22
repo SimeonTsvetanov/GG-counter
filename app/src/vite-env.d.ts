@@ -3,9 +3,6 @@
 /// <reference types="vite/client" />
 /// <reference types="vite-plugin-pwa/vanillajs" />
 
-/** `app.id` from app.config.ts, replaced at build time (app/vite.config.ts and vitest.config.ts `define`). */
-declare const __APP_ID__: string;
-
 /** The last versions of CHANGELOG.md for What's new, read at build time (scripts/changelog.ts). */
 declare const __CHANGELOG__: readonly {
   readonly version: string;

@@ -3,7 +3,7 @@
 // Loaded after the first paint (header-menus.tsx, PLAN T-12); a stand-in button takes its place until then.
 import { useLayoutEffect, useRef, useState } from "react";
 import { Menu } from "lucide-react";
-import { Button } from "../components/ui/button";
+import { Button } from "gg-counter-miniapp/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../components/ui/dropdown-menu";
 import { app, type ShellItemId } from "../config";
 import { t } from "../i18n";

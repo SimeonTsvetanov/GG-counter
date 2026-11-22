@@ -2,8 +2,8 @@
 // closes, focus is trapped inside and returns to the button that opened it (accessibility §4). The
 // first focus goes to the title, as for every long sheet, so reading starts at the top.
 import { useRef, type ReactNode } from "react";
-import { Button } from "../components/ui/button";
-import { Dialog, DialogBody, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../components/ui/dialog";
+import { Button } from "gg-counter-miniapp/components/ui/button";
+import { Dialog, DialogBody, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "gg-counter-miniapp/components/ui/dialog";
 import { t } from "../i18n";
 
 /** Props of {@link ShellDialog}. */

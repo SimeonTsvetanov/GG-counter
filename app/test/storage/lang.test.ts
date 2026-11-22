@@ -1,7 +1,7 @@
 // The UI language choice under gg-counter:v1:lang (PLAN T-09): saved as JSON, unknown values ignored.
 import fc from "fast-check";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { FakeStorage, blockStorage, unblockStorage, useStorage } from "./fake-storage.ts";
+import { FakeStorage, blockStorage, unblockStorage, useStorage } from "gg-counter-miniapp/test/fake-storage";
 
 const LANG_KEY = "gg-counter:v1:lang";
 

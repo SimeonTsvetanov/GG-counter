@@ -2,7 +2,7 @@ import fc from "fast-check";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MIGRATED_KEY, NEW_STATE_KEY, NEW_THEME_KEY, NULL_ENTRY_STATE, STATE_KEY, THEME_KEY, V0_STATE, V1_STATE, V1_STATE_READ, V2_STATE } from "gg-counter-core/test-fixtures";
 import { GAME_VERSION } from "gg-counter-core";
-import { FakeStorage, OTHER_APPS, blockStorage, unblockStorage, useStorage } from "./fake-storage.ts";
+import { FakeStorage, OTHER_APPS, blockStorage, unblockStorage, useStorage } from "gg-counter-miniapp/test/fake-storage";
 
 const NOW = "2026-11-19T12:00:00.000Z";
 /** The UI language key (PLAN T-09). */
@@ -11,7 +11,7 @@ const LANG_KEY = "gg-counter:v1:lang";
 /** Loads fresh copies of the storage modules. */
 async function start() {
   vi.resetModules();
-  const [data, game] = await Promise.all([import("../../src/storage/index.ts"), import("../../src/storage/game.ts")]);
+  const [data, game] = await Promise.all([import("../../src/storage/index.ts"), import("gg-counter-miniapp/storage/game")]);
   return { ...data, ...game };
 }
 

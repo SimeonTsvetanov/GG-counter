@@ -5,7 +5,7 @@ import { Fragment } from "react";
 import type { ShellItemId } from "../config";
 import { app } from "../config";
 import { t } from "../i18n";
-import { CONTAINER_CLASS } from "../lib/layout";
+import { CONTAINER_CLASS } from "gg-counter-miniapp/lib/layout";
 import { isPolicyPage } from "./legal-document";
 import { isPlainClick, policyPageHref } from "./legal-links";
 import { SHELL_ITEMS, shellItemLabel, type RunShellItem } from "./shell-items";

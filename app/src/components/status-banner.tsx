@@ -5,8 +5,8 @@ import { app } from "../config";
 import { useOnlineStatus } from "../hooks/use-online-status";
 import type { PwaInstall } from "../hooks/use-pwa-install";
 import { t } from "../i18n";
-import { CONTAINER_CLASS } from "../lib/layout";
-import { Button } from "./ui/button";
+import { CONTAINER_CLASS } from "gg-counter-miniapp/lib/layout";
+import { Button } from "gg-counter-miniapp/components/ui/button";
 
 /**
  * Shows the offline notice and/or the install offer; renders nothing when neither applies.

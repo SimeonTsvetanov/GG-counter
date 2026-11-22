@@ -158,13 +158,6 @@
     :root { --backdrop: oklch(0% 0 0 / 0.5); --backdrop-blur: none; }
   }
 
-  /* ---------- GG Counter additions (PLAN T-12, DECISIONS 2026-11-19) ---------- */
-  /* Radix dialogs and menus are not in the browser's top layer (native <dialog> is), so they need a
-     stacking level: above the header (10) and the toast region (30) — while a modal is open, the toast
-     renders inside it (accessibility §5). */
-  :root {
-    --z-modal: 40;
-    /* The score on a player card, a notch over the large title (Moni 2026-11-20, SPEC 1.2 F22): 32 → 40 px. */
-    --text-score: clamp(2rem, 1.4rem + 3.2vw, 2.5rem);
-  }
+  /* GG Counter's own tokens (--z-modal, --text-score) moved to the game screen's stylesheet
+     (packages/miniapp/src/styles/custom-properties.css, Quizzard PLAN GG-02): every host supplies the tokens above. */
 }

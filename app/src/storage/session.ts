@@ -1,7 +1,7 @@
 // This tab's sessionStorage, for the one value that must survive a reload but not the tab: when the
 // app last reloaded itself after a failed chunk load (app/src/ui/pwa.ts, pwa §5). Blocked or missing
 // storage never throws; the caller gets "unknown" / "not saved" and then does not reload.
-import { KEY_PREFIX } from "./keys";
+import { KEY_PREFIX } from "gg-counter-miniapp/storage/keys";
 
 /** Key of the time (ms) of the last reload after a `vite:preloadError`. */
 export const PRELOAD_RELOAD_KEY = `${KEY_PREFIX}preload-reload`;

@@ -9,14 +9,21 @@ import { UI_TEXT_SELECTORS } from "./scripts/ui-text-rule.ts";
 
 /** Files whose tool requires `export default` (code-quality §2). */
 const TOOL_CONFIG_FILES = ["**/*.config.{js,ts,mjs,mts}", "**/pw.*.config.ts"];
+/** The mini-app contract loads these modules' default export (`MiniAppEntry.load` / `.help`, Quizzard PLAN §1.2). */
+const CONTRACT_ENTRY_FILES = ["packages/miniapp/src/index.ts", "packages/miniapp/src/help.ts"];
 /** Security §1: no HTML/code sinks (string timers: @typescript-eslint/no-implied-eval, in strict). */
 const HTML_SINKS = [
   ...["innerHTML", "outerHTML", "insertAdjacentHTML", "srcdoc"].map((property) => ({ property, message: "HTML sink — use textContent or h() (engineering → security §1)." })),
   ...["write", "writeln"].map((property) => ({ object: "document", property, message: "HTML sink — use textContent or h() (engineering → security §1)." })),
 ];
-/** Browser storage is touched only by app/src/storage (browser-storage §3): namespacing, migration, failures. */
+/**
+ * Browser storage is touched only by the storage modules (browser-storage §3): namespacing, migration,
+ * failures — the game screen's packages/miniapp/src/storage and the page's app/src/storage.
+ */
 const STORAGE_APIS = ["localStorage", "sessionStorage", "indexedDB"];
-const STORAGE_MESSAGE = "Use the storage module in app/src/storage (engineering → browser-storage §3).";
+const STORAGE_MESSAGE = "Use the storage module (packages/miniapp/src/storage, app/src/storage; engineering → browser-storage §3).";
+/** Code that may not touch browser storage directly: everything of the page and the game screen but their storage modules. */
+const STORAGE_RESTRICTED = { files: ["app/src/**", "packages/miniapp/src/**"], ignores: ["app/src/storage/**", "packages/miniapp/src/storage/**"] };
 /** Modules: named exports only (code-quality §2); tool configs are exempt below. */
 const NO_DEFAULT_EXPORT = { selector: "ExportDefaultDeclaration", message: "Use a named export (code-quality §2)." };
 /** Tests read best as long `describe` blocks; size limits apply to source only. */
@@ -70,16 +77,15 @@ export default tseslint.config(
   },
   // React: hooks rules; components are PascalCase functions and may be longer than plain functions.
   { files: ["**/*.tsx"], plugins: { "react-hooks": reactHooks }, rules: { "react-hooks/rules-of-hooks": "error", "react-hooks/exhaustive-deps": "error", "max-lines-per-function": ["error", { max: 150, skipBlankLines: true, skipComments: true }] } },
-  // PLAN T-09: no hard-coded UI text in the app's JSX — every string goes through t() (scripts/ui-text-rule.ts).
-  { files: ["app/src/**/*.tsx"], rules: { "no-restricted-syntax": ["error", NO_DEFAULT_EXPORT, ...UI_TEXT_SELECTORS] } },
-  { files: TOOL_CONFIG_FILES, rules: { "no-restricted-syntax": "off" } },
+  // PLAN T-09: no hard-coded UI text in the app's and the game screen's JSX — every string goes through t() (scripts/ui-text-rule.ts).
+  { files: ["app/src/**/*.tsx", "packages/miniapp/src/**/*.tsx"], rules: { "no-restricted-syntax": ["error", NO_DEFAULT_EXPORT, ...UI_TEXT_SELECTORS] } },
+  { files: [...TOOL_CONFIG_FILES, ...CONTRACT_ENTRY_FILES], rules: { "no-restricted-syntax": "off" } },
   { files: TEST_FILES, rules: { "max-lines-per-function": "off", "max-lines": "off" } },
   // Layers (engineering → structure §1–2): dependencies point one way, other packages by name only.
   { files: ["packages/core/src/**"], rules: { "no-restricted-imports": ["error", { patterns: [{ group: ["**/app/**", "**/mcp/**", "**/service/**", "*-mcp", "*-mcp/*"], message: "core imports nothing of ours (structure §1)." }] }], "no-restricted-globals": ["error", "document", "window", "localStorage", "sessionStorage", "indexedDB", "navigator", "fetch"] } },
   { files: ["packages/mcp/src/**"], rules: { "no-restricted-imports": ["error", { patterns: [{ group: ["**/app/**", "**/service/**", "**/packages/core/**"], message: "mcp imports core by its package name only (structure §1–2)." }] }] } },
   {
-    files: ["app/src/**"],
-    ignores: ["app/src/storage/**"],
+    ...STORAGE_RESTRICTED,
     rules: {
       "no-restricted-globals": ["error", ...STORAGE_APIS.map((name) => ({ name, message: STORAGE_MESSAGE }))],
       "no-restricted-properties": [
@@ -90,7 +96,10 @@ export default tseslint.config(
       ],
     },
   },
-  { files: ["app/src/**"], rules: { "no-restricted-imports": ["error", { patterns: [{ group: ["**/packages/**", "**/service/**", "*-mcp", "*-mcp/*", "../../../*"], message: "app imports core by its package name; no deep relative chains (structure §1–2)." }] }] } },
+  // The game screen (Quizzard PLAN GG-02) is its own layer: core by its package name, nothing of app/ or the
+  // repo's app.config.ts (Quizzard bundles the package alone); app/ uses only the package's exports.
+  { files: ["packages/miniapp/src/**", "packages/miniapp/*.ts"], rules: { "no-restricted-imports": ["error", { patterns: [{ group: ["**/app/**", "**/mcp/**", "**/service/**", "**/packages/**", "*-mcp", "*-mcp/*", "../../../*", "**/app.config*"], message: "the game screen imports core by its package name and nothing of app/ (structure §1–2)." }] }] } },
+  { files: ["app/src/**"], rules: { "no-restricted-imports": ["error", { patterns: [{ group: ["**/packages/**", "**/service/**", "*-mcp", "*-mcp/*", "../../../*"], message: "app imports core and the game screen by their package names; no deep relative chains (structure §1–2)." }] }] } },
   { files: ["**/*.js", "**/*.mjs"], ...tseslint.configs.disableTypeChecked },
   { files: ["**/*.js", "**/*.mjs"], rules: { "@typescript-eslint/explicit-module-boundary-types": "off", "@typescript-eslint/naming-convention": "off" } },
   { files: ["scripts/**", "packages/mcp/**"], rules: { "no-console": "off" } },

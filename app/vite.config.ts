@@ -8,6 +8,7 @@ import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { VitePWA, type ManifestOptions } from "vite-plugin-pwa";
+import { vitePreset as screenPreset } from "gg-counter-miniapp/vite-preset";
 import { app as config, l10n, type AppConfig } from "../app.config.ts";
 import { cspMetaTag } from "../scripts/csp.ts";
 import { OG_IMAGE, headTags } from "../scripts/seo.ts";
@@ -131,10 +132,8 @@ export default defineConfig(({ mode }) => {
 
   return {
     base,
-    // The storage namespace (app/src/storage/keys.ts) comes from app.config.ts, like everything else;
-    // the Bulgarian config texts are used in app/src/i18n/bg.ts only, so they ship in its lazy chunk.
+    // The Bulgarian config texts are used in app/src/i18n/bg.ts only, so they ship in its lazy chunk.
     define: {
-      __APP_ID__: JSON.stringify(app.id),
       __APP_TEXT_BG__: JSON.stringify(l10n.bg),
       __CHANGELOG__: JSON.stringify(whatsNew(readFileSync(new URL("../CHANGELOG.md", import.meta.url), "utf8"))),
       __CREDITS__: JSON.stringify(appCredits(new URL("./", import.meta.url))),
@@ -146,7 +145,9 @@ export default defineConfig(({ mode }) => {
       pagesNotFound(base),
       previewNextDeploy(base),
       react(),
-      // Tailwind 4 (PLAN T-12): app/src/styles/app.css maps its theme to design/tokens.css.
+      // Tailwind 4 (PLAN T-12): app/src/styles/app.css maps its theme to design/tokens.css. The same
+      // plugin and version as the game screen's preset (gg-counter-miniapp/vite-preset), whose own
+      // instance is typed for the host's Vite (Quizzard: 8); this repo builds with Vite 5.
       tailwindcss(),
       VitePWA({
         // pwa §5: a new version waits for the user's Reload (update toast in app/src/ui/), never reloads
@@ -183,8 +184,9 @@ export default defineConfig(({ mode }) => {
     ],
     resolve: {
       // Radix's scroll lock injects <style> elements that the meta CSP blocks (style-src 'self'); the
-      // stand-in adopts the same CSS as a constructed stylesheet instead (DECISIONS 2026-11-19).
-      alias: { "react-style-singleton": fileURLToPath(new URL("./src/lib/style-singleton.ts", import.meta.url)) },
+      // stand-in of the game screen's preset adopts the same CSS as a constructed stylesheet instead
+      // (DECISIONS 2026-11-19).
+      alias: { ...screenPreset.alias },
     },
     server: {
       port: 5173,

@@ -2,7 +2,7 @@
 // a file (checked through core before anything is asked or changed; confirmed before the game is
 // replaced) and Clear my data (confirmed; only this app's keys). All through app/src/storage.
 import { useRef, useState } from "react";
-import { Button } from "../components/ui/button";
+import { Button } from "gg-counter-miniapp/components/ui/button";
 import { app } from "../config";
 import { t } from "../i18n";
 import { MAX_IMPORT_CHARS, checkImport, clearData, importData, type AppData, type ImportErrorCode } from "../storage";

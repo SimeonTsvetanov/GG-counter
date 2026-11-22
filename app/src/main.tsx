@@ -3,9 +3,8 @@ import { createRoot } from "react-dom/client";
 import { App } from "./app";
 import { initI18n } from "./i18n";
 import "./styles/app.css";
-import { StandaloneHostProvider } from "./providers/standalone-host-provider";
 import { ThemeProvider } from "./providers/theme-provider";
-import { migrateLegacyStorage } from "./storage/migrate";
+import { migrateLegacyStorage } from "gg-counter-miniapp/storage/migrate";
 import { ErrorBoundary } from "./ui/error-boundary";
 import { ToastProvider } from "./ui/toast";
 
@@ -15,7 +14,8 @@ if (!rootElement) {
   throw new Error("Root element with id 'root' not found");
 }
 
-// Before the first render, so the game and theme are read from the namespaced keys (PLAN T-07).
+// Before the first render, so the theme is read from the namespaced keys (PLAN T-07); the game screen's
+// mount runs it too (then it finds nothing left to do).
 migrateLegacyStorage();
 
 /** Renders the app into #root. */
@@ -26,10 +26,8 @@ function render(root: HTMLElement): void {
       <ErrorBoundary>
         <ThemeProvider defaultTheme="system">
           <ToastProvider>
-            {/* The page hosts the game screen (host.ts); App places the screen inside the shell. */}
-            <StandaloneHostProvider>
-              <App />
-            </StandaloneHostProvider>
+            {/* App mounts the game screen (gg-counter-miniapp) inside the page's shell. */}
+            <App />
           </ToastProvider>
         </ThemeProvider>
       </ErrorBoundary>

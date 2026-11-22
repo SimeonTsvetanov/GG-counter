@@ -3,7 +3,7 @@
 // with the same look stands in; what the user did with it (focus, or open by mouse or keyboard) is handed
 // to the real menu, so nothing is lost when someone is quicker than the network.
 import { useState, type ReactNode } from "react";
-import { Button, type ButtonProps } from "../components/ui/button";
+import { Button, type ButtonProps } from "gg-counter-miniapp/components/ui/button";
 
 /** What happened to the stand-in button before the menu code arrived. */
 export type MenuIntent = "focus" | "pointer" | "keyboard";

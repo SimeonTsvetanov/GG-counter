@@ -1,0 +1,9 @@
+@layer tokens, theme, base, layout, components, utilities, overrides;
+/* Entry stylesheet of the Scores mini-app inside Quizzard (src/index.ts imports it; isolated mode,
+   vite-preset.ts). The line above fixes the screen's own layer order (they become sub-layers of
+   `miniapp.scores`); Tailwind's preflight and utilities take their place in it. No tokens, accent or
+   fonts: the host supplies them (PLAN §1.3). `source(none)`: Tailwind scans only the screen's own
+   sources (body.css), never the host's. */
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css" layer(utilities) source(none);
+@import "./body.css";

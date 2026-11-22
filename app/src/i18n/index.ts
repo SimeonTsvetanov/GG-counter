@@ -3,6 +3,7 @@
 // first render only for people who get Bulgarian. Start language: detect.ts. Components call t() while
 // rendering; the composition roots re-render on a change through useLanguage() (use-language.ts).
 import i18next from "i18next";
+import { loadLanguage as loadScreenLanguage } from "gg-counter-miniapp/i18n";
 import { app, type AppText, type LanguageCode } from "../config";
 import { isLanguage, readLanguage, writeLanguage } from "../storage/lang";
 import { pickLanguage } from "./detect";
@@ -36,9 +37,16 @@ interface LanguagePack {
   readonly appText: AppText;
 }
 
-/** Loads each non-English language from its own chunk (precached by the service worker for offline use). */
+/**
+ * Loads each non-English language from its own chunk (precached by the service worker for offline use),
+ * together with the game screen's dictionary of that language: the screen then switches in the same
+ * moment as the page, and its first frame is already in the page's language (gg-counter-miniapp mount).
+ */
 const PACKS: Readonly<Record<Exclude<LanguageCode, "en">, () => Promise<LanguagePack>>> = {
-  bg: () => import("./bg").then((module) => ({ messages: module.bg, appText: module.bgAppText })),
+  bg: async () => {
+    const [module] = await Promise.all([import("./bg"), loadScreenLanguage("bg")]);
+    return { messages: module.bg, appText: module.bgAppText };
+  },
 };
 
 const ENGLISH_TEXT: AppText = { tagline: app.tagline, description: app.description, answer: app.answer, steps: app.steps, features: app.features, faq: app.faq };

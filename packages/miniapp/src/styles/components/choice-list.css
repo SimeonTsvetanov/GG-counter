@@ -1,0 +1,76 @@
+/* Choice list (src/components/choice-confirm-dialog.tsx, SPEC 1.1 F13/F14): the options inside a confirmation
+   that asks what to delete. A vertical radio group on the fill track; the chosen row sits on the lighter
+   thumb with a soft shadow, like the segmented control (ui-patterns §3); each whole row is the hit target,
+   at least 44 px tall (ui-patterns §2). No borders: tint and shadow only. */
+@layer components {
+  /* || Components: choice list */
+  .choice-list {
+    display: grid;
+    min-width: 0;
+    gap: var(--space-1);
+    margin-bottom: var(--space-5);
+    padding: var(--space-1);
+    border-radius: var(--radius-md);
+    background: var(--color-fill);
+    text-align: start;
+  }
+
+  .choice {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: var(--tap-target);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    transition: background-color var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-out);
+
+    &:has(input:checked) {
+      background: var(--color-thumb);
+      box-shadow: var(--shadow-1);
+    }
+
+    /* Presses scale to 0.97, like every button (design-system §9). */
+    &:active {
+      transform: scale(0.97);
+    }
+
+    &:has(input:focus-visible) {
+      outline: var(--focus-ring-width) solid var(--color-focus);
+      outline-offset: var(--focus-ring-offset);
+    }
+  }
+
+  .choice-mark {
+    flex-shrink: 0;
+    width: var(--space-6);
+    height: var(--space-6);
+    color: var(--color-text-secondary);
+
+    .choice:has(input:checked) & {
+      color: var(--color-accent-text);
+    }
+  }
+
+  .choice-text {
+    display: grid;
+    min-width: 0;
+  }
+
+  .choice-label {
+    color: var(--color-text);
+    font-size: var(--text-md);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-tight);
+  }
+
+  /* Body colour, smaller and regular: the secondary grey is under 4.5:1 on the fill track (light 4.15:1) and on
+     the dark thumb (2.33:1) — axe, WCAG 1.4.3. */
+  .choice-hint {
+    color: var(--color-text);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-regular);
+  }
+}

@@ -1,6 +1,6 @@
 // The confirmation before a bulk or irreversible change (design rule 7: replace the game on import,
 // delete all data): a blurred modal whose first focus is Cancel, the least destructive button (a11y §4).
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "../components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "gg-counter-miniapp/components/ui/alert-dialog";
 import { t } from "../i18n";
 
 /** A confirmation to show; null = none. */
