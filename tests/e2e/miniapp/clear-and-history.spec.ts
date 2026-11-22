@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
-import { NEW_STATE_KEY, STATE_KEY, V1_STATE, V2_STATE } from "../../packages/core/test/fixtures/saved-state";
+import { NEW_STATE_KEY, STATE_KEY, V1_STATE, V2_STATE } from "../../../packages/core/test/fixtures/saved-state";
+import { openApp, reloadApp } from "../support/entry.ts";
 
 // GG Counter 1.1, part A (SPEC 1.1 F13–F15, PLAN T-15): the one "what to clear" alert behind Clear session
 // and Reset scores, the same alert on a player's delete button, and the score history saved with the game.
@@ -13,12 +14,7 @@ interface SavedPlayer {
 
 /** Opens the app with `entries` in localStorage (seeded once per test, not on reload). */
 async function openWith(page: Page, entries: Record<string, string>): Promise<void> {
-  await page.addInitScript((items) => {
-    if (sessionStorage.getItem("seeded")) return;
-    sessionStorage.setItem("seeded", "1");
-    for (const [key, value] of Object.entries(items)) localStorage.setItem(key, value);
-  }, entries);
-  await page.goto("./");
+  await openApp(page, { storage: entries });
 }
 
 const savedPlayers = (page: Page) => page.evaluate((key) => (JSON.parse(localStorage.getItem(key) ?? "null") as { players: SavedPlayer[] } | null)?.players ?? [], NEW_STATE_KEY);
@@ -129,7 +125,7 @@ test("F15: every score change is saved as a history entry; quick taps merge into
   expect(await savedPlayer(page, "Boris")).toMatchObject({ score: 22, history: [{ delta: -5, at: "2026-11-20T20:00:05.000Z" }] });
   expect(await savedPlayer(page, "Чен")).toMatchObject({ score: -3, history: [] });
 
-  await page.reload();
+  await reloadApp(page);
   await expect(page.getByRole("button", { name: /^Adjust score for Ana: 38/ })).toBeVisible();
   expect((await savedPlayer(page, "Ana"))?.history).toHaveLength(2);
 });

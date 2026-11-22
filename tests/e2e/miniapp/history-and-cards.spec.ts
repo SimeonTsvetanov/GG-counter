@@ -1,5 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
-import { NEW_STATE_KEY, V2_STATE } from "../../packages/core/test/fixtures/saved-state";
+import { NEW_STATE_KEY, V2_STATE } from "../../../packages/core/test/fixtures/saved-state";
+import { openApp, reloadApp } from "../support/entry.ts";
+import { savedLanguage } from "../support/host.ts";
 
 // GG Counter 1.1, part B (SPEC 1.1 F16–F18, PLAN T-16): the "last changes" line on each card and the
 // history sheet behind it (× removes at once, Restore puts it back), the last-scored mark, the medals and
@@ -14,13 +16,8 @@ interface SavedPlayer {
 }
 
 /** Opens the app with `entries` in localStorage (seeded once per test, not on reload). */
-async function openWith(page: Page, entries: Record<string, string>, path = "./"): Promise<void> {
-  await page.addInitScript((items) => {
-    if (sessionStorage.getItem("seeded")) return;
-    sessionStorage.setItem("seeded", "1");
-    for (const [key, value] of Object.entries(items)) localStorage.setItem(key, value);
-  }, entries);
-  await page.goto(path);
+async function openWith(page: Page, entries: Record<string, string>): Promise<void> {
+  await openApp(page, { storage: entries });
 }
 
 /** A saved game of players with `[name, score]` and no history. */
@@ -68,7 +65,7 @@ test("F16: the line shows the newest changes; × removes one at once, Restore pu
   await expect(sheet).toBeHidden();
   await expect(page.getByRole("button", { name: "Score history for Ana: +4" })).toBeFocused();
   await expect(page.getByRole("button", { name: "Adjust score for Ana: 22" })).toBeVisible();
-  await page.reload();
+  await reloadApp(page);
   await expect(page.getByRole("button", { name: "Adjust score for Ana: 22" })).toBeVisible();
   await expect.poll(async () => (await savedPlayer(page, "Boris"))?.score).toBe(27);
 });
@@ -116,7 +113,7 @@ test("F17: the mark follows the newest change and goes back when it is removed (
 
 // 1.2 (SPEC F22, Moni on the live 1.1.0): no shape around the newest change; the marked card's non-colour cue
 // is its raised shadow; the score's button is 52 px tall and the card keeps its 1.1 height.
-test("F22: no pill on the line, a raised last-scored card, a taller score at the same card height", async ({ page }, testInfo) => {
+test("F22: no pill on the line, a raised last-scored card, a taller score at the same card height", async ({ page, isMobile }) => {
   await openWith(page, withHistory);
   const newest = markedCards(page).locator(".history-strip-item[data-newest]");
   await expect(newest).toHaveCSS("border-top-width", "0px");
@@ -125,8 +122,9 @@ test("F22: no pill on the line, a raised last-scored card, a taller score at the
   expect(await shadow(markedCards(page))).not.toBe(await shadow(page.locator(".player-card:not([data-last-scored])").first()));
   const score = await page.getByRole("button", { name: /^Adjust score for Ana/ }).boundingBox();
   expect(score?.height).toBeGreaterThanOrEqual(52);
+  // Phone = a mobile device project (here `phone`, in Quizzard `scores-mobile*`), not a project name.
   // 1.1.0 measured 220 px for a roomy phone card (320 and 390 px; DECISIONS 2026-11-20, F22 before/after).
-  if (testInfo.project.name === "phone") expect(Math.round((await page.locator(".player-card").first().boundingBox())?.height ?? 0)).toBeLessThanOrEqual(220);
+  if (isMobile) expect(Math.round((await page.locator(".player-card").first().boundingBox())?.height ?? 0)).toBeLessThanOrEqual(220);
 });
 
 test("F18: medals 1, 2, 2 for 34, 27, 27 on the cards and in the leaderboard; none while all scores are equal (AC18)", async ({ page }) => {
@@ -148,7 +146,7 @@ test("F18: medals 1, 2, 2 for 34, 27, 27 on the cards and in the leaderboard; no
   await expect(board.locator(".rank-row")).toHaveText([/^1\. Ana/, /^1\. Boris/, /^1\. Aisha/, /^1\. Kenji/]);
 });
 
-test("F18: up to 4 players roomy cards; from 5 compact ones — more per screen, targets still 44 px (AC18)", async ({ page }, testInfo) => {
+test("F18: up to 4 players roomy cards; from 5 compact ones — more per screen, targets still 44 px (AC18)", async ({ page, isMobile }) => {
   await openWith(page, gameOf([["Ana", 3], ["Boris", 120], ["Aisha", 7]]));
   const grid = page.locator(".player-grid");
   await expect(grid).toHaveAttribute("data-density", "comfortable");
@@ -156,14 +154,14 @@ test("F18: up to 4 players roomy cards; from 5 compact ones — more per screen,
 
   const nine = gameOf([["Ana", 3], ["Boris", 120], ["Aisha", 7], ["Kenji", 0], ["Elena", 12], ["Liam", 9], ["Sofia", 999_999], ["Noah", -5], ["Yuki", 40]]);
   await page.evaluate((state) => { localStorage.setItem(Object.keys(state)[0] ?? "", Object.values(state)[0] ?? ""); }, nine);
-  await page.reload();
+  await reloadApp(page);
   await expect(grid).toHaveAttribute("data-density", "compact");
   const compact = await card(page, "Ana").boundingBox();
   expect(compact?.height).toBeLessThan(roomy?.height ?? 0);
 
   const tops = await page.locator(".player-card").evaluateAll((cards) => cards.map((c) => Math.round(c.getBoundingClientRect().top)));
   const perRow = tops.filter((top) => top === tops[0]).length;
-  if (testInfo.project.name === "phone") {
+  if (isMobile) {
     expect(perRow).toBe(2);
     // 1.0.0's phone card was 180 px tall (PLAN T-12 screenshots): a compact one with a short score is shorter.
     expect(compact?.height).toBeLessThan(180);
@@ -181,7 +179,7 @@ test("F18: up to 4 players roomy cards; from 5 compact ones — more per screen,
 });
 
 test("F16–F18 in Bulgarian: the line, the sheet, Restore and the medal", async ({ page }) => {
-  await openWith(page, { ...withHistory, "gg-counter:v1:lang": "\"bg\"" });
+  await openWith(page, { ...withHistory, ...savedLanguage("bg") });
   await expect(page.getByRole("img", { name: "1-во място" })).toBeVisible();
   await expect(page.getByRole("button", { name: `История на точките на Boris (последна промяна в играта): ${MINUS}1` })).toBeVisible();
   await page.getByRole("button", { name: "История на точките на Ana: +12, +4" }).click();

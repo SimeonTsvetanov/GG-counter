@@ -99,6 +99,14 @@ export default tseslint.config(
   // The game screen (Quizzard PLAN GG-02) is its own layer: core by its package name, nothing of app/ or the
   // repo's app.config.ts (Quizzard bundles the package alone); app/ uses only the package's exports.
   { files: ["packages/miniapp/src/**", "packages/miniapp/*.ts"], rules: { "no-restricted-imports": ["error", { patterns: [{ group: ["**/app/**", "**/mcp/**", "**/service/**", "**/packages/**", "*-mcp", "*-mcp/*", "../../../*", "**/app.config*"], message: "the game screen imports core by its package name and nothing of app/ (structure §1–2)." }] }] } },
+  // Mini-app e2e specs also run inside Quizzard from vendor/gg-counter (its PLAN T-13): no standalone config,
+  // page or screen source (only the saved-game fixtures of core), and every navigation goes through
+  // support/entry.ts (`#/scores`).
+  { files: ["tests/e2e/miniapp/**"], rules: {
+    "no-restricted-imports": ["error", { patterns: [{ group: ["**/app.config*", "**/app/**", "**/shell/**", "**/packages/*/src/**", "**/packages/miniapp/**", "gg-counter-*"], message: "mini-app specs import only @playwright/test, ../support and core's test fixtures (PLAN GG-03)." }] }],
+    "no-restricted-syntax": ["error", NO_DEFAULT_EXPORT,
+      { selector: "CallExpression[callee.property.name='goto']", message: "Open the screen with openApp() from ../support/entry.ts, so it also runs behind Quizzard's #/scores (PLAN GG-03)." }],
+  } },
   { files: ["app/src/**"], rules: { "no-restricted-imports": ["error", { patterns: [{ group: ["**/packages/**", "**/service/**", "*-mcp", "*-mcp/*", "../../../*"], message: "app imports core and the game screen by their package names; no deep relative chains (structure §1–2)." }] }] } },
   { files: ["**/*.js", "**/*.mjs"], ...tseslint.configs.disableTypeChecked },
   { files: ["**/*.js", "**/*.mjs"], rules: { "@typescript-eslint/explicit-module-boundary-types": "off", "@typescript-eslint/naming-convention": "off" } },

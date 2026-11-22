@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { openApp } from "../support/entry.ts";
 
 // SPEC 1.2 F20: short, quiet motion. These tests assert end states only (never a frame in the middle), so the
 // motion cannot make them flaky; they also prove that quick taps never queue animations and that reduced
@@ -27,7 +28,7 @@ async function removePlayer(page: Page, name: string): Promise<void> {
 }
 
 test("a new card pops in and comes to rest; a removed one leaves, the others settle with focus kept", async ({ page }) => {
-  await page.goto("./");
+  await openApp(page);
   await addPlayers(page, ["Ana", "Boris", "Chen"]);
   await expect(page.locator(".player-card[data-motion='entering']")).toHaveCount(3);
   await expect.poll(() => running(page)).toBe(0);
@@ -42,7 +43,7 @@ test("a new card pops in and comes to rest; a removed one leaves, the others set
 });
 
 test("10 quick +1 taps end at 10 with nothing queued; the score rolls once per change", async ({ page }) => {
-  await page.goto("./");
+  await openApp(page);
   await addPlayers(page, ["Ana", "Boris"]);
   const plus = page.getByRole("button", { name: "Increase score for Ana" });
   for (let tap = 0; tap < 10; tap++) await plus.click({ delay: 0 });
@@ -56,7 +57,7 @@ test("10 quick +1 taps end at 10 with nothing queued; the score rolls once per c
 });
 
 test("history: a removed change goes, Restore brings it back, the rows end in place", async ({ page }) => {
-  await page.goto("./");
+  await openApp(page);
   await addPlayers(page, ["Ana"]);
   const plus = page.getByRole("button", { name: "Increase score for Ana" });
   await plus.click();
@@ -95,7 +96,7 @@ test.describe("reduced motion", () => {
         }
       }, true);
     });
-    await page.goto("./");
+    await openApp(page);
     await addPlayers(page, ["Ana", "Boris", "Chen"]);
     await page.getByRole("button", { name: "Increase score for Chen" }).click();
     await page.getByRole("button", { name: "Increase score for Boris" }).click();

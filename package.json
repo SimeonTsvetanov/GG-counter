@@ -1,6 +1,6 @@
 {
   "name": "gg-counter",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@12.18.0",
@@ -18,6 +18,8 @@
     "typecheck": "tsc -b",
     "test": "vitest run --coverage && node --test scripts/*.test.mjs",
     "e2e": "playwright test",
+    "e2e:miniapp": "playwright test tests/e2e/miniapp",
+    "e2e:shell": "playwright test tests/e2e/shell",
     "docs:check": "node scripts/check-docs.ts",
     "docs:images": "pnpm build && playwright test -c playwright.docs.config.ts --pass-with-no-tests",
     "verify": "pnpm generate && pnpm lint && pnpm typecheck && pnpm test && pnpm docs:check && pnpm build && pnpm e2e"

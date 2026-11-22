@@ -1,9 +1,12 @@
-import { expect, test, type Page } from "@playwright/test";
-import { DIRTY_STATE, MIGRATED_KEY, NEW_STATE_KEY, NEW_THEME_KEY, NULL_ENTRY_STATE, STATE_KEY, THEME_KEY, V0_STATE, V1_STATE } from "../../packages/core/test/fixtures/saved-state";
+import { expect, test, type Locator, type Page } from "@playwright/test";
+import { DIRTY_STATE, MIGRATED_KEY, NEW_STATE_KEY, NEW_THEME_KEY, NULL_ENTRY_STATE, STATE_KEY, V0_STATE, V1_STATE } from "../../../packages/core/test/fixtures/saved-state";
+import { openApp, reloadApp } from "../support/entry.ts";
+import { copyWithoutShareSheet, headerActions, toasts } from "../support/host.ts";
 
 // Characterization tests: they describe what GG Counter did before the forge migration
-// (docs/SPEC.md AC1–AC8) and must stay green through every migration step. They seed the pre-forge
+// (docs/SPEC.md AC1–AC7) and must stay green through every migration step. They seed the pre-forge
 // keys, so since PLAN T-07 they also prove the one-time copy to the `gg-counter:v1:*` keys.
+// AC8 (the saved theme) is the page's: tests/e2e/shell/storage.spec.ts.
 
 /** The namespaced keys; removing them makes the next load behave like the first load after an update. */
 const NEW_KEYS = [NEW_STATE_KEY, NEW_THEME_KEY, MIGRATED_KEY] as const;
@@ -14,15 +17,10 @@ function toStoredValue(state: unknown): string | null {
   return typeof state === "string" ? state : JSON.stringify(state);
 }
 
-/** Opens the app with `state` already saved, as an existing user would have it. */
-async function openWith(page: Page, state: unknown, extra: Record<string, string> = {}) {
-  await page.addInitScript(([key, value, more]) => {
-    if (sessionStorage.getItem("seeded")) return;
-    sessionStorage.setItem("seeded", "1");
-    if (value !== null) localStorage.setItem(key, value);
-    for (const [k, v] of Object.entries(more)) localStorage.setItem(k, v);
-  }, [STATE_KEY, toStoredValue(state), extra] as const);
-  await page.goto("./");
+/** Opens the app with `state` already saved under the pre-forge key, as an existing user would have it. */
+function openWith(page: Page, state: unknown): Promise<Locator> {
+  const value = toStoredValue(state);
+  return openApp(page, { storage: value === null ? {} : { [STATE_KEY]: value } });
 }
 
 async function addPlayer(page: Page, name: string) {
@@ -57,7 +55,7 @@ test("AC2: rename and remove a player (remove asks first) and it stays gone afte
   await expect(page.getByRole("alertdialog", { name: "Remove player or score?" })).toBeVisible();
   await page.getByRole("alertdialog").getByRole("button", { name: "Remove" }).click();
   await expect(page.getByRole("textbox", { name: "Player name for Ana" })).toHaveCount(0);
-  await page.reload();
+  await reloadApp(page);
   await expect(page.getByRole("textbox", { name: "Player name for Bobby" })).toBeVisible();
   await expect.poll(async () => (await saved(page))?.players.map((p) => p.name)).toEqual(["Bobby", "Чен"]);
 });
@@ -106,9 +104,9 @@ async function lastShare(page: Page, count: number) {
 
 test("AC5: every leaderboard Share sends the 1.2 text with the app link once, without a separate url", async ({ page }) => {
   await recordShares(page);
-  await openWith(page, V1_STATE);
+  const root = await openWith(page, V1_STATE);
   const openers = [
-    () => page.locator("[data-flip='main:leaderboard']").getByRole("button", { name: "Share", exact: true }).click(),
+    () => root.locator("[data-flip='main:leaderboard']").getByRole("button", { name: "Share", exact: true }).click(),
     async () => {
       await page.getByRole("button", { name: "Open leaderboard" }).first().click();
       await page.getByRole("dialog", { name: "Leaderboard" }).getByRole("button", { name: "Share", exact: true }).click();
@@ -145,9 +143,10 @@ test("AC5: without Web Share the same text is copied and a toast says so; a canc
     Object.defineProperty(navigator, "share", { configurable: true, value: undefined });
     Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: (text: string) => { copied.push(text); return Promise.resolve(); } } });
   });
-  await openWith(page, V1_STATE);
-  await page.locator("[data-flip='main:leaderboard']").getByRole("button", { name: "Share", exact: true }).click();
-  await expect(page.getByText("Leaderboard copied ✓")).toBeVisible();
+  const root = await openWith(page, V1_STATE);
+  await root.locator("[data-flip='main:leaderboard']").getByRole("button", { name: "Share", exact: true }).click();
+  await copyWithoutShareSheet(page);
+  await expect(toasts(page).getByText("Leaderboard copied ✓")).toBeVisible();
   const copied = await page.evaluate(() => (window as unknown as { copied: string[] }).copied);
   expect(copied).toHaveLength(1);
   expect(copied[0]?.split("\n").at(-1)).toBe(`— Made with GG Counter · ${APP_URL}`);
@@ -156,17 +155,17 @@ test("AC5: without Web Share the same text is copied and a toast says so; a canc
   await page.evaluate(() => {
     Object.defineProperty(navigator, "share", { configurable: true, value: () => Promise.reject(new DOMException("cancelled", "AbortError")) });
   });
-  await page.locator("[data-flip='main:leaderboard']").getByRole("button", { name: "Share", exact: true }).click();
+  await root.locator("[data-flip='main:leaderboard']").getByRole("button", { name: "Share", exact: true }).click();
   await expect.poll(() => page.evaluate(() => (window as unknown as { copied: string[] }).copied.length)).toBe(1);
 });
 
 // 1.2.1: the header has no Share button (it gave a wrong "blocked" message with no players; Share stays in the
 // Leaderboard card — disabled while there are no players — the leaderboard window and the menu).
 test("the header has no share button and the card's Share is disabled without players", async ({ page }) => {
-  await page.goto("./");
+  const root = await openApp(page);
   await expect(page.getByRole("button", { name: "Open leaderboard" }).first()).toBeVisible();
-  await expect(page.locator("header").getByRole("button", { name: /share/i })).toHaveCount(0);
-  await expect(page.locator("[data-flip='main:leaderboard']").getByRole("button", { name: "Share", exact: true })).toBeDisabled();
+  await expect(headerActions(page).getByRole("button", { name: /share/i })).toHaveCount(0);
+  await expect(root.locator("[data-flip='main:leaderboard']").getByRole("button", { name: "Share", exact: true })).toBeDisabled();
 });
 
 // 1.1 (SPEC F13): the alert now has a choice; its default "Players and scores" (confirm = the last button)
@@ -181,7 +180,7 @@ test("AC6: clear session removes everything after a confirmation", async ({ page
   await page.getByRole("button", { name: "Clear session" }).first().click();
   await dialog.getByRole("button").last().click();
   await expect(page.getByRole("textbox", { name: "Player name for Ana" })).toHaveCount(0);
-  await page.reload();
+  await reloadApp(page);
   await expect(page.getByRole("textbox", { name: /^Player name for / })).toHaveCount(0);
 });
 
@@ -193,17 +192,8 @@ test("AC7: state saved by the old app loads unchanged (version 1, no version, br
   for (const [state, names] of [[V0_STATE, ["Ana", "Boris"]], [DIRTY_STATE, ["Valid"]], ["{not json", []], [NULL_ENTRY_STATE, NULL_ENTRY_SURVIVORS]] as const) {
     // As saved by the old app on a device the new app has not opened yet (PLAN T-07: the new key wins once it exists).
     await page.evaluate(([key, value, newKeys]) => { for (const k of newKeys) localStorage.removeItem(k); localStorage.setItem(key, value); }, [STATE_KEY, typeof state === "string" ? state : JSON.stringify(state), NEW_KEYS] as const);
-    await page.reload();
+    await reloadApp(page);
     await expect(page.getByRole("textbox", { name: /^Player name for / })).toHaveCount(names.length);
     for (const name of names) await expect(page.getByRole("textbox", { name: `Player name for ${name}` })).toBeVisible();
   }
-});
-
-test("AC8: the saved theme is applied on load", async ({ page }) => {
-  await openWith(page, V1_STATE, { [THEME_KEY]: "dark" });
-  await expect(page.locator("html")).toHaveClass(/dark/);
-  // As saved by the old app on a device the new app has not opened yet (PLAN T-07: the new key wins once it exists).
-  await page.evaluate(([key, newKeys]) => { for (const k of newKeys) localStorage.removeItem(k); localStorage.setItem(key, "light"); }, [THEME_KEY, NEW_KEYS] as const);
-  await page.reload();
-  await expect(page.locator("html")).not.toHaveClass(/dark/);
 });

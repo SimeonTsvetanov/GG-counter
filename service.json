@@ -11,5 +11,5 @@
   "mcp": null,
   "llms": "https://simeontsvetanov.github.io/GG-counter/llms.txt",
   "status": "migrating",
-  "version": "1.2.3"
+  "version": "1.2.4"
 }

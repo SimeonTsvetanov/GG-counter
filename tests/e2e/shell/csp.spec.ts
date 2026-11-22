@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
-import { app } from "../../app.config.ts";
-import { NEW_STATE_KEY, V1_STATE } from "../../packages/core/test/fixtures/saved-state";
+import { app } from "../../../app.config.ts";
+import { NEW_STATE_KEY, V1_STATE } from "../../../packages/core/test/fixtures/saved-state";
+import { seedStorage } from "../support/entry.ts";
 
 // Security §1: the meta CSP of scripts/csp.ts must not block anything the app does. Every test records
 // `securitypolicyviolation` events (all pages, also after navigations) and the browser's CSP console
@@ -24,18 +25,14 @@ async function watchCsp(page: Page): Promise<string[]> {
 }
 
 /** Opens the app with `entries` in localStorage (seeded once per test, not on reload). */
-async function openWith(page: Page, entries: Record<string, string> = {}, path = "./"): Promise<void> {
-  await page.addInitScript((items) => {
-    if (sessionStorage.getItem("seeded")) return;
-    sessionStorage.setItem("seeded", "1");
-    for (const [key, value] of Object.entries(items)) localStorage.setItem(key, value);
-  }, entries);
-  await page.goto(path);
+async function openWith(page: Page, entries: Record<string, string> = {}): Promise<void> {
+  await seedStorage(page, entries);
+  await page.goto("./");
 }
 
 const menuButton = (page: Page) => page.locator("[data-menu-open]").first();
 
-/** The page's scroll as the scroll lock of Radix modals leaves it (app/src/lib/style-singleton.ts). */
+/** The page's scroll as the scroll lock of Radix modals leaves it (packages/miniapp/src/lib/style-singleton.ts). */
 const bodyOverflow = (page: Page) => page.evaluate(() => getComputedStyle(document.body).overflow);
 
 /** Opens a menu entry with the mouse, checks its dialog and the page's scroll lock, and closes it with Escape. */
@@ -50,7 +47,7 @@ async function openAndClose(page: Page, item: string, dialogName: string): Promi
   await expect.poll(() => bodyOverflow(page)).not.toBe("hidden");
 }
 
-/** Opens the app and reloads once so the service worker controls the page (as tests/e2e/pwa.spec.ts). */
+/** Opens the app and reloads once so the service worker controls the page (as tests/e2e/shell/pwa.spec.ts). */
 async function openControlled(page: Page): Promise<void> {
   await page.goto("./");
   await page.evaluate(async () => { await navigator.serviceWorker.ready; });

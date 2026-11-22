@@ -1,15 +1,13 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
+import { openApp } from "../support/entry.ts";
+import { stickyHeader } from "../support/host.ts";
 
 // The on-screen keyboard must not cover a sheet's buttons (DECISIONS 2026-11-20). Android resizes the
 // layout viewport through the viewport meta; iOS Safari only shrinks the visual viewport, which a
-// headless browser cannot do — so the test replaces `visualViewport` with one it controls.
+// headless browser cannot do — so the test replaces `visualViewport` with one it controls. The viewport
+// meta for Android is the page's: tests/e2e/shell/keyboard.spec.ts.
 
 const KEYBOARD = 340;
-
-test("the viewport meta asks Android to resize the page for the keyboard", async ({ page }) => {
-  await page.goto("./");
-  await expect(page.locator('meta[name="viewport"]')).toHaveAttribute("content", /interactive-widget=resizes-content/);
-});
 
 test("a keyboard that only shrinks the visual viewport lifts the sheet: Apply stays visible above it", async ({ page }) => {
   await page.addInitScript(() => {
@@ -17,7 +15,7 @@ test("a keyboard that only shrinks the visual viewport lifts the sheet: Apply st
     const fake = Object.assign(target, { height: window.innerHeight, offsetTop: 0, scale: 1 });
     Object.defineProperty(window, "visualViewport", { configurable: true, value: fake });
   });
-  await page.goto("./");
+  const root = await openApp(page);
   await page.getByRole("textbox", { name: "Player name", exact: true }).fill("Ana");
   await page.getByRole("button", { name: "Add", exact: true }).click();
   await page.getByRole("button", { name: /^Adjust score for Ana/ }).click();
@@ -45,7 +43,9 @@ test("a keyboard that only shrinks the visual viewport lifts the sheet: Apply st
     viewport.height = window.innerHeight;
     viewport.dispatchEvent(new Event("resize"));
   });
-  await expect.poll(async () => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--keyboard-inset"))).toBe("0px");
+  // Read on the screen's root: the property is set on <html> here and on the mount element in Quizzard,
+  // and the root inherits it from <html>.
+  await expect.poll(async () => root.evaluate((element) => getComputedStyle(element).getPropertyValue("--keyboard-inset"))).toBe("0px");
 });
 
 // SPEC 1.2 F19: the field you type in stays on screen. Each Add grows the grid above the Add card, which used to
@@ -72,7 +72,7 @@ async function openKeyboard(page: Page, keyboard: number): Promise<number> {
 
 /** Waits until every locator is between the header's bottom and `visible`. */
 async function expectOnScreen(page: Page, locators: readonly Locator[], visible: number): Promise<void> {
-  const header = (await page.locator(".app-header").boundingBox())?.height ?? 0;
+  const header = (await stickyHeader(page).boundingBox())?.height ?? 0;
   for (const locator of locators) {
     await expect.poll(async () => {
       const box = await locator.boundingBox();
@@ -83,7 +83,7 @@ async function expectOnScreen(page: Page, locators: readonly Locator[], visible:
 
 test("8 players in a row with the keyboard open: the field keeps focus and stays above the keyboard with Add", async ({ page }) => {
   await fakeViewport(page);
-  await page.goto("./");
+  await openApp(page);
   const field = page.getByRole("textbox", { name: "Player name", exact: true });
   const add = page.getByRole("button", { name: "Add", exact: true });
   await field.focus();
@@ -102,7 +102,7 @@ test("8 players in a row with the keyboard open: the field keeps focus and stays
 
 test("a player's name field focused under the keyboard moves above it", async ({ page }) => {
   await fakeViewport(page);
-  await page.goto("./");
+  await openApp(page);
   const field = page.getByRole("textbox", { name: "Player name", exact: true });
   for (const name of ["Ana", "Boris", "Chen", "Dana", "Emil", "Fia"]) {
     await field.fill(name);
@@ -121,7 +121,7 @@ test("a player's name field focused under the keyboard moves above it", async ({
 // 1.2.3: on Moni's phone the page was pinch-zoomed by about 5 % and the reveal switched itself off.
 test("a slightly zoomed page: the Add field still moves above the keyboard", async ({ page }) => {
   await fakeViewport(page);
-  await page.goto("./");
+  await openApp(page);
   const field = page.getByRole("textbox", { name: "Player name", exact: true });
   const add = page.getByRole("button", { name: "Add", exact: true });
   for (const name of ["Ana", "Boris", "Chen", "Dana"]) {

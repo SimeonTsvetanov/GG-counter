@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { app } from "../../app.config.ts";
+import { app } from "../../../app.config.ts";
 
 // PLAN T-08 (pwa → pwa §3–5): offline after the first visit, the offline-only fallback, and updates
 // that wait for the user's Reload. Service workers run in Chromium (both projects here).

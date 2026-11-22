@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { app } from "../../app.config.ts";
+import { app } from "../../../app.config.ts";
 
 // PLAN T-10 (app-shell → legal-pages §1): Terms, Privacy, AI notice, Legal notice and Support open as
 // dialogs from the menu and the footer with the keyboard, open by deep link, and exist as standalone

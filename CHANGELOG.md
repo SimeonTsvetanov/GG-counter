@@ -4,6 +4,18 @@ All notable user-facing changes. Format: Keep a Changelog · SemVer.
 
 ## [Unreleased]
 
+## [1.2.4] - 2026-11-22
+
+### Changed
+- GG Counter looks and works the same. Behind the scenes the score screen is now a building block that
+  can also run inside Quizzard, so the same score keeper can be part of a bigger game-night app.
+- The score history window and the windows that ask what to remove or clear load their content the
+  first time you open them, so the app has a little less to load at start. You will not see a difference.
+
+### Changed (repository only)
+- The end-to-end tests are split into the score screen's flows (`tests/e2e/miniapp`, which Quizzard
+  also runs behind `#/scores`) and the standalone page's (`tests/e2e/shell`).
+
 ## [1.2.3] - 2026-11-20
 
 ### Fixed

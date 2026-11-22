@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { app } from "../../app.config.ts";
+import { app } from "../../../app.config.ts";
 
 // PLAN T-06: the page text generated from app.config.ts exists before JavaScript runs (crawlers,
 // seo-geo §4) and stays visible to people after load, below the tool, with exactly one h1.

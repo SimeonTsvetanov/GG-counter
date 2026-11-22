@@ -71,7 +71,7 @@ function pagesNotFound(base: string): Plugin {
   };
 }
 
-/** Cookie with which an e2e test asks `vite preview` for the next deploy's sw.js (tests/e2e/pwa.spec.ts). */
+/** Cookie with which an e2e test asks `vite preview` for the next deploy's sw.js (tests/e2e/shell/pwa.spec.ts). */
 const NEXT_DEPLOY_COOKIE = /(?:^|;\s*)e2e-next-deploy=(\w+)/;
 
 /**

@@ -1,18 +1,16 @@
 import { readFile } from "node:fs/promises";
 import { expect, test, type Page } from "@playwright/test";
-import { app } from "../../app.config.ts";
-import { NEW_STATE_KEY, V1_STATE, V1_STATE_READ } from "../../packages/core/test/fixtures/saved-state";
+import { app } from "../../../app.config.ts";
+import { NEW_STATE_KEY, V1_STATE, V1_STATE_READ } from "../../../packages/core/test/fixtures/saved-state";
+import { seedStorage } from "../support/entry.ts";
 
 // PLAN T-08: the app shell — menu (keyboard), Settings (theme, export → clear → import), Help, What's
-// new, About, Report a problem, the limit messages and the error screen. Desktop + phone.
+// new, About, Report a problem and the error screen. Desktop + phone. The limit messages are the
+// screen's: tests/e2e/miniapp/limits.spec.ts.
 
 /** Opens the app with `entries` in localStorage (seeded once per test, not on reload). */
 async function openWith(page: Page, entries: Record<string, string> = {}) {
-  await page.addInitScript((items) => {
-    if (sessionStorage.getItem("seeded")) return;
-    sessionStorage.setItem("seeded", "1");
-    for (const [key, value] of Object.entries(items)) localStorage.setItem(key, value);
-  }, entries);
+  await seedStorage(page, entries);
   await page.goto("./");
 }
 
@@ -26,11 +24,6 @@ const ownKeys = (page: Page) => page.evaluate(() => Object.keys(localStorage).fi
 async function openFromMenu(page: Page, item: string) {
   await menuButton(page).click();
   await page.getByRole("menuitem", { name: item }).click();
-}
-
-/** A game with one player at `score`. */
-function oneScore(score: number) {
-  return { players: [{ id: "p1", name: "Ana", score, createdAt: "2026-11-19T10:00:00.000Z" }], lastUpdated: "2026-11-19T10:00:00.000Z", version: 1 };
 }
 
 test("the menu opens and closes with the keyboard and focus comes back to its button", async ({ page }) => {
@@ -179,43 +172,6 @@ test("a deep link #settings opens Settings and the footer version opens What's n
   await expect(page.getByRole("contentinfo")).toContainText(`© ${String(new Date().getFullYear())} ${app.author.name}`);
   await page.getByRole("contentinfo").getByRole("button", { name: `Version ${app.version}` }).click();
   await expect(page.getByRole("dialog", { name: "What's new" })).toBeVisible();
-});
-
-test("limit messages: name too long, 50 players, score out of range — each says why", async ({ page }) => {
-  const fifty = { players: Array.from({ length: 50 }, (_, index) => ({ id: `p${String(index)}`, name: `P${String(index)}`, score: 0, createdAt: "2026-11-19T10:00:00.000Z" })), lastUpdated: "2026-11-19T10:00:00.000Z", version: 1 };
-  await openWith(page, { [NEW_STATE_KEY]: JSON.stringify(fifty) });
-  await page.getByRole("textbox", { name: "Player name", exact: true }).fill("Dana");
-  await page.getByRole("button", { name: "Add", exact: true }).click();
-  await expect(page.getByText("A game can have up to 50 players. Remove a player to add another.")).toBeVisible();
-  await expect(playerNames(page)).toHaveCount(50);
-
-  await page.evaluate(([key, value]) => { localStorage.setItem(key, value); }, [NEW_STATE_KEY, JSON.stringify(oneScore(999_999))] as const);
-  await page.reload();
-  const tooLong = "A".repeat(41);
-  await page.getByRole("textbox", { name: "Player name", exact: true }).fill(tooLong);
-  await page.getByRole("button", { name: "Add", exact: true }).click();
-  await expect(page.getByRole("alert").filter({ hasText: "Names can be up to 40 characters" })).toBeVisible();
-  await expect(page.getByRole("textbox", { name: "Player name", exact: true })).toHaveAttribute("aria-invalid", "true");
-
-  // The rename field has the same 40-character limit (it was 32 before T-08).
-  const rename = page.getByRole("textbox", { name: "Player name for Ana" });
-  await rename.fill("B".repeat(40));
-  await rename.press("Enter");
-  await expect(page.getByRole("textbox", { name: `Player name for ${"B".repeat(40)}` })).toBeVisible();
-  const renamed = page.getByRole("textbox", { name: `Player name for ${"B".repeat(40)}` });
-  await renamed.fill(tooLong);
-  await renamed.press("Enter");
-  await expect(page.getByRole("alert").filter({ hasText: "Names can be up to 40 characters" })).toHaveCount(2);
-
-  await page.getByRole("button", { name: /^Increase score for / }).click();
-  await expect(page.getByRole("alert").filter({ hasText: "Scores go from -999,999 to 999,999." })).toBeVisible();
-  await page.getByRole("button", { name: /^Adjust score for / }).click();
-  const dialog = page.getByRole("dialog", { name: "Adjust score" });
-  await dialog.getByRole("spinbutton").fill("5");
-  await dialog.getByRole("button", { name: "Apply" }).click();
-  await expect(dialog.getByRole("alert")).toHaveText(/Scores go from -999,999 to 999,999/);
-  await page.keyboard.press("Escape");
-  await expect(page.getByRole("button", { name: /^Adjust score for / })).toHaveText("999999");
 });
 
 test("an unexpected error shows the error screen, never a blank page", async ({ page }) => {
