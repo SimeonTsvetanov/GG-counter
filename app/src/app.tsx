@@ -1,25 +1,26 @@
 // The GG Counter main screen — the composition root: it owns the game state and the dialog state
-// shared between the header, the player cards and the leaderboard card, and places the app shell
-// (menu, shell dialogs, footer, toasts — app/src/ui, PLAN T-08) around them.
-import { useRef, useState } from "react";
+// shared between the header buttons, the player cards and the leaderboard card, and places the app shell
+// (header frame, menu, shell dialogs, footer, toasts — app/src/ui, PLAN T-08) around them. The game
+// screen takes language, toasts, sharing, its header slot and its root only from the host (host.ts).
+import { useLayoutEffect, useRef, useState } from "react";
 import { StatusBanner } from "./components/status-banner";
 import { useGameState } from "./hooks/use-game-state";
 import { useInView } from "./hooks/use-in-view";
 import { usePageInfo } from "./hooks/use-page-info";
 import { LeaderboardCard } from "./leaderboard/leaderboard-card";
+import { trackKeyboardInset } from "./lib/keyboard-inset";
 import { CARD_WIDTH_CLASS, CONTAINER_CLASS } from "./lib/layout";
 import { PlayersSection } from "./players/players-section";
-import type { SessionActions } from "./session/action-bar";
+import { ActionBar, type SessionActions } from "./session/action-bar";
 import { AppHeader } from "./session/app-header";
 import { ClearSessionDialog, type ClearScope } from "./session/clear-session-dialog";
 import { shareLeaderboard } from "./share/share-leaderboard";
+import { useHost, useHostLanguage } from "./providers/host-provider";
 import { useTheme } from "./providers/theme-provider";
 import { applyLanguage, t } from "./i18n";
-import { useLanguage } from "./i18n/use-language";
 import { AppFooter } from "./ui/app-footer";
 import { CrashTestHook } from "./ui/error-boundary";
 import { ShellDialogs } from "./ui/shell-dialogs";
-import { useToast } from "./ui/toast";
 import { useAppShell } from "./ui/use-app-shell";
 
 /** Share of the leaderboard card that must be on screen for the full header layout. */
@@ -30,11 +31,11 @@ const AT_TOP_THRESHOLD = 0;
 /** The whole GG Counter screen: players, scores, leaderboard, share, install banner, how it works and FAQ. */
 export function App(): React.JSX.Element {
   // Re-renders the whole screen (every t() call in it) when the language changes in Settings.
-  const lang = useLanguage();
+  const lang = useHostLanguage();
+  const host = useHost();
   const game = useGameState();
   const shell = useAppShell();
   const { setTheme } = useTheme();
-  const showToast = useToast();
   const [isLeaderboardDialogOpen, setIsLeaderboardDialogOpen] = useState(false);
   // The one Clear session alert: which option it opens with, or null while it is closed.
   const [clearRequest, setClearRequest] = useState<ClearScope | null>(null);
@@ -47,12 +48,14 @@ export function App(): React.JSX.Element {
   const isAtTop = useInView(topSentinelRef, AT_TOP_THRESHOLD);
   const pageInfoSlotRef = useRef<HTMLDivElement>(null);
   usePageInfo(pageInfoSlotRef, lang);
+  // Bottom sheets stay above the on-screen keyboard (iOS Safari needs the measured inset).
+  useLayoutEffect(() => trackKeyboardInset({ style: host.root.style }), [host]);
 
   const handleShare = () => {
-    void shareLeaderboard(game.state.players).then((outcome) => {
+    void shareLeaderboard(game.state.players, host.share).then((outcome) => {
       if (outcome === "shared" || outcome === "copied") setIsLeaderboardDialogOpen(false);
-      if (outcome === "copied") showToast({ message: t("app.copiedSummary") });
-      if (outcome === "failed") showToast({ message: t("app.shareFailed") });
+      if (outcome === "copied") host.toast(t("app.copiedSummary"));
+      if (outcome === "failed") host.toast(t("app.shareFailed"));
     });
   };
 
@@ -71,13 +74,16 @@ export function App(): React.JSX.Element {
         <AppHeader
           isLeaderboardInView={isLeaderboardInView}
           isScrolled={!isAtTop}
+          menu={{ runItem: shell.runItem, isInstalled: shell.install.isInstalled, canInstall: shell.install.canInstall }}
+        />
+        <ActionBar
+          variant={isLeaderboardInView ? "ghost" : "outline"}
           leaderboard={{
             open: isLeaderboardDialogOpen,
             onOpenChange: setIsLeaderboardDialogOpen,
             players: game.ranking.players,
           }}
           actions={actions}
-          menu={{ runItem: shell.runItem, isInstalled: shell.install.isInstalled, canInstall: shell.install.canInstall }}
         />
 
         <StatusBanner install={shell.install} />

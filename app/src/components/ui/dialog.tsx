@@ -3,6 +3,7 @@
 // sheet is a column: head and actions stay in view, DialogBody scrolls (ui-patterns §4).
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { cn } from "../../lib/utils";
+import { usePortalContainer } from "./portal-container";
 import { forwardRef } from "react";
 
 const Dialog = DialogPrimitive.Root;
@@ -22,7 +23,7 @@ const DialogContent = forwardRef<
   React.ComponentRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
 >(({ className, children, ...props }, ref) => (
-  <DialogPortal>
+  <DialogPortal container={usePortalContainer()}>
     <DialogOverlay />
     <DialogPrimitive.Content ref={ref} className={cn("sheet", className)} {...props}>
       {children}

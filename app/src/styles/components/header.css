@@ -84,6 +84,12 @@
     align-items: center;
   }
 
+  /* The host's slot for the game screen's buttons (app/src/host.ts) and its outlet: no box of their own,
+     so the buttons are flex items of the row like the header's own (and nothing changes for assistive tech). */
+  .header-slot {
+    display: contents;
+  }
+
   /* Compact layout: the actions spread over the whole row, the logo button first. */
   .header-actions--compact {
     flex: 1;

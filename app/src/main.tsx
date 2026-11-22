@@ -2,8 +2,8 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./app";
 import { initI18n } from "./i18n";
-import { trackKeyboardInset } from "./lib/keyboard-inset";
 import "./styles/app.css";
+import { StandaloneHostProvider } from "./providers/standalone-host-provider";
 import { ThemeProvider } from "./providers/theme-provider";
 import { migrateLegacyStorage } from "./storage/migrate";
 import { ErrorBoundary } from "./ui/error-boundary";
@@ -17,8 +17,6 @@ if (!rootElement) {
 
 // Before the first render, so the game and theme are read from the namespaced keys (PLAN T-07).
 migrateLegacyStorage();
-// Bottom sheets stay above the on-screen keyboard (iOS Safari needs the measured inset).
-trackKeyboardInset();
 
 /** Renders the app into #root. */
 function render(root: HTMLElement): void {
@@ -28,7 +26,10 @@ function render(root: HTMLElement): void {
       <ErrorBoundary>
         <ThemeProvider defaultTheme="system">
           <ToastProvider>
-            <App />
+            {/* The page hosts the game screen (host.ts); App places the screen inside the shell. */}
+            <StandaloneHostProvider>
+              <App />
+            </StandaloneHostProvider>
           </ToastProvider>
         </ThemeProvider>
       </ErrorBoundary>

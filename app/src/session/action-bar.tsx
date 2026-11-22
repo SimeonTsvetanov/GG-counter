@@ -1,14 +1,14 @@
-// The header's actions (Leaderboard, Add player, Share, Clear session, Theme, Menu). One component for
-// both header layouts; they differ only in the button style and an optional leading button. The theme
-// button is shown from 600 px up (header.css); on phones the theme is in Menu → Settings (app-shell §2,
-// DECISIONS 2026-11-19), so the phone header keeps the same number of buttons as before.
+// The session's header buttons (Leaderboard, Add player, Clear session) — part of the game screen. They
+// render through a portal into the host's header slot (`Host.headerActions`, host.ts), so the host owns
+// the header and the screen only fills its slot; the standalone header places the slot between its
+// logo button and its Theme and Menu buttons (app-header.tsx), the same order as before the seam.
 import type { Player } from "gg-counter-core";
 import { Plus, RefreshCw, Trophy } from "lucide-react";
+import { createPortal } from "react-dom";
 import { Button } from "../components/ui/button";
 import { t } from "../i18n";
 import { LeaderboardDialog } from "../leaderboard/leaderboard-dialog";
-import type { AppMenuProps } from "../ui/app-menu";
-import { HeaderAppMenu, HeaderThemeMenu } from "../ui/header-menus";
+import { useHost } from "../providers/host-provider";
 
 /** What the session actions do; the main screen owns the state behind them. */
 export interface SessionActions {
@@ -23,32 +23,18 @@ export interface SessionActions {
 
 /** Props of {@link ActionBar}. */
 export interface ActionBarProps {
-  /** Button style: plain next to the title, on the fill colour in the compact layout. */
+  /** Button style: plain next to the title, on the fill colour in the compact header layout. */
   variant: "ghost" | "outline";
-  /** Layout classes of the bar itself. */
-  className: string;
-  /** State of the Leaderboard dialog, shared by both header layouts. */
+  /** State of the Leaderboard dialog. */
   leaderboard: { open: boolean; onOpenChange: (open: boolean) => void; players: readonly Player[] };
   actions: SessionActions;
-  /** The app menu at the end of the bar (its button takes the bar's style). */
-  menu: Omit<AppMenuProps, "variant">;
-  /** Optional button placed before the actions. */
-  children?: React.ReactNode;
 }
 
-/** Renders the row of icon buttons for the current session. */
-export function ActionBar({
-  variant,
-  className,
-  leaderboard,
-  actions,
-  menu,
-  children,
-}: ActionBarProps): React.JSX.Element {
-  return (
-    <div className={className}>
-      {children}
-
+/** Renders the session's icon buttons into the host's header slot. */
+export function ActionBar({ variant, leaderboard, actions }: ActionBarProps): React.ReactPortal {
+  const { headerActions } = useHost();
+  return createPortal(
+    <>
       <LeaderboardDialog
         {...leaderboard}
         onShare={actions.onShare}
@@ -77,9 +63,7 @@ export function ActionBar({
       >
         <RefreshCw aria-hidden />
       </Button>
-
-      <HeaderThemeMenu className="header-theme" />
-      <HeaderAppMenu {...menu} variant={variant} />
-    </div>
+    </>,
+    headerActions,
   );
 }

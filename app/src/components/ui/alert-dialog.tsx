@@ -4,6 +4,7 @@
 // focuses Cancel first (accessibility §4).
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import { cn } from "../../lib/utils";
+import { usePortalContainer } from "./portal-container";
 import { forwardRef } from "react";
 
 const AlertDialog = AlertDialogPrimitive.Root;
@@ -25,7 +26,7 @@ const AlertDialogContent = forwardRef<
   React.ComponentRef<typeof AlertDialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Content>
 >(({ className, ...props }, ref) => (
-  <AlertDialogPortal>
+  <AlertDialogPortal container={usePortalContainer()}>
     <AlertDialogOverlay />
     <AlertDialogPrimitive.Content
       ref={ref}
