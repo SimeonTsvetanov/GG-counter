@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { NEW_STATE_KEY, V1_STATE } from "../../../packages/core/test/fixtures/saved-state";
 import { openApp, reloadApp } from "../support/entry.ts";
-import { savedLanguage } from "../support/host.ts";
+import { attribution, savedLanguage } from "../support/host.ts";
 
 // PLAN T-09: the game screen in Bulgarian — the T-01 flows, the share text and the limit messages with
 // Bulgarian labels and number grouping, in a Bulgarian browser (locale bg-BG). How the language is chosen
@@ -78,7 +78,7 @@ test("leaderboard, share text and clear session — in Bulgarian", async ({ page
   const text = await page.waitForFunction(() => (window as unknown as { shared?: string }).shared).then((handle) => handle.jsonValue());
   const lines = String(text).split("\n");
   // 1.2 (SPEC F21): the new text in Bulgarian words; the attribution with the app link stays English.
-  expect(lines[0]).toBe("🏆 GG Counter — Класиране");
+  expect(lines[0]).toBe(`🏆 ${attribution().name} — Класиране`);
   expect(lines[1]).toMatch(/^📅 \d{1,2}\.\d{2}\.\d{4}/);
   expect(lines.slice(2)).toEqual([
     "",
@@ -89,7 +89,7 @@ test("leaderboard, share text and clear session — in Bulgarian", async ({ page
     "👑 Победител: Ana — 34 точки",
     "👥 3 играчи · общо 58 точки",
     "",
-    "— Made with GG Counter · https://simeontsvetanov.github.io/GG-counter/",
+    `— Made with ${attribution().name} · ${attribution().url}`,
   ]);
 
   await page.getByRole("button", { name: "Изчисти сесията" }).first().click();

@@ -4,11 +4,14 @@
 // every language
 // (app-shell → i18n §2: values sent out of the app stay English).
 import { formatScore, type LeaderboardTextLabels } from "gg-counter-core";
-import { STANDALONE_NAME, STANDALONE_URL } from "../meta";
+import { getAttribution } from "./attribution";
 import { getLanguage, t } from "../i18n";
 
-/** The last line of every shared text (app-shell §8). */
-export const ATTRIBUTION = `— Made with ${STANDALONE_NAME} · ${STANDALONE_URL}`;
+/** Returns the last line of every shared text (app-shell §8): the app the screen runs in and its address. */
+export function attributionLine(): string {
+  const { name, url } = getAttribution();
+  return `— Made with ${name} · ${url}`;
+}
 
 /** Returns "34 points" / "34 точки" with a true minus sign for negative scores. */
 function points(score: number): string {
@@ -19,11 +22,11 @@ function points(score: number): string {
 export function leaderboardLabels(): LeaderboardTextLabels {
   const list = new Intl.ListFormat(getLanguage(), { type: "conjunction" });
   return {
-    title: t("app.share.title", { name: STANDALONE_NAME }),
+    title: t("app.share.title", { name: getAttribution().name }),
     winners: (names, score) => t("app.share.winner", { count: names.length, names: list.format(names), points: points(score) }),
     tie: (score) => t("app.share.tie", { points: points(score) }),
     summary: (count, total) => t("app.share.summary", { players: t("app.share.players", { count }), points: points(total) }),
-    attribution: ATTRIBUTION,
+    attribution: attributionLine(),
   };
 }
 

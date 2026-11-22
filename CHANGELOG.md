@@ -4,6 +4,12 @@ All notable user-facing changes. Format: Keep a Changelog · SemVer.
 
 ## [Unreleased]
 
+## [1.2.5] - 2026-11-22
+
+### Changed
+- A shared leaderboard can now name the app it was made in (for use inside Quizzard). Here it still says
+  GG Counter.
+
 ## [1.2.4] - 2026-11-22
 
 ### Changed

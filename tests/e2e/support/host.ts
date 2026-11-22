@@ -10,6 +10,8 @@ export type ScreenLanguage = "en" | "bg";
 
 /** Where a host keeps what the screen uses outside its root. */
 interface HostUi {
+  /** The app shared text names (its title line and last line) and its address. */
+  readonly attribution: { readonly name: string; readonly url: string };
   /** The element the screen is mounted on (its blocks; Quizzard: also its overlays). */
   readonly root: (page: Page) => Locator;
   /** Where the screen's header buttons are (contract `slots.headerActions`). */
@@ -28,6 +30,7 @@ interface HostUi {
 
 /** This repo's page (app/src): the screen is its `<main>`, overlays and toasts go to `<body>`. */
 const STANDALONE: HostUi = {
+  attribution: { name: "GG Counter", url: "https://simeontsvetanov.github.io/GG-counter/" },
   // The element, not the role: an open Radix modal hides `<main>` from the accessibility tree.
   root: (page) => page.locator("main"),
   // The whole page header, as the 1.2.1 check ("the header has no Share button") always looked at it.
@@ -48,6 +51,8 @@ const STANDALONE: HostUi = {
  * is `[data-header-slot="scores"]`; without a share sheet `shareText` opens its WhatsApp + Copy sheet.
  */
 const QUIZZARD: HostUi = {
+  // Quizzard names itself in shared text (it passes `attribution-name` / `attribution-url` to the screen).
+  attribution: { name: "Quizzard", url: "https://simeontsvetanov.github.io/Quizzard/" },
   root: (page) => page.locator('[data-miniapp="scores"]'),
   headerActions: (page) => page.locator('[data-header-slot="scores"]'),
   stickyHeader: (page) => page.locator("[data-header]"),
@@ -126,4 +131,9 @@ export function savedLanguage(lang: ScreenLanguage): Record<string, string> {
 /** True for a localStorage key the host writes for itself. */
 export function isHostKey(key: string): boolean {
   return hostUi().isHostKey(key);
+}
+
+/** Returns the app name and address the host puts in shared text. */
+export function attribution(): HostUi["attribution"] {
+  return hostUi().attribution;
 }

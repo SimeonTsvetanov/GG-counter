@@ -1,6 +1,6 @@
 {
   "name": "gg-counter-core",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "private": true,
   "description": "GG Counter's pure score logic (players, scores, ranking, share text, saved-state reading). No DOM, no I/O.",
   "type": "module",

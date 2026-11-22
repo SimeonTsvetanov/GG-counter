@@ -5,7 +5,7 @@
 import { formatLeaderboard, type Player } from "gg-counter-core";
 import type { Host, ShareOutcome } from "../host";
 import { t } from "../i18n";
-import { STANDALONE_NAME } from "../meta";
+import { getAttribution } from "./attribution";
 import { leaderboardLabels, shareDate } from "./share-text";
 
 /** Returns the share text of `players` at `date` in the active language. */
@@ -22,5 +22,5 @@ export function leaderboardText(players: readonly Player[], date: Date): string 
  */
 export function shareLeaderboard(players: readonly Player[], share: Host["share"]): Promise<ShareOutcome> {
   if (players.length === 0) return Promise.resolve("failed");
-  return share({ title: t("app.shareTitle", { name: STANDALONE_NAME }), text: leaderboardText(players, new Date()) });
+  return share({ title: t("app.shareTitle", { name: getAttribution().name }), text: leaderboardText(players, new Date()) });
 }

@@ -4,6 +4,7 @@ import fc from "fast-check";
 import { afterEach, describe, expect, it } from "vitest";
 import { englishLeaderboardLabels, formatLeaderboard, type Player } from "gg-counter-core";
 import { STANDALONE_URL } from "../../src/meta.ts";
+import { parseAttribution, setAttribution } from "../../src/share/attribution.ts";
 import { applyLanguage } from "../../src/i18n/index.ts";
 import { leaderboardLabels, shareDate } from "../../src/share/share-text.ts";
 
@@ -63,5 +64,27 @@ describe("share text", () => {
     expect(shareDate(date)).toBe(date.toLocaleString(undefined, style));
     await applyLanguage("bg");
     expect(shareDate(date)).toBe(date.toLocaleString("bg", style));
+  });
+});
+
+describe("attribution from the host", () => {
+  afterEach(() => { setAttribution(null); });
+  it("names the host in the title and the last line when the host sets both parameters", () => {
+    setAttribution(parseAttribution(new URLSearchParams("attribution-name=Quizzard&attribution-url=https://simeontsvetanov.github.io/Quizzard/")));
+    const labels = leaderboardLabels();
+    expect(labels.title).toContain("Quizzard");
+    expect(labels.attribution).toBe("— Made with Quizzard · https://simeontsvetanov.github.io/Quizzard/");
+  });
+  it.each([
+    ["no parameters", ""],
+    ["only a name", "attribution-name=Quizzard"],
+    ["http address", "attribution-name=Quizzard&attribution-url=http://example.com/"],
+    ["credentials", "attribution-name=Quizzard&attribution-url=https://a:b@example.com/"],
+    ["script as a name", "attribution-name=<script>&attribution-url=https://example.com/"],
+    ["no domain", "attribution-name=Quizzard&attribution-url=https://localhost/"],
+  ])("keeps GG Counter for %s", (_, query) => {
+    expect(parseAttribution(new URLSearchParams(query))).toBeNull();
+    setAttribution(parseAttribution(new URLSearchParams(query)));
+    expect(leaderboardLabels().attribution).toBe(`— Made with GG Counter · ${STANDALONE_URL}`);
   });
 });

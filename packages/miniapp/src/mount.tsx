@@ -13,6 +13,7 @@ import type { PlaceScreen } from "./placement.ts";
 import { HostProvider } from "./providers/host-provider";
 import { ScoresScreen } from "./screen";
 import { migrateLegacyStorage } from "./storage/migrate";
+import { parseAttribution, setAttribution } from "./share/attribution";
 
 /** Root options: a render error goes to the standalone page's error screen when it asked for it. */
 function rootOptions(onCrash: ((error: unknown) => void) | undefined): RootOptions {
@@ -22,6 +23,7 @@ function rootOptions(onCrash: ((error: unknown) => void) | undefined): RootOptio
 /** Renders the screen into `element` now; the texts are already in the host's language. */
 function render(element: HTMLElement, context: MiniAppContext, texts: ScreenTexts, place: PlaceScreen): Unmount {
   const placement = place(element, context);
+  setAttribution(parseAttribution(context.query)); // a host (Quizzard) names itself in shared text
   const options = standaloneOptions(element);
   const stopLanguage = context.language.subscribe((lang) => { void texts.setLanguage(lang); });
   const host = createHost(context, { language: screenLanguage, portalContainer: placement.overlays, root: placement.root });
@@ -34,6 +36,7 @@ function render(element: HTMLElement, context: MiniAppContext, texts: ScreenText
     </StrictMode>
   );
   return () => {
+    setAttribution(null);
     root.unmount();
     stopLanguage();
     placement.remove();

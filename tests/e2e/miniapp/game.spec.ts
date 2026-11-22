@@ -1,7 +1,7 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { DIRTY_STATE, MIGRATED_KEY, NEW_STATE_KEY, NEW_THEME_KEY, NULL_ENTRY_STATE, STATE_KEY, V0_STATE, V1_STATE } from "../../../packages/core/test/fixtures/saved-state";
 import { openApp, reloadApp } from "../support/entry.ts";
-import { copyWithoutShareSheet, headerActions, toasts } from "../support/host.ts";
+import { attribution, copyWithoutShareSheet, headerActions, toasts } from "../support/host.ts";
 
 // Characterization tests: they describe what GG Counter did before the forge migration
 // (docs/SPEC.md AC1–AC7) and must stay green through every migration step. They seed the pre-forge
@@ -85,7 +85,6 @@ test("AC4: the leaderboard is sorted by score with medals and totals", async ({ 
 // 1.2 (SPEC F21, DECISIONS 2026-11-20): Moni asked for a nicer text with the app link, so the pre-forge format
 // of AC5 changed on purpose. Every leaderboard Share (card, dialog) hands the same text to Web Share,
 // without `url` — the link is the text's last line, and apps that append `url` would print it twice.
-const APP_URL = "https://simeontsvetanov.github.io/GG-counter/";
 
 /** Records what the page hands to `navigator.share`. */
 async function recordShares(page: Page) {
@@ -116,10 +115,10 @@ test("AC5: every leaderboard Share sends the 1.2 text with the app link once, wi
   for (const [index, open] of openers.entries()) {
     await open();
     const data = await lastShare(page, index + 1);
-    expect(data?.title).toBe("GG Counter session");
+    expect(data?.title).toBe(`${attribution().name} session`);
     expect(data?.url).toBeUndefined();
     const lines = String(data?.text).split("\n");
-    expect(lines[0]).toBe("🏆 GG Counter — Leaderboard");
+    expect(lines[0]).toBe(`🏆 ${attribution().name} — Leaderboard`);
     expect(lines[1]).toMatch(/^📅 \S/);
     expect(lines.slice(2)).toEqual([
       "",
@@ -130,9 +129,9 @@ test("AC5: every leaderboard Share sends the 1.2 text with the app link once, wi
       "👑 Winner: Ana — 34 points",
       "👥 3 players · 58 points in total",
       "",
-      `— Made with GG Counter · ${APP_URL}`,
+      `— Made with ${attribution().name} · ${attribution().url}`,
     ]);
-    expect(String(data?.text).split(APP_URL)).toHaveLength(2);
+    expect(String(data?.text).split(attribution().url)).toHaveLength(2);
   }
 });
 
@@ -149,7 +148,7 @@ test("AC5: without Web Share the same text is copied and a toast says so; a canc
   await expect(toasts(page).getByText("Leaderboard copied ✓")).toBeVisible();
   const copied = await page.evaluate(() => (window as unknown as { copied: string[] }).copied);
   expect(copied).toHaveLength(1);
-  expect(copied[0]?.split("\n").at(-1)).toBe(`— Made with GG Counter · ${APP_URL}`);
+  expect(copied[0]?.split("\n").at(-1)).toBe(`— Made with ${attribution().name} · ${attribution().url}`);
 
   // The user closes the share sheet: nothing is copied, no toast.
   await page.evaluate(() => {
