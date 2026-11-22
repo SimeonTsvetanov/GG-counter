@@ -110,11 +110,13 @@ test("a player's name field focused under the keyboard moves above it", async ({
   }
   const visible = await openKeyboard(page, KEYBOARD);
   const rename = page.getByRole("textbox", { name: "Player name for Fia" });
-  // Put the card's name field just under the keyboard's top, then focus it without the browser's own scrolling.
+  // Put the card's name field just under the keyboard's top, then tap it as a user would. The field is
+  // inside the real viewport (the keyboard is simulated), so the tap itself scrolls nothing. A script
+  // focus() is not used: mobile WebKit ignores it without a user gesture (CI 2026-11-22).
   await rename.evaluate((element, top) => {
     window.scrollBy({ top: element.getBoundingClientRect().top - top, behavior: "instant" });
-    (element as HTMLInputElement).focus({ preventScroll: true });
   }, visible + 20);
+  await rename.click();
   await expectOnScreen(page, [rename], visible);
 });
 
