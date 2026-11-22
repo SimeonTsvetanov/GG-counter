@@ -3,7 +3,7 @@
 // (tests/e2e/miniapp) find it only here: ONE place to adapt per host. The host comes from the
 // Playwright project's `metadata.host` (Quizzard's `scores*` projects, PLAN T-13), else `E2E_HOST`,
 // else "standalone".
-import { test, type Locator, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 /** A language the screen translates (contract `Lang`). */
 export type ScreenLanguage = "en" | "bg";
@@ -52,7 +52,13 @@ const QUIZZARD: HostUi = {
   headerActions: (page) => page.locator('[data-header-slot="scores"]'),
   stickyHeader: (page) => page.locator("[data-header]"),
   toasts: (page) => page.locator("[data-toasts]"),
-  copyWithoutShareSheet: (page) => page.locator('dialog[data-dialog="share"]').getByRole("button", { name: "Copy" }).click(),
+  // Quizzard's sheet stays open after Copy (its own shell behaviour): close it, or it covers the next tap.
+  copyWithoutShareSheet: async (page) => {
+    const sheet = page.locator('dialog[data-dialog="share"]');
+    await sheet.getByRole("button", { name: "Copy" }).click();
+    await sheet.getByRole("button", { name: "Close" }).click();
+    await expect(sheet).toBeHidden();
+  },
   savedLanguage: (lang) => ({ "quizzard:v1:lang": JSON.stringify(lang) }),
   isHostKey: (key) => key.startsWith("quizzard:v1:"),
 };
